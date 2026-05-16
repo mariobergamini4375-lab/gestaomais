@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>GestãoMais — Mais controle, mais resultado!</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --surface: #111520;
+      --surface2: #161c2e;
+      --border: #1e2740;
+      --accent: #3b82f6;
+      --accent2: #8b5cf6;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --pink: #ec4899;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #475569;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      --glow: 0 0 30px rgba(59, 130, 246, 0.15);
+    }
+
+    body.light-mode {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --surface2: #f8f9fa;
+      --border: #e0e0e0;
+      --accent: #3b82f6;
+      --accent2: #8b5cf6;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --pink: #ec4899;
+      --text: #1a1a2e;
+      --text2: #4a5568;
+      --text3: #718096;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+      --glow: 0 0 30px rgba(59, 130, 246, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Syne', sans-serif;
+    }
+
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, .12) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 20%, rgba(139, 92, 246, .1) 0%, transparent 60%), var(--bg);
+      padding: 1rem;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: var(--shadow), var(--glow);
+      animation: fadeUp .5s ease;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-logo .brand {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .login-logo .brand span {
+      color: var(--accent);
+    }
+
+    .login-logo p {
+      color: var(--text2);
+      font-size: .85rem;
+      margin-top: .25rem;
+    }
+
+    .login-card label {
+      display: block;
+      font-size: .75rem;
+      color: var(--text2);
+      margin-bottom: .4rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: .7rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .9rem;
+      outline: none;
+      margin-bottom: 1rem;
+    }
+
+    .login-card input:focus {
+      border-color: var(--accent);
+    }
+
+    .login-error {
+      color: var(--red);
+      font-size: .8rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: .7rem 1rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      white-space: nowrap;
+      min-height: 44px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-red {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .3);
+    }
+
+    .btn-pink {
+      background: var(--pink);
+      color: #fff;
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .btn-whatsapp:hover {
+      background: #1da851;
+    }
+
+    .btn-sm {
+      padding: .5rem .75rem;
+      font-size: .75rem;
+      min-height: 36px;
+    }
+
+    #app {
+      display: none;
+    }
+
+    .layout {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      min-height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      transition: transform .3s ease;
+      transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-logo {
+      padding: 1.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo .brand {
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .sidebar-logo .brand span {
+      color: var(--accent);
+    }
+
+    .sidebar-logo small {
+      color: var(--text3);
+      font-size: .65rem;
+    }
+
+    .nav-section {
+      padding: 0.8rem;
+    }
+
+    .nav-section-title {
+      font-size: .65rem;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: .5rem;
+      padding-left: .5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .7rem .75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: .9rem;
+      font-weight: 500;
+      transition: all .15s;
+      margin-bottom: .15rem;
+      min-height: 44px;
+    }
+
+    .nav-item:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: rgba(59, 130, 246, .15);
+      color: var(--accent);
+    }
+
+    .nav-item .icon {
+      width: 24px;
+      font-size: 1.1rem;
+    }
+
+    .nav-submenu {
+      margin-left: 2rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .nav-subitem {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .6rem .75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: .85rem;
+      font-weight: 500;
+      transition: all .15s;
+      min-height: 40px;
+    }
+
+    .nav-subitem:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: .7rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: .85rem;
+      min-height: 44px;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .main {
+      margin-left: 0;
+      flex: 1;
+      width: 100%;
+    }
+
+    .topbar {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .clock {
+      font-family: 'DM Sans', monospace;
+      font-size: 0.85rem;
+      background: var(--surface2);
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.3;
+    }
+
+    .clock-time {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .clock-date {
+      font-size: 0.65rem;
+      color: var(--text2);
+    }
+
+    .theme-toggle {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .burger {
+      display: block;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .overlay-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      z-index: 99;
+      display: none;
+    }
+
+    .overlay-bg.open {
+      display: block;
+    }
+
+    .content {
+      padding: 1rem;
+    }
+
+    .page {
+      display: none;
+      animation: fadeUp .3s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .stat-card.yellow::before {
+      background: var(--yellow);
+    }
+
+    .stat-card.red::before {
+      background: var(--red);
+    }
+
+    .stat-card.pink::before {
+      background: var(--pink);
+    }
+
+    .stat-label {
+      font-size: .75rem;
+      color: var(--text2);
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .stat-cobrancas {
+      margin-top: 0.8rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .cobranca-item {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 0.8rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .cobranca-info {
+      flex: 1;
+    }
+
+    .cobranca-nome {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .cobranca-valor {
+      font-size: 0.85rem;
+      color: var(--yellow);
+      font-weight: 600;
+    }
+
+    .cobranca-vencimento {
+      font-size: 0.7rem;
+      color: var(--text3);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .section-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 600px;
+      border-collapse: collapse;
+      font-size: .8rem;
+    }
+
+    thead th {
+      background: var(--surface2);
+      padding: .6rem .8rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .7rem;
+      text-transform: uppercase;
+      color: var(--text2);
+    }
+
+    tbody tr {
+      border-top: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: .6rem .8rem;
+    }
+
+    .td-actions {
+      display: flex;
+      gap: .3rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: .15rem .5rem;
+      border-radius: 20px;
+      font-size: .7rem;
+      font-weight: 600;
+    }
+
+    .badge-pendente {
+      background: rgba(245, 158, 11, .15);
+      color: var(--yellow);
+    }
+
+    .badge-pago {
+      background: rgba(16, 185, 129, .15);
+      color: var(--green);
+    }
+
+    .badge-atrasado {
+      background: rgba(239, 68, 68, .15);
+      color: var(--red);
+    }
+
+    .search-row {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: .6rem .8rem .6rem 2rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .85rem;
+    }
+
+    .search-box .search-icon {
+      position: absolute;
+      left: .7rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      font-size: 0.8rem;
+    }
+
+    .filter-select {
+      padding: .6rem .8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .8rem;
+    }
+
+    .date-filter {
+      padding: .6rem .8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .8rem;
+    }
+
+    .form-group {
+      margin-bottom: 0.8rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: .3rem;
+      text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: .6rem .8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .85rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .form-divider {
+      margin: 1rem 0;
+      border-top: 1px solid var(--border);
+      padding-top: 0.5rem;
+    }
+
+    .pill-num {
+      font-size: .7rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: .1rem .4rem;
+      border-radius: 20px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .8);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 1.2rem;
+      cursor: pointer;
+      min-width: 40px;
+      min-height: 40px;
+    }
+
+    .modal-body {
+      padding: 1rem;
+    }
+
+    .modal-footer {
+      padding: 0.8rem 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: .5rem;
+      justify-content: flex-end;
+    }
+
+    .hoje-header-bar {
+      background: linear-gradient(135deg, rgba(239, 68, 68, .12), rgba(245, 158, 11, .08));
+      border: 1px solid rgba(239, 68, 68, .25);
+      border-radius: 12px;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .hoje-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .hoje-count {
+      background: var(--red);
+      color: #fff;
+      font-size: .7rem;
+      padding: .1rem .5rem;
+      border-radius: 20px;
+    }
+
+    .hoje-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    .hoje-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .hoje-card-nome {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .hoje-card-valor {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--yellow);
+    }
+
+    .hoje-card-actions {
+      display: flex;
+      gap: .5rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    .history-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.8rem;
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .history-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: .4rem;
+    }
+
+    .history-dot.green {
+      background: var(--green);
+    }
+
+    .history-dot.red {
+      background: var(--red);
+    }
+
+    .history-dot.yellow {
+      background: var(--yellow);
+    }
+
+    .history-dot.pink {
+      background: var(--pink);
+    }
+
+    .history-time {
+      font-size: .7rem;
+      color: var(--text3);
+      margin-top: .1rem;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text3);
+    }
+
+    .empty-icon {
+      font-size: 2rem;
+      margin-bottom: .5rem;
+    }
+
+    .dias-horarios-list {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .dia-horario-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .dia-horario-item:last-child {
+      border-bottom: none;
+    }
+
+    .remove-dia-btn {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 0.3rem;
+    }
+
+    .add-dia-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .add-dia-row select {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .add-dia-row button {
+      white-space: nowrap;
+    }
+
+    .frequencia-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .frequencia-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .frequencia-aluno-nome {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .frequencia-dias {
+      font-size: 0.8rem;
+      color: var(--text2);
+      margin-bottom: 0.5rem;
+    }
+
+    .frequencia-status {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .presenca-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: all 0.2s;
+    }
+
+    .presenca-btn.presente {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .presenca-btn.falta {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
+
+    .frequencia-data {
+      font-size: 0.7rem;
+      color: var(--text3);
+      margin-top: 0.5rem;
+    }
+
+    .presenca-auto-header {
+      background: linear-gradient(135deg, rgba(59, 130, 246, .12), rgba(139, 92, 246, .08));
+      border: 1px solid rgba(59, 130, 246, .25);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .presenca-auto-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .presenca-auto-dia {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .presenca-auto-horario {
+      font-size: 0.9rem;
+      color: var(--text2);
+    }
+
+    .presenca-auto-count {
+      background: var(--green);
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    .aniversariantes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .aniversariante-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.2s;
+    }
+
+    .aniversariante-icon {
+      font-size: 2rem;
+    }
+
+    .aniversariante-info {
+      flex: 1;
+    }
+
+    .aniversariante-nome {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .aniversariante-data {
+      font-size: 0.8rem;
+      color: var(--text2);
+    }
+
+    .reposicao-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .reposicao-form-group {
+      margin-bottom: 1rem;
+    }
+
+    .reposicao-form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .reposicao-falta-item {
+      background: var(--surface2);
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .reposicao-falta-item:hover {
+      background: var(--border);
+    }
+
+    .reposicao-falta-item.selected {
+      background: var(--accent);
+      color: white;
+    }
+
+    .reposicao-falta-item.has-reposicao {
+      background: rgba(245, 158, 11, 0.15);
+      border-left: 3px solid var(--yellow);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .alunos-por-hora-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .alunos-por-hora-table th,
+    .alunos-por-hora-table td {
+      border: 1px solid var(--border);
+      padding: 0.5rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .alunos-por-hora-table th {
+      background: var(--surface2);
+      font-weight: 600;
+    }
+
+    .alunos-por-hora-table td {
+      background: var(--surface);
+    }
+
+    .alunos-lista {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .alunos-lista li {
+      padding: 0.2rem 0;
+      font-size: 0.75rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text2);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="brand">Gestão<span>Mais</span></div>
+        <p>Mais controle, mais resultado!</p>
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <label>Email</label>
+      <input type="email" id="login-user" placeholder="seu@email.com">
+      <label>Senha</label>
+      <input type="password" id="login-pass" placeholder="******">
+      <button class="btn btn-primary" style="width:100%; margin-bottom:0.5rem" onclick="doLogin()">Entrar</button>
+      <button class="btn btn-ghost" style="width:100%" onclick="doRegister()">Criar Conta</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <div class="layout">
+      <div class="overlay-bg" id="overlay-bg" onclick="closeSidebar()"></div>
+
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="brand">Gestão<span>Mais</span></div>
+          <small>Mais controle, mais resultado!</small>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Principal</div>
+          <div class="nav-item" onclick="navigate('dashboard')"><span class="icon">📊</span> Dashboard</div>
+          <div class="nav-item" onclick="navigate('alunos')"><span class="icon">👥</span> Cadastro de Alunos</div>
+          <div class="nav-item" onclick="navigate('aniversariantes')"><span class="icon">🎂</span> Aniversariantes da
+            Semana</div>
+
+          <div class="nav-item" onclick="toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade <span
+              style="margin-left:auto">▼</span></div>
+          <div id="submenu-mensalidade" style="display:none; padding-left: 1.5rem;">
+            <div class="nav-subitem" onclick="navigate('parcelas'); event.stopPropagation()"><span
+                class="icon">📋</span> Mensalidades / Controle</div>
+            <div class="nav-subitem" onclick="navigate('hoje'); event.stopPropagation()"><span class="icon">🔥</span>
+              Vencendo Hoje</div>
+            <div class="nav-subitem" onclick="navigate('disparo'); event.stopPropagation()"><span class="icon">✏️</span>
+              Enviar Mensagem WhatsApp</div>
+          </div>
+
+          <div class="nav-item" onclick="toggleSubmenuFrequencia()"><span class="icon">📅</span> Frequência <span
+              style="margin-left:auto">▼</span></div>
+          <div id="submenu-frequencia" style="display:none; padding-left: 1.5rem;">
+            <div class="nav-subitem" onclick="navigate('presenca-automatica'); event.stopPropagation()"><span
+                class="icon">🕐</span> Marcar Presença</div>
+            <div class="nav-subitem" onclick="navigate('alunos-por-hora'); event.stopPropagation()"><span
+                class="icon">📊</span> Alunos por Hora</div>
+            <div class="nav-subitem" onclick="navigate('reposicao'); event.stopPropagation()"><span
+                class="icon">🔄</span> Reposição de Aula</div>
+            <div class="nav-subitem" onclick="navigate('frequencia'); event.stopPropagation()"><span
+                class="icon">✅</span> Marcar Presença Manual</div>
+            <div class="nav-subitem" onclick="navigate('relatorio-frequencia'); event.stopPropagation()"><span
+                class="icon">📊</span> Relatório</div>
+          </div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Análise</div>
+          <div class="nav-item" onclick="navigate('historico')"><span class="icon">📜</span> Histórico</div>
+          <div class="nav-item" onclick="navigate('relatorios')"><span class="icon">📈</span> Relatórios</div>
+        </div>
+        <div class="sidebar-footer">
+          <button class="logout-btn" onclick="doLogout()">🚪 Sair</button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <button class="burger" onclick="toggleSidebar()">☰</button>
+          <span class="topbar-title" id="topbar-title">Dashboard</span>
+          <div class="topbar-right">
+            <div class="clock" id="clock">
+              <span class="clock-time" id="clock-time">--:--:--</span>
+              <span class="clock-date" id="clock-date">--</span>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌙 Dark</button>
+            <span style="font-size:.7rem;color:var(--text3)" id="topbar-date"></span>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="page active" id="page-dashboard">
+            <div class="stats-grid">
+              <div class="stat-card yellow">
+                <div class="stat-label">🔔 Vencendo Hoje</div>
+                <div class="stat-value" id="dashboard-stat-hoje">0</div>
+                <div class="stat-cobrancas" id="dashboard-lista-hoje"></div>
+              </div>
+              <div class="stat-card red">
+                <div class="stat-label">⚠️ Atrasadas</div>
+                <div class="stat-value" id="dashboard-stat-atrasadas">0</div>
+                <div class="stat-cobrancas" id="dashboard-lista-atrasadas"></div>
+              </div>
+              <div class="stat-card pink">
+                <div class="stat-label">🎂 Aniversariantes do Dia</div>
+                <div class="stat-value" id="dashboard-stat-aniversariantes">0</div>
+                <div class="stat-cobrancas" id="dashboard-lista-aniversariantes"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-alunos">
+            <div class="section-header">
+              <h2>Cadastro de Alunos</h2>
+              <button class="btn btn-primary" onclick="openClienteModal()">+ Novo Aluno</button>
+            </div>
+            <div class="search-row">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-clientes" placeholder="Buscar..." oninput="renderClientes()">
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Endereço</th>
+                    <th>Aniversário</th>
+                    <th>Dias/Horários Aula</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="clientes-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="page" id="page-aniversariantes">
+            <div class="section-header">
+              <h2>🎂 Aniversariantes da Semana</h2>
+              <div><span class="badge badge-pendente" id="aniversariantes-semana-info">Carregando...</span></div>
+            </div>
+            <div id="aniversariantes-content"></div>
+          </div>
+
+          <div class="page" id="page-parcelas">
+            <div class="section-header">
+              <h2>📋 Mensalidades / Controle</h2>
+            </div>
+            <div class="search-row">
+              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-parcelas"
+                  placeholder="Buscar..." oninput="renderParcelas()"></div>
+              <input type="date" class="date-filter" id="filter-data-de" placeholder="Data de"
+                onchange="renderParcelas()">
+              <input type="date" class="date-filter" id="filter-data-ate" placeholder="Data até"
+                onchange="renderParcelas()">
+              <select class="filter-select" id="filter-parcela-status" onchange="renderParcelas()">
+                <option value="">Todos</option>
+                <option value="pendente">Pendente</option>
+                <option value="pago">Pago</option>
+                <option value="atrasado">Atrasado</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="limparFiltrosParcelas()">Limpar</button>
+            </div>
+            <div class="table-wrap">
+              <table id="parcelas-table">
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Último Envio</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="parcelas-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="page" id="page-hoje">
+            <div class="hoje-header-bar">
+              <div>
+                <div class="hoje-title">🔥 Vencendo Hoje <span class="hoje-count" id="hoje-count-badge">0</span></div>
+                <div class="hoje-date" id="hoje-date-label"></div>
+              </div><button class="btn btn-ghost btn-sm" onclick="renderHoje()">↻ Atualizar</button>
+            </div>
+            <div id="hoje-content"></div>
+          </div>
+
+          <div class="page" id="page-disparo">
+            <div class="section-header">
+              <h2>✏️ Enviar Mensagem WhatsApp</h2>
+            </div>
+            <div class="disparo-filters"><label>Filtrar:</label><select class="filter-select" id="disparo-filter-status"
+                onchange="renderDisparoTable()">
+                <option value="urgente">🚨 Atrasadas + Hoje</option>
+                <option value="vencendo_hoje">🔥 Vencendo hoje</option>
+                <option value="atrasado">⚠️ Atrasadas</option>
+                <option value="pendente">🕐 Pendentes</option>
+                <option value="todos">Todos (não pagos)</option>
+              </select></div>
+            <div class="disparo-toolbar">
+              <div class="disparo-toolbar-left">
+                <h3>💬 WhatsApp</h3>
+              </div>
+              <div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('modal-msg')">✏️
+                  Mensagem</button></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Telefone</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Último Envio</th>
+                    <th>Enviar</th>
+                  </tr>
+                </thead>
+                <tbody id="disparo-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="page" id="page-presenca-automatica">
+            <div class="section-header">
+              <h2>🕐 Marcar Presença</h2>
+              <div><span class="presenca-auto-count" id="presenca-auto-count">0 alunos</span></div>
+            </div>
+            <div class="presenca-auto-header">
+              <div class="presenca-auto-info">
+                <div>
+                  <div class="presenca-auto-dia" id="presenca-auto-dia">--</div>
+                  <div class="presenca-auto-horario" id="presenca-auto-horario">--:--</div>
+                </div>
+                <div><span class="badge badge-pendente">📅 Aulas no horário atual (59min de duração)</span></div>
+              </div>
+            </div>
+            <div id="presenca-automatica-content"></div>
+          </div>
+
+          <div class="page" id="page-alunos-por-hora">
+            <div class="section-header">
+              <h2>📊 Alunos por Hora</h2>
+              <div><span class="badge badge-pendente" id="alunos-por-hora-info">Carregando...</span></div>
+            </div>
+            <div class="table-wrap">
+              <table class="alunos-por-hora-table" id="alunos-por-hora-table">
+                <thead id="alunos-por-hora-thead">
+                  <tr>
+                    <th>Horário</th>
+                    <th>Segunda</th>
+                    <th>Terça</th>
+                    <th>Quarta</th>
+                    <th>Quinta</th>
+                    <th>Sexta</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                  </tr>
+                </thead>
+                <tbody id="alunos-por-hora-tbody">
+                  <tr>
+                    <td colspan="8" class="empty">Carregando...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="page" id="page-reposicao">
+            <div class="section-header">
+              <h2>🔄 Reposição de Aula</h2>
+            </div>
+            <div class="reposicao-card">
+              <div class="reposicao-form-group"><label>Selecione o Aluno</label><select id="reposicao-aluno"
+                  class="filter-select" style="width:100%" onchange="limparSelecaoFalta()">
+                  <option value="">-- Selecione --</option>
+                </select></div>
+              <div class="reposicao-form-group"><label>Faltas do Aluno</label>
+                <div id="reposicao-faltas-list" style="max-height:200px;overflow-y:auto;">
+                  <div class="empty">Selecione um aluno</div>
+                </div>
+              </div>
+              <div class="reposicao-form-group"><label>Data da Reposição</label><input type="date" id="reposicao-data"
+                  class="filter-select" style="width:100%"></div>
+              <div class="reposicao-form-group"><label>Horário</label><select id="reposicao-horario"
+                  class="filter-select" style="width:100%">
+                  <option value="08:00">08:00</option>
+                  <option value="09:00">09:00</option>
+                  <option value="10:00">10:00</option>
+                  <option value="14:00">14:00</option>
+                  <option value="15:00">15:00</option>
+                  <option value="16:00">16:00</option>
+                  <option value="17:00">17:00</option>
+                  <option value="18:00">18:00</option>
+                  <option value="19:00">19:00</option>
+                  <option value="20:00">20:00</option>
+                </select></div>
+              <div class="modal-footer" style="justify-content:center;padding:1rem 0 0 0;"><button
+                  class="btn btn-primary" onclick="salvarReposicao()">Salvar Reposição</button></div>
+            </div>
+            <div class="section-header" style="margin-top:1rem;">
+              <h3>📋 Reposições Agendadas</h3>
+            </div>
+            <div id="reposicoes-agendadas-list"></div>
+          </div>
+
+          <div class="page" id="page-frequencia">
+            <div class="section-header">
+              <h2>✅ Marcar Presença Manual</h2>
+              <div><input type="date" id="frequencia-data" value="" style="padding:0.5rem;"><button
+                  class="btn btn-primary btn-sm" onclick="carregarFrequencia()">Carregar</button></div>
+            </div>
+            <div id="frequencia-content"></div>
+          </div>
+
+          <div class="page" id="page-relatorio-frequencia">
+            <div class="section-header">
+              <h2>📊 Relatório de Frequência</h2>
+              <div><input type="month" id="rel-frequencia-mes" value=""><button class="btn btn-primary btn-sm"
+                  onclick="carregarRelatorioFrequencia()">Gerar</button></div>
+            </div>
+            <div id="relatorio-frequencia-content"></div>
+          </div>
+
+          <div class="page" id="page-historico">
+            <div class="section-header">
+              <h2>Histórico</h2>
+            </div>
+            <div class="history-list" id="historico-list"></div>
+          </div>
+
+          <div class="page" id="page-relatorios">
+            <div class="section-header">
+              <h2>Relatórios</h2>
+            </div>
+            <div class="report-filters" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem"><input
+                type="date" id="rel-de" style="padding:.6rem"><input type="date" id="rel-ate"
+                style="padding:.6rem"><select id="rel-status" style="padding:.6rem">
+                <option value="">Todos</option>
+                <option value="pendente">Pendente</option>
+                <option value="pago">Pago</option>
+                <option value="atrasado">Atrasado</option>
+              </select><button class="btn btn-primary" onclick="renderRelatorio()">Filtrar</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="relatorio-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-cliente">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Aluno</h3><button class="modal-close" onclick="closeModal('modal-cliente')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="cliente-id">
+        <div class="form-group"><label>Nome *</label><input type="text" id="cliente-nome"></div>
+        <div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone"
+            placeholder="(11) 99999-9999" oninput="maskPhone(this)"></div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="cliente-endereco"></div>
+        <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cliente-nascimento"></div>
+        <div class="form-group"><label>Dias e Horários das Aulas</label>
+          <div id="dias-horarios-container">
+            <div id="dias-horarios-list" class="dias-horarios-list"></div>
+            <div class="add-dia-row"><select id="novo-dia">
+                <option value="Segunda-feira">Segunda</option>
+                <option value="Terça-feira">Terça</option>
+                <option value="Quarta-feira">Quarta</option>
+                <option value="Quinta-feira">Quinta</option>
+                <option value="Sexta-feira">Sexta</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
+              </select><select id="novo-horario">
+                <option value="08:00">08:00</option>
+                <option value="09:00">09:00</option>
+                <option value="10:00">10:00</option>
+                <option value="14:00">14:00</option>
+                <option value="15:00">15:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+                <option value="18:00">18:00</option>
+                <option value="19:00">19:00</option>
+                <option value="20:00">20:00</option>
+              </select><button class="btn btn-primary btn-sm" onclick="adicionarDiaHorario()">+ Adicionar</button></div>
+          </div>
+        </div>
+        <div class="form-divider"></div>
+        <div class="form-group"><label style="color:var(--accent);">📅 INFORMAÇÕES DA MENSALIDADE</label></div>
+        <div class="form-row">
+          <div class="form-group"><label>Valor *</label><input type="number" id="cliente-mensalidade-valor" step="0.01">
+          </div>
+          <div class="form-group"><label>Vencimento *</label><input type="date" id="cliente-mensalidade-vencimento">
+          </div>
+        </div>
+        <div class="form-group"><label>Descrição</label><input type="text" id="cliente-mensalidade-descricao"
+            placeholder="Ex: Mensalidade"></div>
+        <div class="form-group"><label><input type="checkbox" id="cliente-mensalidade-parcelado"
+              onchange="toggleClienteParcelamento()"> Parcelado</label></div>
+        <div id="cliente-parcelamento-fields" style="display:none">
+          <div class="form-row">
+            <div class="form-group"><label>Nº Parcelas</label><input type="number" id="cliente-mensalidade-parcelas"
+                min="2" value="2"></div>
+            <div class="form-group"><label>Intervalo</label><select id="cliente-mensalidade-intervalo">
+                <option value="mensal">Mensal</option>
+                <option value="quinzenal">Quinzenal</option>
+                <option value="semanal">Semanal</option>
+              </select></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="closeModal('modal-cliente')">Cancelar</button><button class="btn btn-primary"
+          onclick="saveCliente()">Salvar</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-status">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Status</h3><button class="modal-close" onclick="closeModal('modal-status')">×</button>
+      </div>
+      <div class="modal-body"><input type="hidden" id="status-id"><input type="hidden" id="status-tipo">
+        <div class="form-group"><label>Novo Status</label><select id="status-novo">
+            <option value="pendente">Pendente</option>
+            <option value="pago">Pago</option>
+            <option value="atrasado">Atrasado</option>
+          </select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="closeModal('modal-status')">Cancelar</button><button class="btn btn-primary"
+          onclick="saveStatus()">Confirmar</button></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-msg">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Mensagem Padrão</h3><button class="modal-close" onclick="closeModal('modal-msg')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label>Template</label><textarea id="msg-template" rows="4"
+            placeholder="{nome}, {tipo}, {parcela}, {total_parcelas}, {valor}, {vencimento}"></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="resetMsgTemplate()">Restaurar</button><button
+          class="btn btn-primary" onclick="salvarMsgTemplate()">Salvar</button></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDDJ8YkybzUdN-bnSiFc3P5IQft5yT3GU",
+      authDomain: "gestaomais-b3872.firebaseapp.com",
+      projectId: "gestaomais-b3872",
+      storageBucket: "gestaomais-b3872.firebasestorage.app",
+      messagingSenderId: "652867293678",
+      appId: "1:652867293678:web:364b3e1d5275ea680a3eff"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Funções auxiliares
+    function uid() { return '_' + Math.random().toString(36).substr(2, 9); }
+    function fmtBRL(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+    function fmtDate(d) { if (!d) return '—'; return d.split('-').reverse().join('/'); }
+    function today() { return new Date().toISOString().split('T')[0]; }
+
+    let clientesCache = [];
+    let dividasCache = [];
+    let parcelasCache = [];
+    let frequenciasCache = [];
+    let reposicoesCache = [];
+    let historicoCache = [];
+    let ultimosParabensCache = [];
+
+    async function refreshCache() {
+      const clientesSnap = await db.collection('clientes').get();
+      clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const dividasSnap = await db.collection('dividas').get();
+      dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const parcelasSnap = await db.collection('parcelas').get();
+      parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const frequenciasSnap = await db.collection('frequencias').get();
+      frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const reposicoesSnap = await db.collection('reposicoes').get();
+      reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const historicoSnap = await db.collection('historico').orderBy('dt', 'desc').get();
+      historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const ultimosParabensSnap = await db.collection('ultimosParabens').get();
+      ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    async function addHistory(acao, tipo) {
+      await db.collection('historico').add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
+      await refreshCache();
+    }
+
+    // ============================================
+    // LOGIN
+    // ============================================
+    async function doLogin() {
+      const email = document.getElementById('login-user').value;
+      const password = document.getElementById('login-pass').value;
+      const errorDiv = document.getElementById('login-error');
+
+      if (!email || !password) {
+        errorDiv.textContent = '❌ Preencha email e senha!';
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
+        return;
+      }
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        errorDiv.style.display = 'none';
+      } catch (error) {
+        errorDiv.textContent = '❌ ' + error.message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
+      }
+    }
+
+    async function doRegister() {
+      const email = document.getElementById('login-user').value;
+      const password = document.getElementById('login-pass').value;
+      const errorDiv = document.getElementById('login-error');
+
+      if (!email || !password) {
+        errorDiv.textContent = '❌ Preencha email e senha!';
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
+        return;
+      }
+
+      if (password.length < 6) {
+        errorDiv.textContent = '❌ A senha deve ter pelo menos 6 caracteres!';
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
+        return;
+      }
+
+      try {
+        await auth.createUserWithEmailAndPassword(email, password);
+        errorDiv.style.display = 'none';
+      } catch (error) {
+        errorDiv.textContent = '❌ ' + error.message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
+      }
+    }
+
+    async function doLogout() {
+      await auth.signOut();
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    }
+
+    // ============================================
+    // NAVEGAÇÃO
+    // ============================================
+    function toggleSubmenuMensalidade() {
+      const submenu = document.getElementById('submenu-mensalidade');
+      submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleSubmenuFrequencia() {
+      const submenu = document.getElementById('submenu-frequencia');
+      submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function navigate(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+
+      let title = '';
+      if (page === 'dashboard') title = 'Dashboard';
+      else if (page === 'alunos') title = 'Cadastro de Alunos';
+      else if (page === 'aniversariantes') title = 'Aniversariantes da Semana';
+      else if (page === 'parcelas') title = 'Mensalidades / Controle';
+      else if (page === 'hoje') title = 'Vencendo Hoje';
+      else if (page === 'disparo') title = 'Enviar Mensagem WhatsApp';
+      else if (page === 'presenca-automatica') title = 'Marcar Presença';
+      else if (page === 'alunos-por-hora') title = 'Alunos por Hora';
+      else if (page === 'reposicao') title = 'Reposição de Aula';
+      else if (page === 'frequencia') title = 'Marcar Presença Manual';
+      else if (page === 'relatorio-frequencia') title = 'Relatório de Frequência';
+      else if (page === 'historico') title = 'Histórico';
+      else if (page === 'relatorios') title = 'Relatórios';
+
+      document.getElementById('topbar-title').innerText = title;
+      closeSidebar();
+
+      if (page === 'dashboard') renderDashboard();
+      if (page === 'alunos') renderClientes();
+      if (page === 'aniversariantes') carregarAniversariantesSemana();
+      if (page === 'parcelas') renderParcelas();
+      if (page === 'hoje') renderHoje();
+      if (page === 'disparo') renderDisparoTable();
+      if (page === 'presenca-automatica') carregarPresencaAutomatica();
+      if (page === 'alunos-por-hora') carregarAlunosPorHora();
+      if (page === 'reposicao') carregarReposicao();
+      if (page === 'frequencia') carregarFrequencia();
+      if (page === 'relatorio-frequencia') carregarRelatorioFrequencia();
+      if (page === 'historico') renderHistorico();
+      if (page === 'relatorios') renderRelatorio();
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay-bg').classList.toggle('open');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay-bg').classList.remove('open');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // ============================================
+    // RELÓGIO
+    // ============================================
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const timeString = `${hours}:${minutes}:${seconds}`;
+
+      const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+      const dayName = days[now.getDay()];
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      const dateString = `${dayName}, ${day}/${month}/${year}`;
+
+      const clockTime = document.getElementById('clock-time');
+      const clockDate = document.getElementById('clock-date');
+      if (clockTime) clockTime.textContent = timeString;
+      if (clockDate) clockDate.textContent = dateString;
+    }
+
+    // ============================================
+    // DARK/LIGHT MODE
+    // ============================================
+    function toggleTheme() {
+      const body = document.body;
+      const themeBtn = document.getElementById('theme-toggle');
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        localStorage.setItem('theme', 'dark');
+        if (themeBtn) themeBtn.innerHTML = '🌙 Dark';
+      } else {
+        body.classList.add('light-mode');
+        localStorage.setItem('theme', 'light');
+        if (themeBtn) themeBtn.innerHTML = '☀️ Light';
+      }
+    }
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const body = document.body;
+      const themeBtn = document.getElementById('theme-toggle');
+      if (savedTheme === 'light') {
+        body.classList.add('light-mode');
+        if (themeBtn) themeBtn.innerHTML = '☀️ Light';
+      } else {
+        body.classList.remove('light-mode');
+        if (themeBtn) themeBtn.innerHTML = '🌙 Dark';
+      }
+    }
+
+    // ============================================
+    // MENSAGENS
+    // ============================================
+    const MSG_DEFAULT = "Olá {nome}, a parcela {parcela}/{total_parcelas} da mensalidade \"{tipo}\" com vencimento em {vencimento} no valor de {valor}. Aguardamos seu contato.";
+
+    function getMsgTemplate() { return localStorage.getItem('msg_template') || MSG_DEFAULT; }
+
+    function buildMsg(p, c, d) {
+      let tpl = getMsgTemplate();
+      return tpl.replace(/{nome}/g, c?.nome || '')
+        .replace(/{tipo}/g, d?.tipo || 'Mensalidade')
+        .replace(/{parcela}/g, p.numeroParcela)
+        .replace(/{total_parcelas}/g, p.totalParcelas)
+        .replace(/{valor}/g, fmtBRL(p.valor))
+        .replace(/{vencimento}/g, fmtDate(p.dataVencimento));
+    }
+
+    function buildMsgAniversario(cliente) {
+      return `🎉 *PARABÉNS ${cliente.nome}!* 🎂\n\nHoje é seu dia especial! Desejamos muita saúde, paz, sucesso e realizações! 🥳🎈\n\nAgradecemos pela confiança e por fazer parte da nossa história! 💝`;
+    }
+
+    function resetMsgTemplate() { document.getElementById('msg-template').value = MSG_DEFAULT; }
+    function salvarMsgTemplate() { const val = document.getElementById('msg-template').value; if (val) localStorage.setItem('msg_template', val); else localStorage.removeItem('msg_template'); closeModal('modal-msg'); alert('Mensagem salva!'); }
+
+    // ============================================
+    // CLIENTES
+    // ============================================
+    let currentDiasHorarios = [];
+
+    function adicionarDiaHorario() {
+      const dia = document.getElementById('novo-dia').value;
+      const horario = document.getElementById('novo-horario').value;
+      currentDiasHorarios.push({ dia, horario });
+      atualizarListaDiasHorarios();
+    }
+
+    function removerDiaHorario(index) {
+      if (confirm('Remover este dia/horário?')) {
+        currentDiasHorarios.splice(index, 1);
+        atualizarListaDiasHorarios();
+      }
+    }
+
+    function atualizarListaDiasHorarios() {
+      const container = document.getElementById('dias-horarios-list');
+      if (!container) return;
+      if (currentDiasHorarios.length === 0) {
+        container.innerHTML = '<div style="padding:0.5rem;text-align:center;color:var(--text3);">Nenhum dia/horário</div>';
+        return;
+      }
+      container.innerHTML = currentDiasHorarios.map((item, idx) => `
+        <div class="dia-horario-item"><span>${item.dia} às ${item.horario}</span><button class="remove-dia-btn" onclick="removerDiaHorario(${idx})">❌</button></div>
+      `).join('');
+    }
+
+    function toggleClienteParcelamento() {
+      const show = document.getElementById('cliente-mensalidade-parcelado').checked;
+      document.getElementById('cliente-parcelamento-fields').style.display = show ? 'block' : 'none';
+    }
+
+    function openClienteModal(id = null) {
+      document.getElementById('cliente-id').value = '';
+      document.getElementById('cliente-nome').value = '';
+      document.getElementById('cliente-telefone').value = '';
+      document.getElementById('cliente-endereco').value = '';
+      document.getElementById('cliente-nascimento').value = '';
+      document.getElementById('cliente-mensalidade-valor').value = '';
+      document.getElementById('cliente-mensalidade-vencimento').value = today();
+      document.getElementById('cliente-mensalidade-descricao').value = '';
+      document.getElementById('cliente-mensalidade-parcelado').checked = false;
+      document.getElementById('cliente-parcelamento-fields').style.display = 'none';
+      currentDiasHorarios = [];
+
+      if (id) {
+        const c = clientesCache.find(x => x.id === id);
+        if (c) {
+          document.getElementById('cliente-id').value = c.id;
+          document.getElementById('cliente-nome').value = c.nome;
+          document.getElementById('cliente-telefone').value = c.telefone;
+          document.getElementById('cliente-endereco').value = c.endereco || '';
+          document.getElementById('cliente-nascimento').value = c.nascimento || '';
+          if (c.diasHorarios) currentDiasHorarios = [...c.diasHorarios];
+          if (c.mensalidadeInfo) {
+            document.getElementById('cliente-mensalidade-valor').value = c.mensalidadeInfo.valor || '';
+            document.getElementById('cliente-mensalidade-vencimento').value = c.mensalidadeInfo.vencimento || today();
+            document.getElementById('cliente-mensalidade-descricao').value = c.mensalidadeInfo.descricao || '';
+            document.getElementById('cliente-mensalidade-parcelado').checked = c.mensalidadeInfo.parcelado || false;
+            if (c.mensalidadeInfo.parcelado) {
+              document.getElementById('cliente-mensalidade-parcelas').value = c.mensalidadeInfo.numParcelas || 2;
+              document.getElementById('cliente-mensalidade-intervalo').value = c.mensalidadeInfo.intervalo || 'mensal';
+              document.getElementById('cliente-parcelamento-fields').style.display = 'block';
+            }
+          }
+        }
+      }
+      atualizarListaDiasHorarios();
+      openModal('modal-cliente');
+    }
+
+    async function saveCliente() {
+      const id = document.getElementById('cliente-id').value;
+      const nome = document.getElementById('cliente-nome').value.trim();
+      const telefone = document.getElementById('cliente-telefone').value.trim();
+      const endereco = document.getElementById('cliente-endereco').value;
+      const nascimento = document.getElementById('cliente-nascimento').value;
+      const valorMensalidade = parseFloat(document.getElementById('cliente-mensalidade-valor').value);
+      const vencimentoMensalidade = document.getElementById('cliente-mensalidade-vencimento').value;
+      const descricaoMensalidade = document.getElementById('cliente-mensalidade-descricao').value || 'Mensalidade';
+      const parcelado = document.getElementById('cliente-mensalidade-parcelado').checked;
+      const numParcelas = parseInt(document.getElementById('cliente-mensalidade-parcelas').value) || 1;
+      const intervalo = document.getElementById('cliente-mensalidade-intervalo').value;
+
+      if (!nome || !telefone) return alert('Preencha nome e telefone!');
+
+      const mensalidadeInfo = { valor: valorMensalidade, vencimento: vencimentoMensalidade, descricao: descricaoMensalidade, parcelado, numParcelas, intervalo };
+
+      if (id) {
+        await db.collection('clientes').doc(id).update({ nome, telefone, endereco, nascimento, diasHorarios: currentDiasHorarios, mensalidadeInfo });
+        await refreshCache();
+        await addHistory(`Aluno ${nome} atualizado`, 'green');
+      } else {
+        if (!valorMensalidade || !vencimentoMensalidade) return alert('Preencha valor e vencimento!');
+        const docRef = await db.collection('clientes').add({ nome, telefone, endereco, nascimento, diasHorarios: currentDiasHorarios, mensalidadeInfo });
+        await refreshCache();
+        await addHistory(`Aluno ${nome} cadastrado`, 'green');
+        await criarMensalidadeParaCliente(docRef.id, nome, valorMensalidade, vencimentoMensalidade, descricaoMensalidade, parcelado, numParcelas, intervalo);
+      }
+      closeModal('modal-cliente');
+      renderClientes();
+      renderDashboard();
+    }
+
+    async function criarMensalidadeParaCliente(clienteId, nomeCliente, valor, vencimento, descricao, parcelado, numParcelas, intervalo) {
+      const dividaRef = await db.collection('dividas').add({ clienteId, tipo: descricao, descricao, valor, vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1 });
+      await refreshCache();
+
+      if (parcelado && numParcelas > 1) {
+        const valorParcela = valor / numParcelas;
+        for (let i = 0; i < numParcelas; i++) {
+          let dataVenc = vencimento;
+          if (i > 0) {
+            const d = new Date(vencimento + 'T12:00:00');
+            if (intervalo === 'mensal') d.setMonth(d.getMonth() + i);
+            else if (intervalo === 'quinzenal') d.setDate(d.getDate() + (i * 15));
+            else if (intervalo === 'semanal') d.setDate(d.getDate() + (i * 7));
+            dataVenc = d.toISOString().split('T')[0];
+          }
+          await db.collection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: i + 1, totalParcelas: numParcelas, valor: parseFloat(valorParcela.toFixed(2)), dataVencimento: dataVenc, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
+        }
+        await addHistory(`${numParcelas} parcelas geradas para ${nomeCliente}`, 'purple');
+      } else {
+        await db.collection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: 1, totalParcelas: 1, valor, dataVencimento: vencimento, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
+        await addHistory(`Mensalidade criada para ${nomeCliente}`, 'green');
+      }
+      await refreshCache();
+      renderParcelas();
+      renderDashboard();
+    }
+
+    async function deleteClienteHandler(id) {
+      if (!confirm('⚠️ Excluir aluno e TODAS as mensalidades?')) return;
+      const c = clientesCache.find(x => x.id === id);
+
+      const parcelasDoCliente = parcelasCache.filter(p => p.clienteId === id);
+      for (const parcela of parcelasDoCliente) await db.collection('parcelas').doc(parcela.id).delete();
+
+      const dividasDoCliente = dividasCache.filter(d => d.clienteId === id);
+      for (const divida of dividasDoCliente) await db.collection('dividas').doc(divida.id).delete();
+
+      await db.collection('clientes').doc(id).delete();
+      await refreshCache();
+      await addHistory(`Aluno ${c?.nome} excluído`, 'red');
+      renderClientes();
+      renderDashboard();
+    }
+
+    async function renderClientes() {
+      const search = document.getElementById('search-clientes')?.value.toLowerCase() || '';
+      let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
+      const tbody = document.getElementById('clientes-tbody');
+      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
+      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="deleteClienteHandler('${c.id}')">🗑</button></td></tr>`).join('');
+    }
+
+    // ============================================
+    // PARCELAS
+    // ============================================
+    function limparFiltrosParcelas() {
+      document.getElementById('search-parcelas').value = '';
+      document.getElementById('filter-data-de').value = '';
+      document.getElementById('filter-data-ate').value = '';
+      document.getElementById('filter-parcela-status').value = '';
+      renderParcelas();
+    }
+
+    async function renderParcelas() {
+      const search = document.getElementById('search-parcelas')?.value.toLowerCase() || '';
+      const filtroStatus = document.getElementById('filter-parcela-status')?.value || '';
+      const dataDe = document.getElementById('filter-data-de')?.value || '';
+      const dataAte = document.getElementById('filter-data-ate')?.value || '';
+
+      let parcelas = parcelasCache.filter(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const d = dividasCache.find(x => x.id === p.dividaId);
+        const match = (c?.nome || '').toLowerCase().includes(search) || (d?.tipo || '').toLowerCase().includes(search);
+        let dataMatch = true;
+        if (dataDe && p.dataVencimento < dataDe) dataMatch = false;
+        if (dataAte && p.dataVencimento > dataAte) dataMatch = false;
+        return match && dataMatch && (!filtroStatus || p.status === filtroStatus);
+      });
+
+      const tbody = document.getElementById('parcelas-tbody');
+      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
+
+      tbody.innerHTML = parcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const d = dividasCache.find(x => x.id === p.dividaId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, d));
+        return `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="openStatusModal('${p.id}', 'parcela')">🔄</button><a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="deleteDividaHandler('${p.dividaId}')">🗑</button></td></tr>`;
+      }).join('');
+    }
+
+    async function deleteDividaHandler(id) {
+      if (!confirm('Excluir mensalidade e parcelas?')) return;
+      const parcelasDaDivida = parcelasCache.filter(p => p.dividaId === id);
+      for (const parcela of parcelasDaDivida) await db.collection('parcelas').doc(parcela.id).delete();
+      await db.collection('dividas').doc(id).delete();
+      await refreshCache();
+      await addHistory(`Mensalidade excluída`, 'red');
+      renderParcelas();
+      renderDashboard();
+    }
+
+    function openStatusModal(id, tipo) {
+      document.getElementById('status-id').value = id;
+      document.getElementById('status-tipo').value = tipo;
+      const item = tipo === 'parcela' ? parcelasCache.find(x => x.id === id) : dividasCache.find(x => x.id === id);
+      document.getElementById('status-novo').value = item?.status || 'pendente';
+      openModal('modal-status');
+    }
+
+    async function saveStatus() {
+      const id = document.getElementById('status-id').value;
+      const tipo = document.getElementById('status-tipo').value;
+      const novoStatus = document.getElementById('status-novo').value;
+
+      if (tipo === 'parcela') {
+        const p = parcelasCache.find(x => x.id === id);
+        await db.collection('parcelas').doc(id).update({ status: novoStatus });
+        await addHistory(`Parcela ${p.numeroParcela}/${p.totalParcelas}: ${p.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow');
+      } else {
+        const d = dividasCache.find(x => x.id === id);
+        await db.collection('dividas').doc(id).update({ status: novoStatus });
+        await addHistory(`Mensalidade: ${d.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow');
+      }
+      await refreshCache();
+      closeModal('modal-status');
+      renderParcelas();
+      renderDashboard();
+      renderHoje();
+    }
+
+    // ============================================
+    // DASHBOARD
+    // ============================================
+    async function renderDashboard() {
+      const hoje = today();
+      let parcelas = parcelasCache;
+      let changed = false;
+      for (let i = 0; i < parcelas.length; i++) {
+        if (parcelas[i].status === 'pendente' && parcelas[i].dataVencimento < hoje) {
+          await db.collection('parcelas').doc(parcelas[i].id).update({ status: 'atrasado' });
+          changed = true;
+        }
+      }
+      if (changed) await refreshCache();
+      parcelas = parcelasCache;
+
+      const hojeParcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago' && p.ultimoEnvioLembrete !== hoje);
+      document.getElementById('dashboard-stat-hoje').textContent = hojeParcelas.length;
+      document.getElementById('dashboard-lista-hoje').innerHTML = hojeParcelas.length ? hojeParcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
+        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Vence hoje</div></div><a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn btn-whatsapp btn-sm">💬</a></div>`;
+      }).join('') : '<div class="empty">✅ Nenhuma cobrança para hoje</div>';
+
+      const atrasadas = parcelas.filter(p => p.status === 'atrasado');
+      document.getElementById('dashboard-stat-atrasadas').textContent = atrasadas.length;
+      document.getElementById('dashboard-lista-atrasadas').innerHTML = atrasadas.length ? atrasadas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
+        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Atrasado</div></div><a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn btn-whatsapp btn-sm">💬</a></div>`;
+      }).join('') : '<div class="empty">✅ Nenhuma parcela em atraso</div>';
+
+      let aniversariantes = clientesCache.filter(c => c.nascimento && c.nascimento.slice(5) === hoje.slice(5));
+      aniversariantes = aniversariantes.filter(c => !ultimosParabensCache.some(item => item.clienteId === c.id && item.data === hoje));
+      document.getElementById('dashboard-stat-aniversariantes').textContent = aniversariantes.length;
+      document.getElementById('dashboard-lista-aniversariantes').innerHTML = aniversariantes.length ? aniversariantes.map(c => {
+        const tel = c.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsgAniversario(c));
+        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`;
+      }).join('') : '<div class="empty">🎂 Nenhum aniversariante</div>';
+    }
+
+    // ============================================
+    // VENCENDO HOJE
+    // ============================================
+    async function renderHoje() {
+      const hoje = today();
+      const parcelas = parcelasCache.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
+      document.getElementById('hoje-count-badge').textContent = parcelas.length;
+      document.getElementById('hoje-date-label').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+      document.getElementById('hoje-content').innerHTML = !parcelas.length ? '<div class="empty">✅ Nenhuma cobrança para hoje</div>' : `<div class="hoje-cards">${parcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
+        return `<div class="hoje-card"><div><div class="hoje-card-nome">${c?.nome}</div><div class="hoje-card-valor">${fmtBRL(p.valor)}</div></div><div class="hoje-card-actions"><a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a><button class="btn btn-green btn-sm" onclick="marcarPago('${p.id}')">✔ Marcar Pago</button></div></div>`;
+      }).join('')}</div>`;
+    }
+
+    async function marcarPago(parcelaId) {
+      await db.collection('parcelas').doc(parcelaId).update({ status: 'pago' });
+      await refreshCache();
+      await addHistory(`Parcela marcada como paga`, 'green');
+      renderHoje();
+      renderDashboard();
+    }
+
+    // ============================================
+    // DISPARO
+    // ============================================
+    function getParcelasDisparo() {
+      const filtro = document.getElementById('disparo-filter-status').value;
+      const hoje = today();
+      let parcelas = parcelasCache;
+      if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago'));
+      else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
+      else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado');
+      else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente');
+      else parcelas = parcelas.filter(p => p.status !== 'pago');
+      return parcelas;
+    }
+
+    async function renderDisparoTable() {
+      const parcelas = getParcelasDisparo();
+      const tbody = document.getElementById('disparo-tbody');
+      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
+      tbody.innerHTML = parcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
+        return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td><a href="https://wa.me/55${tel}?text=${msg}" target="_blank" class="btn btn-whatsapp btn-sm">📤 Enviar</a></td></tr>`;
+      }).join('');
+    }
+
+    // ============================================
+    // ANIVERSARIANTES DA SEMANA
+    // ============================================
+    async function carregarAniversariantesSemana() {
+      const hoje = new Date();
+      let inicioSemana = new Date(hoje);
+      let fimSemana = new Date(hoje);
+      if (hoje.getDay() === 0) { inicioSemana.setDate(hoje.getDate() + 1); fimSemana.setDate(hoje.getDate() + 7); }
+      else { const diasParaSegunda = hoje.getDay() - 1; inicioSemana.setDate(hoje.getDate() - diasParaSegunda); fimSemana.setDate(inicioSemana.getDate() + 6); }
+
+      const aniversariantes = clientesCache.filter(c => {
+        if (!c.nascimento) return false;
+        const [ano, mes, dia] = c.nascimento.split('-');
+        const dataAniversario = new Date(ano, parseInt(mes) - 1, parseInt(dia));
+        return dataAniversario >= inicioSemana && dataAniversario <= fimSemana;
+      }).sort((a, b) => a.nascimento.slice(5).localeCompare(b.nascimento.slice(5)));
+
+      document.getElementById('aniversariantes-semana-info').textContent = `${aniversariantes.length} aniversariante(s)`;
+      document.getElementById('aniversariantes-content').innerHTML = !aniversariantes.length ? '<div class="empty">Nenhum aniversariante</div>' : `<div class="aniversariantes-grid">${aniversariantes.map(a => `<div class="aniversariante-card"><div class="aniversariante-icon">🎂</div><div class="aniversariante-info"><div class="aniversariante-nome">${a.nome}</div><div class="aniversariante-data">${fmtDate(a.nascimento)}</div></div></div>`).join('')}</div>`;
+    }
+
+    // ============================================
+    // ALUNOS POR HORA
+    // ============================================
+    function carregarAlunosPorHora() {
+      const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+      const horarios = ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+      const mapa = {};
+      horarios.forEach(h => { mapa[h] = {}; dias.forEach(d => mapa[h][d] = []); });
+      clientesCache.forEach(c => { if (c.diasHorarios) c.diasHorarios.forEach(dh => { if (mapa[dh.horario]?.[dh.dia]) mapa[dh.horario][dh.dia].push(c.nome); }); });
+
+      const tbody = document.getElementById('alunos-por-hora-tbody');
+      tbody.innerHTML = horarios.map(horario => `<tr><th>${horario}</th>${dias.map(dia => `<td>${mapa[horario][dia].length ? `<span class="badge">${mapa[horario][dia].length}</span><ul class="alunos-lista">${mapa[horario][dia].map(n => `<li>👤 ${n}</li>`).join('')}</ul>` : '—'}</td>`).join('')}</tr>`).join('');
+    }
+
+    // ============================================
+    // REPOSICAO
+    // ============================================
+    let faltaSelecionada = null;
+
+    function limparSelecaoFalta() { faltaSelecionada = null; carregarFaltasAluno(); }
+
+    async function carregarReposicao() {
+      document.getElementById('reposicao-aluno').innerHTML = '<option value="">-- Selecione --</option>' + clientesCache.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+      faltaSelecionada = null;
+      await carregarReposicoesAgendadas();
+    }
+
+    async function carregarFaltasAluno() {
+      const alunoId = document.getElementById('reposicao-aluno').value;
+      if (!alunoId) { document.getElementById('reposicao-faltas-list').innerHTML = '<div class="empty">Selecione um aluno</div>'; return; }
+      const faltas = frequenciasCache.filter(f => f.clienteId === alunoId && f.status === 'falta' && !reposicoesCache.some(r => r.faltaOriginalId === f.id && r.foiCumprida));
+      document.getElementById('reposicao-faltas-list').innerHTML = !faltas.length ? '<div class="empty">Sem faltas pendentes</div>' : faltas.map(f => `<div class="reposicao-falta-item" onclick="selecionarFalta('${f.id}', this)"><strong>Data:</strong> ${fmtDate(f.data)}</div>`).join('');
+    }
+
+    function selecionarFalta(faltaId, element) {
+      document.querySelectorAll('.reposicao-falta-item').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      faltaSelecionada = faltaId;
+    }
+
+    async function salvarReposicao() {
+      const alunoId = document.getElementById('reposicao-aluno').value;
+      const dataReposicao = document.getElementById('reposicao-data').value;
+      const horarioReposicao = document.getElementById('reposicao-horario').value;
+      if (!alunoId || !faltaSelecionada || !dataReposicao) return alert('Preencha todos os campos!');
+      await db.collection('reposicoes').add({ alunoId, faltaOriginalId: faltaSelecionada, dataReposicao, horarioReposicao, foiCumprida: false });
+      await refreshCache();
+      await addHistory(`Reposição agendada`, 'green');
+      alert('Reposição agendada!');
+      faltaSelecionada = null;
+      document.getElementById('reposicao-data').value = '';
+      await carregarFaltasAluno();
+      await carregarReposicoesAgendadas();
+    }
+
+    async function carregarReposicoesAgendadas() {
+      const repos = reposicoesCache.filter(r => !r.foiCumprida);
+      document.getElementById('reposicoes-agendadas-list').innerHTML = !repos.length ? '<div class="empty">Nenhuma reposição agendada</div>' : `<div class="frequencia-grid">${repos.map(r => `<div class="frequencia-card"><div class="frequencia-aluno-nome">${clientesCache.find(c => c.id === r.alunoId)?.nome}</div><div class="frequencia-dias">${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}</div><button class="btn btn-red btn-sm" onclick="cancelarReposicao('${r.id}')">Cancelar</button></div>`).join('')}</div>`;
+    }
+
+    async function cancelarReposicao(id) {
+      if (!confirm('Cancelar reposição?')) return;
+      await db.collection('reposicoes').doc(id).delete();
+      await refreshCache();
+      await carregarReposicoesAgendadas();
+      await carregarFaltasAluno();
+    }
+
+    // ============================================
+    // FREQUENCIA
+    // ============================================
+    async function carregarFrequencia() {
+      const data = document.getElementById('frequencia-data').value || today();
+      const dataObj = new Date(data + 'T12:00:00');
+      const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'long' }).charAt(0).toUpperCase() + dataObj.toLocaleDateString('pt-BR', { weekday: 'long' }).slice(1);
+      let alunos = clientesCache.filter(c => c.diasHorarios?.some(dh => dh.dia === diaSemana));
+      const filtro = document.getElementById('buscar-frequencia')?.value.toLowerCase() || '';
+      if (filtro) alunos = alunos.filter(c => c.nome.toLowerCase().includes(filtro));
+
+      document.getElementById('frequencia-content').innerHTML = !alunos.length ? '<div class="empty">Nenhum aluno</div>' : `<div class="frequencia-grid">${alunos.map(a => {
+        const freq = frequenciasCache.find(f => f.clienteId === a.id && f.data === data);
+        return `<div class="frequencia-card"><div class="frequencia-aluno-nome">${a.nome}</div><div class="frequencia-status"><button class="presenca-btn ${freq?.status === 'presente' ? 'presente' : ''}" onclick="marcarPresenca('${a.id}', '${data}', 'presente')">✅ Presente</button><button class="presenca-btn ${freq?.status === 'falta' ? 'falta' : ''}" onclick="marcarPresenca('${a.id}', '${data}', 'falta')">❌ Falta</button><button class="presenca-btn" onclick="marcarPresenca('${a.id}', '${data}', null)">🗑 Remover</button></div><div class="frequencia-data">${fmtDate(data)}</div></div>`;
+      }).join('')}</div>`;
+    }
+
+    async function marcarPresenca(clienteId, data, status) {
+      const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
+      if (status === null && existing) await db.collection('frequencias').doc(existing.id).delete();
+      else if (existing) await db.collection('frequencias').doc(existing.id).update({ status });
+      else await db.collection('frequencias').add({ clienteId, data, status });
+      await refreshCache();
+      await carregarFrequencia();
+    }
+
+    async function carregarPresencaAutomatica() {
+      const agora = new Date();
+      const horaAtual = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+      const dataAtual = today();
+      const diaSemana = agora.toLocaleDateString('pt-BR', { weekday: 'long' }).charAt(0).toUpperCase() + agora.toLocaleDateString('pt-BR', { weekday: 'long' }).slice(1);
+
+      const alunosComAula = clientesCache.filter(c => c.diasHorarios?.some(dh => dh.dia === diaSemana && dh.horario === horaAtual));
+      document.getElementById('presenca-auto-count').textContent = `${alunosComAula.length} alunos`;
+      document.getElementById('presenca-auto-dia').textContent = diaSemana;
+      document.getElementById('presenca-auto-horario').textContent = horaAtual;
+
+      document.getElementById('presenca-automatica-content').innerHTML = !alunosComAula.length ? '<div class="empty">Nenhum aluno com aula agora</div>' : `<div class="frequencia-grid">${alunosComAula.map(a => {
+        const freq = frequenciasCache.find(f => f.clienteId === a.id && f.data === dataAtual);
+        return `<div class="frequencia-card"><div class="frequencia-aluno-nome">${a.nome}</div><div class="frequencia-status"><button class="presenca-btn ${freq?.status === 'presente' ? 'presente' : ''}" onclick="marcarPresenca('${a.id}', '${dataAtual}', 'presente')">✅ Presente</button><button class="presenca-btn ${freq?.status === 'falta' ? 'falta' : ''}" onclick="marcarPresenca('${a.id}', '${dataAtual}', 'falta')">❌ Falta</button></div></div>`;
+      }).join('')}</div>`;
+    }
+
+    // ============================================
+    // RELATORIO FREQUENCIA
+    // ============================================
+    async function carregarRelatorioFrequencia() {
+      const mes = document.getElementById('rel-frequencia-mes').value || new Date().toISOString().slice(0, 7);
+      const [ano, mesNum] = mes.split('-');
+      const diasNoMes = new Date(parseInt(ano), parseInt(mesNum), 0).getDate();
+      const diasDoMes = Array.from({ length: diasNoMes }, (_, i) => `${ano}-${mesNum}-${String(i + 1).padStart(2, '0')}`);
+
+      document.getElementById('relatorio-frequencia-content').innerHTML = `<div class="table-wrap"><table><thead><tr><th>Aluno</th>${diasDoMes.map(d => `<th>${d.slice(8)}</th>`).join('')}<th>%</th></tr></thead><tbody>${clientesCache.map(c => {
+        let presentes = 0, total = 0;
+        const linha = diasDoMes.map(data => {
+          const dataObj = new Date(data + 'T12:00:00');
+          const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'long' }).charAt(0).toUpperCase() + dataObj.toLocaleDateString('pt-BR', { weekday: 'long' }).slice(1);
+          const temAula = c.diasHorarios?.some(dh => dh.dia === diaSemana);
+          if (!temAula) return `<td>-</td>`;
+          total++;
+          const freq = frequenciasCache.find(f => f.clienteId === c.id && f.data === data);
+          if (freq?.status === 'presente') { presentes++; return `<td style="background:var(--green);color:white;">✅</td>`; }
+          return `<td style="background:var(--red);color:white;">❌</td>`;
+        }).join('');
+        const percentual = total ? ((presentes / total) * 100).toFixed(1) : 0;
+        return `<tr><td><strong>${c.nome}</strong></td>${linha}<td><strong>${percentual}%</strong></td></tr>`;
+      }).join('')}</tbody></table></div>`;
+    }
+
+    // ============================================
+    // HISTORICO
+    // ============================================
+    async function renderHistorico() {
+      document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join('');
+    }
+
+    // ============================================
+    // RELATORIOS
+    // ============================================
+    async function renderRelatorio() {
+      const de = document.getElementById('rel-de').value;
+      const ate = document.getElementById('rel-ate').value;
+      const status = document.getElementById('rel-status').value;
+      let parcelas = parcelasCache;
+      if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de);
+      if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate);
+      if (status) parcelas = parcelas.filter(p => p.status === status);
+
+      document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<td><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td></tr>`;
+      }).join('');
+    }
+
+    // ============================================
+    // UTILITARIOS
+    // ============================================
+    function maskPhone(input) {
+      let v = input.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+      else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+      else if (v.length > 0) v = `(${v}`;
+      input.value = v;
+    }
+
+    async function criarDadosIniciais() {
+      if (clientesCache.length === 0) {
+        const aluno1 = await db.collection('clientes').add({ nome: 'João Silva', telefone: '(11) 99999-9999', endereco: 'Rua A, 123', nascimento: '1990-05-15', diasHorarios: [{ dia: 'Segunda-feira', horario: '18:00' }] });
+        const aluno2 = await db.collection('clientes').add({ nome: 'Maria Oliveira', telefone: '(11) 88888-8888', endereco: 'Rua B, 456', nascimento: '1985-08-20', diasHorarios: [{ dia: 'Terça-feira', horario: '19:00' }] });
+        await refreshCache();
+        const divida = await db.collection('dividas').add({ clienteId: aluno1.id, tipo: 'Mensalidade', valor: 350, vencimento: today(), status: 'pendente' });
+        await db.collection('parcelas').add({ dividaId: divida.id, clienteId: aluno1.id, numeroParcela: 1, totalParcelas: 1, valor: 350, dataVencimento: today(), status: 'pendente' });
+        await refreshCache();
+      }
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    async function initApp() {
+      document.getElementById('msg-template').value = getMsgTemplate();
+      document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR');
+      loadTheme();
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      const buscaDiv = document.createElement('div');
+      buscaDiv.innerHTML = `<div class="search-box" style="margin-left:auto;"><span class="search-icon">🔍</span><input type="text" id="buscar-frequencia" placeholder="Buscar aluno..." oninput="filtrarFrequencia()"></div>`;
+      document.querySelector('#page-frequencia .section-header')?.appendChild(buscaDiv);
+
+      const backupBtn = document.createElement('button');
+      backupBtn.className = 'logout-btn';
+      backupBtn.style.marginBottom = '0.5rem';
+      backupBtn.innerHTML = '💾 Backup Manual';
+      backupBtn.onclick = () => alert('Use o Firebase Console para fazer backup dos dados');
+      document.querySelector('.sidebar-footer')?.insertBefore(backupBtn, document.querySelector('.sidebar-footer').firstChild);
+
+      await refreshCache();
+      await criarDadosIniciais();
+
+      renderDashboard();
+      renderHoje();
+      renderClientes();
+      carregarAniversariantesSemana();
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        await initApp();
+      } else {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+      }
+    });
+
+    window.doLogin = doLogin;
+    window.doRegister = doRegister;
+    window.doLogout = doLogout;
+    window.navigate = navigate;
+    window.toggleSubmenuMensalidade = toggleSubmenuMensalidade;
+    window.toggleSubmenuFrequencia = toggleSubmenuFrequencia;
+    window.toggleSidebar = toggleSidebar;
+    window.closeSidebar = closeSidebar;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.toggleTheme = toggleTheme;
+    window.openClienteModal = openClienteModal;
+    window.saveCliente = saveCliente;
+    window.deleteClienteHandler = deleteClienteHandler;
+    window.deleteDividaHandler = deleteDividaHandler;
+    window.limparFiltrosParcelas = limparFiltrosParcelas;
+    window.openStatusModal = openStatusModal;
+    window.saveStatus = saveStatus;
+    window.marcarPago = marcarPago;
+    window.renderDisparoTable = renderDisparoTable;
+    window.resetMsgTemplate = resetMsgTemplate;
+    window.salvarMsgTemplate = salvarMsgTemplate;
+    window.adicionarDiaHorario = adicionarDiaHorario;
+    window.removerDiaHorario = removerDiaHorario;
+    window.toggleClienteParcelamento = toggleClienteParcelamento;
+    window.renderRelatorio = renderRelatorio;
+    window.maskPhone = maskPhone;
+    window.carregarFrequencia = carregarFrequencia;
+    window.marcarPresenca = marcarPresenca;
+    window.carregarPresencaAutomatica = carregarPresencaAutomatica;
+    window.carregarReposicao = carregarReposicao;
+    window.carregarFaltasAluno = carregarFaltasAluno;
+    window.selecionarFalta = selecionarFalta;
+    window.salvarReposicao = salvarReposicao;
+    window.cancelarReposicao = cancelarReposicao;
+    window.limparSelecaoFalta = limparSelecaoFalta;
+    window.carregarRelatorioFrequencia = carregarRelatorioFrequencia;
+    window.carregarAniversariantesSemana = carregarAniversariantesSemana;
+    window.carregarAlunosPorHora = carregarAlunosPorHora;
+    window.renderHoje = renderHoje;
+    window.renderParcelas = renderParcelas;
+    window.renderClientes = renderClientes;
+    window.renderDashboard = renderDashboard;
+    window.renderHistorico = renderHistorico;
+    window.filtrarFrequencia = carregarFrequencia;
+  </script>
+</body>
+
+</html>
