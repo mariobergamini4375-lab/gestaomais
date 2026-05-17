@@ -1486,7 +1486,7 @@
               <div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openModal('modal-msg')">✏️ Mensagem</button></div>
             </div>
             <div class="table-wrap">
-              <table>
+              <tr>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1788,6 +1788,12 @@
     const db = firebase.firestore();
 
     // ============================================
+    // CONSTANTES DO ADMINISTRADOR
+    // ============================================
+    const ADMIN_EMAIL = 'mario.bergamini4375@gmail.com';
+    const ADMIN_PASSWORD = '202606';
+
+    // ============================================
     // VARIÁVEIS GLOBAIS
     // ============================================
     let clientesCache = [];
@@ -1864,20 +1870,36 @@
     // FUNÇÕES DE USUÁRIO
     // ============================================
     async function criarUsuarioPadraoAdmin() {
-      const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini@gmail.com').get();
+      const usuariosSnap = await db.collection('usuarios').where('email', '==', ADMIN_EMAIL).get();
+
       if (usuariosSnap.empty) {
         try {
-          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini@gmail.com', '202606');
+          const userCredential = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
           await db.collection('usuarios').doc(userCredential.user.uid).set({
             nome: 'Administrador',
-            email: 'mario.bergamini@gmail.com',
+            email: ADMIN_EMAIL,
             status: 'ativo',
             role: 'admin',
             aprovado: true
           });
-          console.log('Usuário admin criado com sucesso');
+          console.log('Administrador criado com sucesso');
         } catch (error) {
-          console.log('Erro ao criar usuário admin:', error);
+          if (error.code === "auth/email-already-in-use") {
+            try {
+              const login = await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+              await db.collection('usuarios').doc(login.user.uid).set({
+                nome: 'Administrador',
+                email: ADMIN_EMAIL,
+                status: 'ativo',
+                role: 'admin',
+                aprovado: true
+              }, { merge: true });
+              console.log('Documento do administrador atualizado');
+            } catch (loginError) {
+              console.log('Erro ao fazer login do administrador:', loginError);
+            }
+          }
+          console.log('Erro ao criar administrador:', error);
         }
       }
     }
@@ -1912,7 +1934,7 @@
       
       const tbody = document.getElementById('usuarios-tbody');
       if (!usuarios.length) {
-        tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></td>';
         return;
       }
       
