@@ -1220,7 +1220,6 @@
       color: var(--text3);
     }
 
-    /* RESPONSIVIDADE CELULAR */
     @media (max-width: 768px) {
       .stats-grid {
         grid-template-columns: 1fr !important;
@@ -1271,7 +1270,6 @@
       }
     }
 
-    /* Card de faltas consecutivas */
     .faltas-consecutivas-card {
       background: var(--surface);
       border: 1px solid var(--orange);
@@ -1284,8 +1282,7 @@
       color: var(--orange);
       margin-bottom: 1rem;
     }
-    
-    /* Estilo para células de feriado no relatório */
+
     .feriado-cell {
       background-color: rgba(239, 68, 68, 0.15) !important;
       color: var(--red) !important;
@@ -1293,6 +1290,7 @@
       position: relative;
       cursor: help;
     }
+
     .feriado-cell::after {
       content: "📅";
       margin-left: 4px;
@@ -1365,7 +1363,7 @@
             <div class="nav-subitem" onclick="window.navigate('whatsapp-faltas'); event.stopPropagation()"><span
                 class="icon">💬</span> WhatsApp Faltas</div>
           </div>
-          <!-- Menu Gerenciar Usuários - visível apenas para admin via JS -->
+
           <div id="menu-gerenciar-usuarios" style="display:none;">
             <div class="nav-section">
               <div class="nav-section-title">Administração</div>
@@ -1420,11 +1418,11 @@
               </div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card alert">
-                  <div class="stat-label">⚠️ Alunos com Faltas Consecutivas</div>
-                  <div class="stat-value" id="dashboard-stat-faltas">0</div>
-                  <div class="stat-cobrancas" id="dashboard-lista-faltas"></div>
-                </div>
+              <div class="stat-card alert">
+                <div class="stat-label">⚠️ Alunos com Faltas Consecutivas</div>
+                <div class="stat-value" id="dashboard-stat-faltas">0</div>
+                <div class="stat-cobrancas" id="dashboard-lista-faltas"></div>
+              </div>
             </div>
           </div>
 
@@ -1592,8 +1590,8 @@
                 <tbody id="alunos-por-hora-tbody">
                   <tr>
                     <td colspan="8" class="empty">Carregando...</td>
-                  </tr>
-                </tbody>
+              </table>
+              </tbody>
               </table>
             </div>
           </div>
@@ -1637,7 +1635,7 @@
             </div>
             <div id="frequencia-content"></div>
           </div>
-          
+
           <div class="page" id="page-whatsapp-faltas">
             <div class="section-header">
               <h2>💬 WhatsApp Faltas</h2>
@@ -1675,34 +1673,30 @@
                 <option value="atrasado">Atrasado</option>
               </select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
             <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Aluno</th>
-                    <th>Mensalidade</th>
-                    <th>Parcela</th>
-                    <th>Valor</th>
-                    <th>Vencimento</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="relatorio-tbody"></tbody>
+              </table>
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Mensalidade</th>
+                  <th>Parcela</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="relatorio-tbody"></tbody>
               </table>
             </div>
           </div>
 
-          <!-- Página Gerenciar Usuários -->
           <div class="page" id="page-usuarios">
             <div class="section-header">
-              <h2>👥 Gerenciar Usuários</h2>
-              <button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo Usuário</button>
+              <h2>👥 Gerenciar Usuários</h2><button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo
+                Usuário</button>
             </div>
             <div class="search-row">
-              <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="search-usuarios" placeholder="Buscar usuário..."
-                  oninput="window.renderUsuarios()">
-              </div>
+              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-usuarios"
+                  placeholder="Buscar usuário..." oninput="window.renderUsuarios()"></div>
             </div>
             <div class="table-wrap">
               <table>
@@ -1711,6 +1705,8 @@
                     <th>Nome</th>
                     <th>Email</th>
                     <th>Status</th>
+                    <th>Data Cadastro</th>
+                    <th>Último Login</th>
                     <th>Tipo</th>
                     <th>Ações</th>
                   </tr>
@@ -1730,17 +1726,13 @@
       <div class="modal-header">
         <h3>Aluno</h3><button class="modal-close" onclick="window.closeModal('modal-cliente')">×</button>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="cliente-id">
+      <div class="modal-body"><input type="hidden" id="cliente-id">
         <div class="form-group"><label>Nome *</label><input type="text" id="cliente-nome"></div>
         <div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone"
             placeholder="(11) 99999-9999" oninput="window.maskPhone(this)"></div>
         <div class="form-group"><label>Endereço</label><input type="text" id="cliente-endereco"></div>
         <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cliente-nascimento"></div>
-        <div class="form-group">
-          <label>Data da Matrícula</label>
-          <input type="date" id="cliente-matricula">
-        </div>
+        <div class="form-group"><label>Data da Matrícula</label><input type="date" id="cliente-matricula"></div>
         <div class="form-group"><label>Dias e Horários das Aulas</label>
           <div id="dias-horarios-container">
             <div id="dias-horarios-list" class="dias-horarios-list"></div>
@@ -1786,27 +1778,23 @@
     </div>
   </div>
 
-  <!-- Modal Usuário -->
   <div class="modal-overlay" id="modal-usuario">
     <div class="modal">
       <div class="modal-header">
         <h3 id="modal-usuario-title">Novo Usuário</h3><button class="modal-close"
           onclick="window.closeModal('modal-usuario')">×</button>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="usuario-id">
+      <div class="modal-body"><input type="hidden" id="usuario-id">
         <div class="form-group"><label>Nome</label><input type="text" id="usuario-nome" placeholder="Nome completo">
         </div>
         <div class="form-group"><label>Email</label><input type="email" id="usuario-email"
             placeholder="email@exemplo.com"></div>
         <div class="form-group" id="usuario-senha-group"><label>Senha</label><input type="password" id="usuario-senha"
             placeholder="******"></div>
-        <div class="form-group"><label>Status</label>
-          <select id="usuario-status" class="filter-select">
+        <div class="form-group"><label>Status</label><select id="usuario-status" class="filter-select">
             <option value="ativo">Ativo</option>
             <option value="bloqueado">Bloqueado</option>
-          </select>
-        </div>
+          </select></div>
       </div>
       <div class="modal-footer"><button class="btn btn-ghost"
           onclick="window.closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary"
@@ -1847,7 +1835,6 @@
     </div>
   </div>
 
-  <!-- Botão voltar ao topo -->
   <button class="btn btn-primary btn-topo" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">⬆</button>
 
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1890,26 +1877,39 @@
     let currentUser = null;
     let currentUserRole = null;
 
-    // Lista de Feriados (Nacionais, SP, Ourinhos)
+    // Lista de Feriados
     const feriadosList = [
-      "2024-01-01", "2025-01-01", "2026-01-01", // Confraternização Universal
-      "2024-04-21", "2025-04-21", "2026-04-21", // Tiradentes
-      "2024-05-01", "2025-05-01", "2026-05-01", // Dia do Trabalhador
-      "2024-09-07", "2025-09-07", "2026-09-07", // Independência do Brasil
-      "2024-10-12", "2025-10-12", "2026-10-12", // Nossa Senhora Aparecida
-      "2024-11-02", "2025-11-02", "2026-11-02", // Finados
-      "2024-11-15", "2025-11-15", "2026-11-15", // Proclamação da República
-      "2024-12-25", "2025-12-25", "2026-12-25", // Natal
-      "2024-02-13", "2025-03-04", "2026-02-17", // Carnaval (datas aproximadas, ajuste manual se necessário)
-      "2024-03-29", "2025-04-18", "2026-04-03", // Sexta-feira Santa
-      "2024-05-30", "2025-06-19", "2026-06-04", // Corpus Christi
-      "2024-07-09", "2025-07-09", "2026-07-09", // Revolução Constitucionalista (SP)
-      "2024-11-20", "2025-11-20", "2026-11-20", // Consciência Negra (Ourinhos/SP)
+      "2024-01-01", "2025-01-01", "2026-01-01",
+      "2024-04-21", "2025-04-21", "2026-04-21",
+      "2024-05-01", "2025-05-01", "2026-05-01",
+      "2024-09-07", "2025-09-07", "2026-09-07",
+      "2024-10-12", "2025-10-12", "2026-10-12",
+      "2024-11-02", "2025-11-02", "2026-11-02",
+      "2024-11-15", "2025-11-15", "2026-11-15",
+      "2024-12-25", "2025-12-25", "2026-12-25",
+      "2024-02-13", "2025-03-04", "2026-02-17",
+      "2024-03-29", "2025-04-18", "2026-04-03",
+      "2024-05-30", "2025-06-19", "2026-06-04",
+      "2024-07-09", "2025-07-09", "2026-07-09",
+      "2024-11-20", "2025-11-20", "2026-11-20",
     ];
-    
+
     function ehFeriado(dataStr) {
-        if (!dataStr) return false;
-        return feriadosList.includes(dataStr);
+      if (!dataStr) return false;
+      return feriadosList.includes(dataStr);
+    }
+
+    // ============================================
+    // FUNÇÃO MULTITENANT
+    // ============================================
+    function getUserCollection(collectionName) {
+      if (!currentUser?.uid) {
+        throw new Error('Usuário não autenticado');
+      }
+      if (currentUserRole === 'admin') {
+        return db.collection(collectionName);
+      }
+      return db.collection('usuarios').doc(currentUser.uid).collection(collectionName);
     }
 
     // ============================================
@@ -1924,38 +1924,42 @@
       const data = new Date(dataStr + 'T12:00:00');
       return dias[data.getDay()];
     }
-
     function horarioParaMinutos(horario) {
       const [h, m] = horario.split(':').map(Number);
       return (h * 60) + m;
     }
 
     // ============================================
-    // REFRESH CACHE
+    // REFRESH CACHE (MULTITENANT)
     // ============================================
     async function refreshCache() {
-      const clientesSnap = await db.collection('clientes').get();
+      const getCol = (name) => {
+        if (currentUserRole === 'admin') return db.collection(name);
+        return db.collection('usuarios').doc(currentUser.uid).collection(name);
+      };
+
+      const clientesSnap = await getCol('clientes').get();
       clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const dividasSnap = await db.collection('dividas').get();
+      const dividasSnap = await getCol('dividas').get();
       dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const parcelasSnap = await db.collection('parcelas').get();
+      const parcelasSnap = await getCol('parcelas').get();
       parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const frequenciasSnap = await db.collection('frequencias').get();
+      const frequenciasSnap = await getCol('frequencias').get();
       frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const reposicoesSnap = await db.collection('reposicoes').get();
+      const reposicoesSnap = await getCol('reposicoes').get();
       reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const historicoSnap = await db.collection('historico').orderBy('dt', 'desc').get();
+      const historicoSnap = await getCol('historico').orderBy('dt', 'desc').get();
       historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const ultimosParabensSnap = await db.collection('ultimosParabens').get();
+      const ultimosParabensSnap = await getCol('ultimosParabens').get();
       ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const alertasSnap = await db.collection('alertasFaltas').get();
+      const alertasSnap = await getCol('alertasFaltas').get();
       alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
       const usuariosSnap = await db.collection('usuarios').get();
@@ -1963,7 +1967,11 @@
     }
 
     async function addHistory(acao, tipo) {
-      await db.collection('historico').add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
+      const getCol = () => {
+        if (currentUserRole === 'admin') return db.collection('historico');
+        return db.collection('usuarios').doc(currentUser.uid).collection('historico');
+      };
+      await getCol().add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
       await refreshCache();
     }
 
@@ -1980,7 +1988,9 @@
             email: 'mario.bergamini@gmail.com',
             status: 'ativo',
             role: 'admin',
-            aprovado: true
+            aprovado: true,
+            dadosMigrados: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           console.log('Usuário admin criado com sucesso');
         } catch (error) {
@@ -2009,6 +2019,25 @@
       return usuarioData;
     }
 
+    // ============================================
+    // GERENCIAR USUÁRIOS
+    // ============================================
+    window.aprovarUsuario = async function (userId) {
+      if (currentUserRole !== 'admin') return;
+      if (!confirm('Aprovar este usuário?')) return;
+
+      await db.collection('usuarios').doc(userId).update({
+        status: 'ativo',
+        aprovado: true,
+        aprovadoEm: new Date().toISOString(),
+        aprovadoPor: currentUser.email
+      });
+
+      await refreshCache();
+      await addHistory(`Usuário aprovado`, 'green');
+      window.renderUsuarios();
+    };
+
     window.renderUsuarios = async function () {
       if (currentUserRole !== 'admin') return;
 
@@ -2019,26 +2048,48 @@
 
       const tbody = document.getElementById('usuarios-tbody');
       if (!usuarios.length) {
-        tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
         return;
       }
 
-      tbody.innerHTML = usuarios.map(u => `<tr>
+      tbody.innerHTML = usuarios.map(u => {
+        let statusBadge = '';
+        if (u.status === 'ativo') statusBadge = '<span class="badge badge-ativo">✅ Ativo</span>';
+        else if (u.status === 'bloqueado') statusBadge = '<span class="badge badge-bloqueado">🔒 Bloqueado</span>';
+        else statusBadge = '<span class="badge badge-aguardando">⏳ Aguardando</span>';
+
+        let roleBadge = u.role === 'admin' ? '<span class="badge badge-pendente">👑 Admin</span>' : '<span class="badge badge-pago">👤 Usuário</span>';
+
+        let actions = '';
+        if (u.status === 'aguardando') {
+          actions += `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Aprovar</button>`;
+        }
+        if (u.status === 'bloqueado') {
+          actions += `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`;
+        }
+        if (u.status === 'ativo') {
+          actions += `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>`;
+        }
+        if (u.role !== 'admin') {
+          actions += `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>`;
+        }
+
+        return `
+      <tr>
         <td><strong>${u.nome || '—'}</strong></td>
         <td>${u.email}</td>
-        <td><span class="badge badge-${u.status === 'ativo' ? 'ativo' : (u.status === 'bloqueado' ? 'bloqueado' : 'aguardando')}">${u.status === 'ativo' ? '✅ Ativo' : (u.status === 'bloqueado' ? '🔒 Bloqueado' : '⏳ Aguardando')}</span></td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-pendente' : 'badge-pago'}">${u.role === 'admin' ? '👑 Administrador' : '👤 Usuário'}</span></td>
-        <td class="td-actions">
-          <button class="btn btn-ghost btn-sm" onclick="window.editarUsuario('${u.id}')">✏️</button>
-          ${u.status !== 'bloqueado' ? `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>` : `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`}
-          ${u.role !== 'admin' ? `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>` : ''}
-        </span></td>
-      </tr>`).join('');
+        <td>${statusBadge}</td>
+        <td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR') : '—'}</td>
+        <td>${u.ultimoLogin ? new Date(u.ultimoLogin).toLocaleDateString('pt-BR') : '—'}</td>
+        <td>${roleBadge}</td>
+        <td class="td-actions">${actions}</span></td>
+      </tr>
+    `;
+      }).join('');
     };
 
     window.openUsuarioModal = function (id = null) {
       if (currentUserRole !== 'admin') return;
-
       document.getElementById('usuario-id').value = '';
       document.getElementById('usuario-nome').value = '';
       document.getElementById('usuario-email').value = '';
@@ -2046,7 +2097,6 @@
       document.getElementById('usuario-status').value = 'ativo';
       document.getElementById('modal-usuario-title').textContent = 'Novo Usuário';
       document.getElementById('usuario-senha-group').style.display = 'block';
-
       if (id) {
         const u = usuariosCache.find(x => x.id === id);
         if (u) {
@@ -2061,28 +2111,19 @@
       window.openModal('modal-usuario');
     };
 
-    window.editarUsuario = function (id) {
-      window.openUsuarioModal(id);
-    };
+    window.editarUsuario = function (id) { window.openUsuarioModal(id); };
 
     window.saveUsuario = async function () {
       if (currentUserRole !== 'admin') return;
-
       const id = document.getElementById('usuario-id').value;
       const nome = document.getElementById('usuario-nome').value.trim();
       const email = document.getElementById('usuario-email').value.trim();
       const senha = document.getElementById('usuario-senha').value;
       const status = document.getElementById('usuario-status').value;
-
-      if (!nome || !email) {
-        alert('Preencha nome e email!');
-        return;
-      }
-
+      if (!nome || !email) { alert('Preencha nome e email!'); return; }
       const saveBtn = event?.target;
       const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar';
       if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
-
       try {
         if (id) {
           await db.collection('usuarios').doc(id).update({ nome, status });
@@ -2090,17 +2131,11 @@
           await addHistory(`Usuário ${nome} atualizado`, 'green');
           alert('Usuário atualizado com sucesso!');
         } else {
-          if (!senha) {
-            alert('Preencha a senha!');
-            return;
-          }
+          if (!senha) { alert('Preencha a senha!'); return; }
           const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
           await db.collection('usuarios').doc(userCredential.user.uid).set({
-            nome,
-            email,
-            status,
-            role: 'user',
-            aprovado: true
+            nome, email, status, role: 'user', aprovado: true,
+            dadosMigrados: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           await refreshCache();
           await addHistory(`Usuário ${nome} criado pelo administrador`, 'green');
@@ -2127,7 +2162,7 @@
     window.ativarUsuario = async function (id) {
       if (currentUserRole !== 'admin') return;
       if (!confirm('Deseja ativar este usuário?')) return;
-      await db.collection('usuarios').doc(id).update({ status: 'ativo' });
+      await db.collection('usuarios').doc(id).update({ status: 'ativo', aprovado: true });
       await refreshCache();
       await addHistory(`Usuário ativado`, 'green');
       window.renderUsuarios();
@@ -2135,15 +2170,13 @@
 
     window.excluirUsuario = async function (id, email) {
       if (currentUserRole !== 'admin') return;
-      if (!confirm(`Deseja excluir o usuário ${email}?`)) return;
-
+      if (!confirm(`Deseja excluir o usuário ${email}? Esta ação é irreversível!`)) return;
       try {
         const user = await auth.getUserByEmail(email);
         await auth.deleteUser(user.uid);
       } catch (error) {
         console.log('Erro ao excluir do auth:', error);
       }
-
       await db.collection('usuarios').doc(id).delete();
       await refreshCache();
       await addHistory(`Usuário ${email} excluído`, 'red');
@@ -2151,22 +2184,23 @@
     };
 
     // ============================================
-    // LOGIN MODIFICADO
+    // LOGIN E REGISTER
     // ============================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
       const password = document.getElementById('login-pass').value;
       const errorDiv = document.getElementById('login-error');
-
       if (!email || !password) {
         errorDiv.textContent = '❌ Preencha email e senha!';
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 3000);
         return;
       }
-
       try {
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        await db.collection('usuarios').doc(userCredential.user.uid).update({
+          ultimoLogin: new Date().toISOString()
+        });
         const usuarioData = await verificarAcessoUsuario(userCredential.user);
         errorDiv.style.display = 'none';
         currentUser = userCredential.user;
@@ -2182,29 +2216,29 @@
       const email = document.getElementById('login-user').value;
       const password = document.getElementById('login-pass').value;
       const errorDiv = document.getElementById('login-error');
-
       if (!email || !password) {
         errorDiv.textContent = '❌ Preencha email e senha!';
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 3000);
         return;
       }
-
       if (password.length < 6) {
         errorDiv.textContent = '❌ A senha deve ter pelo menos 6 caracteres!';
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 3000);
         return;
       }
-
       try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        await db.collection('usuarios').doc(userCredential.user.uid).set({
+        const uid = userCredential.user.uid;
+        await db.collection('usuarios').doc(uid).set({
           nome: email.split('@')[0],
           email: email,
           status: 'aguardando',
           role: 'user',
-          aprovado: false
+          aprovado: false,
+          dadosMigrados: true,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         await auth.signOut();
         errorDiv.textContent = '✅ Conta criada! Aguarde liberação pelo administrador.';
@@ -2234,17 +2268,14 @@
       const submenu = document.getElementById('submenu-mensalidade');
       submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
     };
-
     window.toggleSubmenuFrequencia = function () {
       const submenu = document.getElementById('submenu-frequencia');
       submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
     };
-
     window.navigate = function (page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const pageElement = document.getElementById(`page-${page}`);
       if (pageElement) pageElement.classList.add('active');
-
       let title = '';
       if (page === 'dashboard') title = 'Dashboard';
       else if (page === 'alunos') title = 'Cadastro de Alunos';
@@ -2261,10 +2292,8 @@
       else if (page === 'historico') title = 'Histórico';
       else if (page === 'relatorios') title = 'Relatórios';
       else if (page === 'usuarios') title = 'Gerenciar Usuários';
-
       document.getElementById('topbar-title').innerText = title;
       window.closeSidebar();
-
       if (page === 'dashboard') window.renderDashboard();
       if (page === 'alunos') window.renderClientes();
       if (page === 'aniversariantes') window.carregarAniversariantesSemana();
@@ -2274,27 +2303,21 @@
       if (page === 'presenca-automatica') window.carregarPresencaAutomatica();
       if (page === 'alunos-por-hora') window.carregarAlunosPorHora();
       if (page === 'reposicao') window.carregarReposicao();
-      if (page === 'frequencia') {
-        window.carregarFrequencia();
-        window.renderFaltasConsecutivas();
-      }
+      if (page === 'frequencia') { window.carregarFrequencia(); window.renderFaltasConsecutivas(); }
       if (page === 'whatsapp-faltas') window.renderWhatsAppFaltas();
       if (page === 'relatorio-frequencia') window.carregarRelatorioFrequencia();
       if (page === 'historico') window.renderHistorico();
       if (page === 'relatorios') window.renderRelatorio();
       if (page === 'usuarios') window.renderUsuarios();
     };
-
     window.toggleSidebar = function () {
       document.getElementById('sidebar').classList.toggle('open');
       document.getElementById('overlay-bg').classList.toggle('open');
     };
-
     window.closeSidebar = function () {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('overlay-bg').classList.remove('open');
     };
-
     window.openModal = function (id) { document.getElementById(id).classList.add('open'); };
     window.closeModal = function (id) { document.getElementById(id).classList.remove('open'); };
 
@@ -2307,14 +2330,12 @@
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
       const timeString = `${hours}:${minutes}:${seconds}`;
-
       const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
       const dayName = days[now.getDay()];
       const day = String(now.getDate()).padStart(2, '0');
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const year = now.getFullYear();
       const dateString = `${dayName}, ${day}/${month}/${year}`;
-
       const clockTime = document.getElementById('clock-time');
       const clockDate = document.getElementById('clock-date');
       if (clockTime) clockTime.textContent = timeString;
@@ -2337,7 +2358,6 @@
         if (themeBtn) themeBtn.innerHTML = '☀️ Light';
       }
     };
-
     function loadTheme() {
       const savedTheme = localStorage.getItem('theme');
       const body = document.body;
@@ -2356,31 +2376,21 @@
     // ============================================
     const MSG_DEFAULT = "Olá {nome}, a parcela {parcela}/{total_parcelas} da mensalidade \"{tipo}\" com vencimento em {vencimento} no valor de {valor}. Aguardamos seu contato.";
     const MSG_FALTAS_CONSECUTIVAS = "Olá {nome}!\n\nIdentificamos 2 faltas consecutivas nas aulas.\n\nEntre em contato conosco para agendar sua aula de reposição.\n\nEstamos à disposição 🙂";
-
     function getMsgTemplate() { return localStorage.getItem('msg_template') || MSG_DEFAULT; }
-
     function buildMsg(p, c, d) {
       let tpl = getMsgTemplate();
-      return tpl.replace(/{nome}/g, c?.nome || '')
-        .replace(/{tipo}/g, d?.tipo || 'Mensalidade')
-        .replace(/{parcela}/g, p.numeroParcela)
-        .replace(/{total_parcelas}/g, p.totalParcelas)
-        .replace(/{valor}/g, fmtBRL(p.valor))
-        .replace(/{vencimento}/g, fmtDate(p.dataVencimento));
+      return tpl.replace(/{nome}/g, c?.nome || '').replace(/{tipo}/g, d?.tipo || 'Mensalidade').replace(/{parcela}/g, p.numeroParcela).replace(/{total_parcelas}/g, p.totalParcelas).replace(/{valor}/g, fmtBRL(p.valor)).replace(/{vencimento}/g, fmtDate(p.dataVencimento));
     }
-
     function buildMsgAniversario(cliente) {
       return `🎉 *PARABÉNS ${cliente.nome}!* 🎂\n\nHoje é seu dia especial! Desejamos muita saúde, paz, sucesso e realizações! 🥳🎈\n\nAgradecemos pela confiança e por fazer parte da nossa história! 💝`;
     }
-
     window.resetMsgTemplate = function () { document.getElementById('msg-template').value = MSG_DEFAULT; };
     window.salvarMsgTemplate = function () { const val = document.getElementById('msg-template').value; if (val) localStorage.setItem('msg_template', val); else localStorage.removeItem('msg_template'); window.closeModal('modal-msg'); alert('Mensagem salva!'); };
 
     // ============================================
-    // DASHBOARD - ENVIO DE PARABÉNS COM OCULTAÇÃO
+    // DASHBOARD
     // ============================================
     let hiddenItems = { hoje: [], atrasadas: [], aniversariantes: [] };
-
     function loadHiddenItems() {
       const saved = localStorage.getItem('hiddenDashboardItems');
       if (saved) {
@@ -2392,48 +2402,24 @@
         } catch (e) { }
       }
     }
-
-    function saveHiddenItems() {
-      localStorage.setItem('hiddenDashboardItems', JSON.stringify(hiddenItems));
-    }
-
+    function saveHiddenItems() { localStorage.setItem('hiddenDashboardItems', JSON.stringify(hiddenItems)); }
     async function ocultarItemAposEnvio(tipo, id, clienteId = null) {
-      if (tipo === 'hoje') {
-        if (!hiddenItems.hoje.includes(id)) hiddenItems.hoje.push(id);
-        window.renderDashboard();
-      }
-      else if (tipo === 'atrasada') {
-        if (!hiddenItems.atrasadas.some(item => item.id === id)) {
-          hiddenItems.atrasadas.push({ id: id, hiddenAt: Date.now() });
-        }
-        window.renderDashboard();
-      }
-      else if (tipo === 'aniversariante') {
-        if (!hiddenItems.aniversariantes.includes(id)) {
-          hiddenItems.aniversariantes.push(id);
-          await db.collection('ultimosParabens').add({ clienteId: id, data: today(), enviadoEm: new Date().toISOString() });
-          await refreshCache();
-        }
-        window.renderDashboard();
-      }
+      if (tipo === 'hoje') { if (!hiddenItems.hoje.includes(id)) hiddenItems.hoje.push(id); window.renderDashboard(); }
+      else if (tipo === 'atrasada') { if (!hiddenItems.atrasadas.some(item => item.id === id)) { hiddenItems.atrasadas.push({ id: id, hiddenAt: Date.now() }); } window.renderDashboard(); }
+      else if (tipo === 'aniversariante') { if (!hiddenItems.aniversariantes.includes(id)) { hiddenItems.aniversariantes.push(id); await getUserCollection('ultimosParabens').add({ clienteId: id, data: today(), enviadoEm: new Date().toISOString() }); await refreshCache(); } window.renderDashboard(); }
       saveHiddenItems();
     }
-
     function verificarRestauracaoAtrasadas() {
       const agora = Date.now();
       const doisDiasEmMs = 2 * 24 * 60 * 60 * 1000;
       let alterado = false;
-      hiddenItems.atrasadas = hiddenItems.atrasadas.filter(item => {
-        const deveRestaurar = (agora - item.hiddenAt) >= doisDiasEmMs;
-        if (deveRestaurar) alterado = true;
-        return !deveRestaurar;
-      });
+      hiddenItems.atrasadas = hiddenItems.atrasadas.filter(item => { const deveRestaurar = (agora - item.hiddenAt) >= doisDiasEmMs; if (deveRestaurar) alterado = true; return !deveRestaurar; });
       if (alterado) { saveHiddenItems(); window.renderDashboard(); }
     }
     setInterval(verificarRestauracaoAtrasadas, 60 * 60 * 1000);
 
     // ============================================
-    // VERIFICAR FALTAS CONSECUTIVAS (Melhorada)
+    // VERIFICAR FALTAS CONSECUTIVAS
     // ============================================
     async function verificarFaltasConsecutivas() {
       for (const aluno of clientesCache) {
@@ -2449,7 +2435,6 @@
             const dataFalta = new Date(falta.data + 'T12:00:00');
             const dataAnteriorDate = new Date(dataAnterior + 'T12:00:00');
             const diffDias = Math.ceil((dataFalta - dataAnteriorDate) / (1000 * 60 * 60 * 24));
-
             if (diffDias <= 7) {
               faltasConsecutivas.push(falta.data);
             } else {
@@ -2458,26 +2443,14 @@
           } else {
             faltasConsecutivas = [falta.data];
           }
-
           dataAnterior = falta.data;
-
           if (faltasConsecutivas.length >= 2) {
-            const alertaExistente = alertasFaltasCache.find(a =>
-              a.alunoId === aluno.id &&
-              !a.resolvido &&
-              a.faltas && a.faltas[0] === faltasConsecutivas[0]
-            );
-
+            const alertaExistente = alertasFaltasCache.find(a => a.alunoId === aluno.id && !a.resolvido && a.faltas && a.faltas[0] === faltasConsecutivas[0]);
             if (!alertaExistente) {
-              await db.collection('alertasFaltas').add({
-                alunoId: aluno.id,
-                nome: aluno.nome,
-                telefone: aluno.telefone,
-                faltas: [...faltasConsecutivas],
-                ultimaFalta: faltasConsecutivas[faltasConsecutivas.length - 1],
-                resolvido: false,
-                reposicaoAgendada: false,
-                criadoEm: new Date().toISOString()
+              await getUserCollection('alertasFaltas').add({
+                alunoId: aluno.id, nome: aluno.nome, telefone: aluno.telefone,
+                faltas: [...faltasConsecutivas], ultimaFalta: faltasConsecutivas[faltasConsecutivas.length - 1],
+                resolvido: false, reposicaoAgendada: false, criadoEm: new Date().toISOString()
               });
               await refreshCache();
             }
@@ -2488,122 +2461,74 @@
     }
 
     // ============================================
-    // RENDER FALTAS CONSECUTIVAS (na página de frequência)
+    // RENDER FALTAS CONSECUTIVAS
     // ============================================
     window.renderFaltasConsecutivas = function () {
       const container = document.getElementById('faltas-consecutivas-lista');
       if (!container) return;
-
       const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-
       if (alertas.length === 0) {
         container.innerHTML = '<div class="empty">✅ Nenhum aluno com 2 faltas consecutivas</div>';
         return;
       }
-
       container.innerHTML = alertas.map(alerta => `
-        <div class="cobranca-item" style="border-left: 3px solid var(--orange);">
-          <div class="cobranca-info">
-            <div class="cobranca-nome">${alerta.nome}</div>
-            <div class="cobranca-valor">⚠️ 2 faltas consecutivas</div>
-            <div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div>
-          </div>
-          <div class="td-actions">
-            <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">
-              📲 WhatsApp
-            </button>
-            <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">
-              ✔ Dar baixa
-            </button>
-          </div>
-        </div>
-      `).join('');
+    <div class="cobranca-item" style="border-left: 3px solid var(--orange);">
+      <div class="cobranca-info">
+        <div class="cobranca-nome">${alerta.nome}</div>
+        <div class="cobranca-valor">⚠️ 2 faltas consecutivas</div>
+        <div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div>
+      </div>
+      <div class="td-actions">
+        <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">📲 WhatsApp</button>
+        <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button>
+      </div>
+    </div>
+  `).join('');
     };
-    
+
     // ============================================
-    // RENDER WHATSAPP FALTAS (Nova Subaba)
+    // RENDER WHATSAPP FALTAS
     // ============================================
     window.renderWhatsAppFaltas = function () {
       const container = document.getElementById('whatsapp-faltas-content');
       const countSpan = document.getElementById('whatsapp-faltas-count');
       if (!container) return;
-
       const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-
       if (!countSpan) return;
       countSpan.textContent = `${alertas.length} alerta(s)`;
       countSpan.className = alertas.length > 0 ? 'badge badge-pendente' : 'badge badge-pago';
-
       if (alertas.length === 0) {
         container.innerHTML = '<div class="empty">✅ Nenhum alerta de faltas consecutivas pendente</div>';
         return;
       }
-
-      container.innerHTML = `
-        <div class="frequencia-grid">
-          ${alertas.map(alerta => {
-            // Busca dados atualizados do aluno caso o nome no alerta esteja desatualizado (segurança)
-            const aluno = clientesCache.find(c => c.id === alerta.alunoId) || { nome: alerta.nome, telefone: alerta.telefone };
-            return `
-              <div class="frequencia-card" style="border-left: 3px solid var(--orange);">
-                <div class="frequencia-aluno-nome">${aluno.nome || alerta.nome}</div>
-                <div class="frequencia-dias">
-                  <strong>Telefone:</strong> ${aluno.telefone || alerta.telefone}<br>
-                  <strong>Faltas consecutivas:</strong> ${alerta.faltas.map(f => fmtDate(f)).join(', ')}
-                </div>
-                <div class="td-actions" style="margin-top: 10px;">
-                  <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${aluno.telefone || alerta.telefone}', '${aluno.nome || alerta.nome}')">
-                    ✏️ Enviar Mensagem WhatsApp
-                  </button>
-                  <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">
-                    Ocultar Alerta
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+      container.innerHTML = `<div class="frequencia-grid">${alertas.map(alerta => {
+        const aluno = clientesCache.find(c => c.id === alerta.alunoId) || { nome: alerta.nome, telefone: alerta.telefone };
+        return `<div class="frequencia-card" style="border-left: 3px solid var(--orange);"><div class="frequencia-aluno-nome">${aluno.nome || alerta.nome}</div><div class="frequencia-dias"><strong>Telefone:</strong> ${aluno.telefone || alerta.telefone}<br><strong>Faltas consecutivas:</strong> ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div><div class="td-actions" style="margin-top: 10px;"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${aluno.telefone || alerta.telefone}', '${aluno.nome || alerta.nome}')">✏️ Enviar Mensagem WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">Ocultar Alerta</button></div></div>`;
+      }).join('')}</div>`;
     };
 
     window.enviarWhatsappFalta = async function (alertaId, telefone, nome) {
       const mensagem = MSG_FALTAS_CONSECUTIVAS.replace(/{nome}/g, nome);
       const numero = telefone?.replace(/\D/g, '') || '';
-      if (!numero) {
-        alert('Número de telefone não cadastrado para este aluno!');
-        return;
-      }
-      
-      // Registrar envio no Firebase
+      if (!numero) { alert('Número de telefone não cadastrado para este aluno!'); return; }
       try {
-          await db.collection('logsWhatsApp').add({
-              tipo: 'alerta_falta',
-              alertaId: alertaId,
-              alunoNome: nome,
-              telefone: telefone,
-              mensagem: mensagem,
-              dataHora: new Date().toISOString(),
-              status: 'enviado'
-          });
-          await addHistory(`Mensagem de falta consecutiva enviada para ${nome}`, 'whatsapp');
-      } catch(error) {
-          console.error("Erro ao registrar envio de WhatsApp:", error);
-      }
-      
+        await db.collection('logsWhatsApp').add({ tipo: 'alerta_falta', alertaId, alunoNome: nome, telefone, mensagem, dataHora: new Date().toISOString(), status: 'enviado' });
+        await addHistory(`Mensagem de falta consecutiva enviada para ${nome}`, 'whatsapp');
+      } catch (error) { console.error("Erro ao registrar envio de WhatsApp:", error); }
       window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
     };
 
     window.ocultarAlertaFalta = async function (id) {
       if (!confirm('Dar baixa neste alerta? Ele será removido da lista.')) return;
-      await db.collection('alertasFaltas').doc(id).update({ resolvido: true });
+      await getUserCollection('alertasFaltas').doc(id).update({ resolvido: true });
       await refreshCache();
       window.renderFaltasConsecutivas();
       window.renderWhatsAppFaltas();
-      window.renderDashboard(); // Atualiza dashboard também
+      window.renderDashboard();
     };
 
     // ============================================
-    // REGISTRO DE ENVIO WHATSAPP (Financeiro)
+    // REGISTRO DE ENVIO WHATSAPP
     // ============================================
     async function registrarEnvioWhatsApp(parcelaId, clienteId, telaOrigem) {
       const agora = new Date();
@@ -2611,34 +2536,20 @@
       const apenasData = agora.toISOString().split('T')[0];
       const parcela = parcelasCache.find(p => p.id === parcelaId);
       if (parcela) {
-        await db.collection('parcelas').doc(parcelaId).update({
-          ultimoEnvio: dataHora, ultimoEnvioLembrete: apenasData, ultimoEnvioTela: telaOrigem
-        });
+        await getUserCollection('parcelas').doc(parcelaId).update({ ultimoEnvio: dataHora, ultimoEnvioLembrete: apenasData, ultimoEnvioTela: telaOrigem });
       }
       const cliente = clientesCache.find(c => c.id === clienteId);
       await addHistory(`WhatsApp enviado para ${cliente?.nome} - Tela: ${telaOrigem}`, 'whatsapp');
       await refreshCache();
-
-      window.renderParcelas();
-      window.renderHoje();
-      window.renderDisparoTable();
-      window.renderDashboard();
+      window.renderParcelas(); window.renderHoje(); window.renderDisparoTable(); window.renderDashboard();
     }
-
     async function registrarEnvioAniversario(clienteId, telaOrigem) {
       const agora = new Date();
-      await db.collection('ultimosParabens').add({
-        clienteId: clienteId, data: today(), enviadoEm: agora.toLocaleString('pt-BR'), telaOrigem: telaOrigem
-      });
+      await getUserCollection('ultimosParabens').add({ clienteId, data: today(), enviadoEm: agora.toLocaleString('pt-BR'), telaOrigem });
       await addHistory(`Parabéns enviado para aniversariante - Tela: ${telaOrigem}`, 'pink');
       await refreshCache();
-
-      window.renderParcelas();
-      window.renderHoje();
-      window.renderDisparoTable();
-      window.renderDashboard();
+      window.renderParcelas(); window.renderHoje(); window.renderDisparoTable(); window.renderDashboard();
     }
-
     window.enviarWhatsAppComRegistro = async function (parcelaId, clienteId, telaOrigem, telefone, mensagem) {
       await registrarEnvioWhatsApp(parcelaId, clienteId, telaOrigem);
       const parcela = parcelasCache.find(p => p.id === parcelaId);
@@ -2648,7 +2559,6 @@
       }
       window.open(`https://wa.me/55${telefone}?text=${mensagem}`, '_blank');
     };
-
     window.enviarParabensComRegistro = function (clienteId, telaOrigem, telefone, mensagem) {
       registrarEnvioAniversario(clienteId, telaOrigem);
       ocultarItemAposEnvio('aniversariante', clienteId);
@@ -2668,7 +2578,6 @@
       }
       return horarios;
     }
-
     function popularSelectHorarios() {
       const horarios = gerarOpcoesHorarios();
       const selectHorario = document.getElementById('novo-horario');
@@ -2676,38 +2585,22 @@
       const selectReposicao = document.getElementById('reposicao-horario');
       if (selectReposicao) selectReposicao.innerHTML = horarios.map(h => `<option value="${h}">${h}</option>`).join('');
     }
-
     window.adicionarDiaHorario = function () {
       const dia = document.getElementById('novo-dia').value;
       const horario = document.getElementById('novo-horario').value;
       currentDiasHorarios.push({ dia, horario });
       atualizarListaDiasHorarios();
     };
-
     window.removerDiaHorario = function (index) {
-      if (confirm('Remover este dia/horário?')) {
-        currentDiasHorarios.splice(index, 1);
-        atualizarListaDiasHorarios();
-      }
+      if (confirm('Remover este dia/horário?')) { currentDiasHorarios.splice(index, 1); atualizarListaDiasHorarios(); }
     };
-
     function atualizarListaDiasHorarios() {
       const container = document.getElementById('dias-horarios-list');
       if (!container) return;
-      if (currentDiasHorarios.length === 0) {
-        container.innerHTML = '<div style="padding:0.5rem;text-align:center;color:var(--text3);">Nenhum dia/horário</div>';
-        return;
-      }
-      container.innerHTML = currentDiasHorarios.map((item, idx) => `
-        <div class="dia-horario-item"><span>${item.dia} às ${item.horario}</span><button class="remove-dia-btn" onclick="window.removerDiaHorario(${idx})">❌</button></div>
-      `).join('');
+      if (currentDiasHorarios.length === 0) { container.innerHTML = '<div style="padding:0.5rem;text-align:center;color:var(--text3);">Nenhum dia/horário</div>'; return; }
+      container.innerHTML = currentDiasHorarios.map((item, idx) => `<div class="dia-horario-item"><span>${item.dia} às ${item.horario}</span><button class="remove-dia-btn" onclick="window.removerDiaHorario(${idx})">❌</button></div>`).join('');
     }
-
-    window.toggleClienteParcelamento = function () {
-      const show = document.getElementById('cliente-mensalidade-parcelado').checked;
-      document.getElementById('cliente-parcelamento-fields').style.display = show ? 'block' : 'none';
-    };
-
+    window.toggleClienteParcelamento = function () { const show = document.getElementById('cliente-mensalidade-parcelado').checked; document.getElementById('cliente-parcelamento-fields').style.display = show ? 'block' : 'none'; };
     window.openClienteModal = function (id = null) {
       popularSelectHorarios();
       document.getElementById('cliente-id').value = '';
@@ -2722,7 +2615,6 @@
       document.getElementById('cliente-mensalidade-parcelado').checked = false;
       document.getElementById('cliente-parcelamento-fields').style.display = 'none';
       currentDiasHorarios = [];
-
       if (id) {
         const c = clientesCache.find(x => x.id === id);
         if (c) {
@@ -2749,13 +2641,11 @@
       atualizarListaDiasHorarios();
       window.openModal('modal-cliente');
     };
-
     window.saveCliente = async function () {
       const saveBtn = document.querySelector('#modal-cliente .btn-primary');
       const originalText = saveBtn.innerHTML;
       saveBtn.disabled = true;
       saveBtn.innerHTML = '⏳ Salvando...';
-
       try {
         const id = document.getElementById('cliente-id').value;
         const nome = document.getElementById('cliente-nome').value.trim();
@@ -2769,18 +2659,15 @@
         const parcelado = document.getElementById('cliente-mensalidade-parcelado').checked;
         const numParcelas = parseInt(document.getElementById('cliente-mensalidade-parcelas').value) || 1;
         const intervalo = document.getElementById('cliente-mensalidade-intervalo').value;
-
         if (!nome || !telefone) { alert('Preencha nome e telefone!'); return; }
-
         const mensalidadeInfo = { valor: valorMensalidade, vencimento: vencimentoMensalidade, descricao: descricaoMensalidade, parcelado, numParcelas, intervalo };
-
         if (id) {
-          await db.collection('clientes').doc(id).update({ nome, telefone, endereco, nascimento, dataMatricula, diasHorarios: currentDiasHorarios, mensalidadeInfo });
+          await getUserCollection('clientes').doc(id).update({ nome, telefone, endereco, nascimento, dataMatricula, diasHorarios: currentDiasHorarios, mensalidadeInfo });
           await refreshCache();
           await addHistory(`Aluno ${nome} atualizado`, 'green');
         } else {
           if (!valorMensalidade || !vencimentoMensalidade) { alert('Preencha valor e vencimento!'); return; }
-          const docRef = await db.collection('clientes').add({ nome, telefone, endereco, nascimento, dataMatricula, diasHorarios: currentDiasHorarios, mensalidadeInfo });
+          const docRef = await getUserCollection('clientes').add({ nome, telefone, endereco, nascimento, dataMatricula, diasHorarios: currentDiasHorarios, mensalidadeInfo });
           await refreshCache();
           await addHistory(`Aluno ${nome} cadastrado`, 'green');
           await criarMensalidadeParaCliente(docRef.id, nome, valorMensalidade, vencimentoMensalidade, descricaoMensalidade, parcelado, numParcelas, intervalo);
@@ -2793,11 +2680,9 @@
         saveBtn.innerHTML = originalText;
       }
     };
-
     async function criarMensalidadeParaCliente(clienteId, nomeCliente, valor, vencimento, descricao, parcelado, numParcelas, intervalo) {
-      const dividaRef = await db.collection('dividas').add({ clienteId, tipo: descricao, descricao, valor, vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1 });
+      const dividaRef = await getUserCollection('dividas').add({ clienteId, tipo: descricao, descricao, valor, vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1 });
       await refreshCache();
-
       if (parcelado && numParcelas > 1) {
         const valorParcela = valor / numParcelas;
         for (let i = 0; i < numParcelas; i++) {
@@ -2809,217 +2694,110 @@
             else if (intervalo === 'semanal') d.setDate(d.getDate() + (i * 7));
             dataVenc = d.toISOString().split('T')[0];
           }
-          await db.collection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: i + 1, totalParcelas: numParcelas, valor: parseFloat(valorParcela.toFixed(2)), dataVencimento: dataVenc, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
+          await getUserCollection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: i + 1, totalParcelas: numParcelas, valor: parseFloat(valorParcela.toFixed(2)), dataVencimento: dataVenc, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
         }
         await addHistory(`${numParcelas} parcelas geradas para ${nomeCliente}`, 'purple');
       } else {
-        await db.collection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: 1, totalParcelas: 1, valor, dataVencimento: vencimento, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
+        await getUserCollection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: 1, totalParcelas: 1, valor, dataVencimento: vencimento, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
         await addHistory(`Mensalidade criada para ${nomeCliente}`, 'green');
       }
       await refreshCache();
       window.renderParcelas();
       window.renderDashboard();
     }
-
     window.deleteClienteHandler = async function (id) {
       if (!confirm('⚠️ Excluir aluno e TODAS as mensalidades?')) return;
       const c = clientesCache.find(x => x.id === id);
       const parcelasDoCliente = parcelasCache.filter(p => p.clienteId === id);
-      for (const parcela of parcelasDoCliente) await db.collection('parcelas').doc(parcela.id).delete();
+      for (const parcela of parcelasDoCliente) await getUserCollection('parcelas').doc(parcela.id).delete();
       const dividasDoCliente = dividasCache.filter(d => d.clienteId === id);
-      for (const divida of dividasDoCliente) await db.collection('dividas').doc(divida.id).delete();
-      await db.collection('clientes').doc(id).delete();
+      for (const divida of dividasDoCliente) await getUserCollection('dividas').doc(divida.id).delete();
+      await getUserCollection('clientes').doc(id).delete();
       await refreshCache();
       await addHistory(`Aluno ${c?.nome} excluído`, 'red');
       window.renderClientes();
       window.renderDashboard();
     };
-
     window.renderClientes = async function () {
       const search = document.getElementById('search-clientes')?.value.toLowerCase().trim() || '';
       let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
       const tbody = document.getElementById('clientes-tbody');
-      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
-      tbody.innerHTML = clientes.map(c => `<tr>
-        <td><strong>${c.nome}</strong></td>
-        <td>${c.telefone}</td>
-        <td>${c.endereco || '—'}</td>
-        <td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td>
-        <td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td>
-        <td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td>
-        <td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td>
-      </tr>`).join('');
+      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td><tr>'; return; }
+      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td></tr>`).join('');
     };
 
     // ============================================
     // PARCELAS
     // ============================================
-    window.limparFiltrosParcelas = function () {
-      document.getElementById('search-parcelas').value = '';
-      document.getElementById('filter-data-de').value = '';
-      document.getElementById('filter-data-ate').value = '';
-      document.getElementById('filter-parcela-status').value = '';
-      window.renderParcelas();
-    };
-
+    window.limparFiltrosParcelas = function () { document.getElementById('search-parcelas').value = ''; document.getElementById('filter-data-de').value = ''; document.getElementById('filter-data-ate').value = ''; document.getElementById('filter-parcela-status').value = ''; window.renderParcelas(); };
     window.renderParcelas = async function () {
       const search = document.getElementById('search-parcelas')?.value.toLowerCase().trim() || '';
       const filtroStatus = document.getElementById('filter-parcela-status')?.value || '';
       const dataDe = document.getElementById('filter-data-de')?.value || '';
       const dataAte = document.getElementById('filter-data-ate')?.value || '';
-
-      const mapaClientes = {};
-      clientesCache.forEach(c => { mapaClientes[c.id] = c; });
-      const mapaDividas = {};
-      dividasCache.forEach(d => { mapaDividas[d.id] = d; });
-
+      const mapaClientes = {}; clientesCache.forEach(c => { mapaClientes[c.id] = c; });
+      const mapaDividas = {}; dividasCache.forEach(d => { mapaDividas[d.id] = d; });
       let parcelas = parcelasCache.filter(p => {
-        const c = mapaClientes[p.clienteId];
-        const d = mapaDividas[p.dividaId];
-        const nomeAluno = (c?.nome || '').toLowerCase();
-        const tipoMensalidade = (d?.tipo || '').toLowerCase();
+        const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId];
+        const nomeAluno = (c?.nome || '').toLowerCase(); const tipoMensalidade = (d?.tipo || '').toLowerCase();
         const matchBusca = !search || nomeAluno.includes(search) || tipoMensalidade.includes(search);
-        let matchData = true;
-        if (dataDe && p.dataVencimento < dataDe) matchData = false;
-        if (dataAte && p.dataVencimento > dataAte) matchData = false;
+        let matchData = true; if (dataDe && p.dataVencimento < dataDe) matchData = false; if (dataAte && p.dataVencimento > dataAte) matchData = false;
         const matchStatus = !filtroStatus || p.status === filtroStatus;
         return matchBusca && matchData && matchStatus;
       });
-
       const tbody = document.getElementById('parcelas-tbody');
       if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
-
       let html = '';
       for (const p of parcelas) {
-        const c = mapaClientes[p.clienteId];
-        const d = mapaDividas[p.dividaId];
-        const tel = c?.telefone?.replace(/\D/g, '');
-        const msg = encodeURIComponent(buildMsg(p, c, d));
-        html += `
-          <tr>
-            <td><strong>${c?.nome || '—'}</strong></td>
-            <td>${d?.tipo || '—'}</td>
-            <td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td>
-            <td>${fmtBRL(p.valor)}</span></td>
-            <td>${fmtDate(p.dataVencimento)}</span></td>
-            <td><span class="badge badge-${p.status}">${p.status}</span></td>
-            <td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span></td>
-            <td class="td-actions">
-              <button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button>
-              <a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a>
-              <button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button>
-            </span>
-          </tr>`;
+        const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
+        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span></td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></span></td></tr>`;
       }
       tbody.innerHTML = html;
     };
-
     window.deleteDividaHandler = async function (id) {
       if (!confirm('Excluir mensalidade e parcelas?')) return;
       const parcelasDaDivida = parcelasCache.filter(p => p.dividaId === id);
-      for (const parcela of parcelasDaDivida) await db.collection('parcelas').doc(parcela.id).delete();
-      await db.collection('dividas').doc(id).delete();
+      for (const parcela of parcelasDaDivida) await getUserCollection('parcelas').doc(parcela.id).delete();
+      await getUserCollection('dividas').doc(id).delete();
       await refreshCache();
       await addHistory(`Mensalidade excluída`, 'red');
-      window.renderParcelas();
-      window.renderDashboard();
+      window.renderParcelas(); window.renderDashboard();
     };
-
-    window.openStatusModal = function (id, tipo) {
-      document.getElementById('status-id').value = id;
-      document.getElementById('status-tipo').value = tipo;
-      const item = tipo === 'parcela' ? parcelasCache.find(x => x.id === id) : dividasCache.find(x => x.id === id);
-      document.getElementById('status-novo').value = item?.status || 'pendente';
-      window.openModal('modal-status');
-    };
-
+    window.openStatusModal = function (id, tipo) { document.getElementById('status-id').value = id; document.getElementById('status-tipo').value = tipo; const item = tipo === 'parcela' ? parcelasCache.find(x => x.id === id) : dividasCache.find(x => x.id === id); document.getElementById('status-novo').value = item?.status || 'pendente'; window.openModal('modal-status'); };
     window.saveStatus = async function () {
-      const id = document.getElementById('status-id').value;
-      const tipo = document.getElementById('status-tipo').value;
-      const novoStatus = document.getElementById('status-novo').value;
-
-      if (tipo === 'parcela') {
-        const p = parcelasCache.find(x => x.id === id);
-        await db.collection('parcelas').doc(id).update({ status: novoStatus });
-        await addHistory(`Parcela ${p.numeroParcela}/${p.totalParcelas}: ${p.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow');
-      } else {
-        const d = dividasCache.find(x => x.id === id);
-        await db.collection('dividas').doc(id).update({ status: novoStatus });
-        await addHistory(`Mensalidade: ${d.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow');
-      }
-      await refreshCache();
-      window.closeModal('modal-status');
-      window.renderParcelas();
-      window.renderDashboard();
-      window.renderHoje();
+      const id = document.getElementById('status-id').value; const tipo = document.getElementById('status-tipo').value; const novoStatus = document.getElementById('status-novo').value;
+      if (tipo === 'parcela') { const p = parcelasCache.find(x => x.id === id); await getUserCollection('parcelas').doc(id).update({ status: novoStatus }); await addHistory(`Parcela ${p.numeroParcela}/${p.totalParcelas}: ${p.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow'); }
+      else { const d = dividasCache.find(x => x.id === id); await getUserCollection('dividas').doc(id).update({ status: novoStatus }); await addHistory(`Mensalidade: ${d.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow'); }
+      await refreshCache(); window.closeModal('modal-status'); window.renderParcelas(); window.renderDashboard(); window.renderHoje();
     };
 
     // ============================================
-    // DASHBOARD (Atualizado para mostrar faltas)
+    // DASHBOARD RENDER
     // ============================================
     window.renderDashboard = async function () {
       const hoje = today();
       let parcelas = parcelasCache;
       let changed = false;
-      for (let i = 0; i < parcelas.length; i++) {
-        if (parcelas[i].status === 'pendente' && parcelas[i].dataVencimento < hoje) {
-          await db.collection('parcelas').doc(parcelas[i].id).update({ status: 'atrasado' });
-          changed = true;
-        }
-      }
+      for (let i = 0; i < parcelas.length; i++) { if (parcelas[i].status === 'pendente' && parcelas[i].dataVencimento < hoje) { await getUserCollection('parcelas').doc(parcelas[i].id).update({ status: 'atrasado' }); changed = true; } }
       if (changed) await refreshCache();
       parcelas = parcelasCache;
-
       const hojeParcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago' && p.ultimoEnvioLembrete !== hoje && !hiddenItems.hoje.includes(p.id));
       document.getElementById('dashboard-stat-hoje').textContent = hojeParcelas.length;
-      document.getElementById('dashboard-lista-hoje').innerHTML = hojeParcelas.length ? hojeParcelas.map(p => {
-        const c = clientesCache.find(x => x.id === p.clienteId);
-        const tel = c?.telefone?.replace(/\D/g, '');
-        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
-        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Vence hoje</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`;
-      }).join('') : '<div class="empty">✅ Nenhuma cobrança para hoje</div>';
-
+      document.getElementById('dashboard-lista-hoje').innerHTML = hojeParcelas.length ? hojeParcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Vence hoje</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`; }).join('') : '<div class="empty">✅ Nenhuma cobrança para hoje</div>';
       const atrasadas = parcelas.filter(p => p.status === 'atrasado' && !hiddenItems.atrasadas.some(item => item.id === p.id));
       document.getElementById('dashboard-stat-atrasadas').textContent = atrasadas.length;
-      document.getElementById('dashboard-lista-atrasadas').innerHTML = atrasadas.length ? atrasadas.map(p => {
-        const c = clientesCache.find(x => x.id === p.clienteId);
-        const tel = c?.telefone?.replace(/\D/g, '');
-        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
-        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Atrasado</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`;
-      }).join('') : '<div class="empty">✅ Nenhuma parcela em atraso</div>';
-
+      document.getElementById('dashboard-lista-atrasadas').innerHTML = atrasadas.length ? atrasadas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Atrasado</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`; }).join('') : '<div class="empty">✅ Nenhuma parcela em atraso</div>';
       let aniversariantes = clientesCache.filter(c => c.nascimento && c.nascimento.slice(5) === hoje.slice(5));
       aniversariantes = aniversariantes.filter(c => !ultimosParabensCache.some(item => item.clienteId === c.id && item.data === hoje) && !hiddenItems.aniversariantes.includes(c.id));
       document.getElementById('dashboard-stat-aniversariantes').textContent = aniversariantes.length;
-      document.getElementById('dashboard-lista-aniversariantes').innerHTML = aniversariantes.length ? aniversariantes.map(c => {
-        const tel = c.telefone?.replace(/\D/g, '');
-        const msg = encodeURIComponent(buildMsgAniversario(c));
-        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="#" onclick="window.enviarParabensComRegistro('${c.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`;
-      }).join('') : '<div class="empty">🎂 Nenhum aniversariante</div>';
-      
-      // Alertas de Faltas Consecutivas no Dashboard
+      document.getElementById('dashboard-lista-aniversariantes').innerHTML = aniversariantes.length ? aniversariantes.map(c => { const tel = c.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsgAniversario(c)); return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="#" onclick="window.enviarParabensComRegistro('${c.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`; }).join('') : '<div class="empty">🎂 Nenhum aniversariante</div>';
       const alertasFaltas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
       const dashboardFaltasContainer = document.getElementById('dashboard-lista-faltas');
       const dashboardFaltasStat = document.getElementById('dashboard-stat-faltas');
       if (dashboardFaltasContainer) {
-          dashboardFaltasStat.textContent = alertasFaltas.length;
-          if (alertasFaltas.length === 0) {
-              dashboardFaltasContainer.innerHTML = '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>';
-          } else {
-              dashboardFaltasContainer.innerHTML = alertasFaltas.map(alerta => `
-                  <div class="cobranca-item" style="border-left: 3px solid var(--orange);">
-                      <div class="cobranca-info">
-                          <div class="cobranca-nome">${alerta.nome}</div>
-                          <div class="cobranca-valor">⚠️ 2 faltas consecutivas</div>
-                          <div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div>
-                      </div>
-                      <div class="td-actions">
-                          <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">📲 WhatsApp</button>
-                          <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button>
-                      </div>
-                  </div>
-              `).join('');
-          }
+        dashboardFaltasStat.textContent = alertasFaltas.length;
+        if (alertasFaltas.length === 0) { dashboardFaltasContainer.innerHTML = '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>'; }
+        else { dashboardFaltasContainer.innerHTML = alertasFaltas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join(''); }
       }
     };
 
@@ -3031,111 +2809,45 @@
       const parcelas = parcelasCache.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
       document.getElementById('hoje-count-badge').textContent = parcelas.length;
       document.getElementById('hoje-date-label').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-      document.getElementById('hoje-content').innerHTML = !parcelas.length ? '<div class="empty">✅ Nenhuma cobrança para hoje</div>' : `<div class="hoje-cards">${parcelas.map(p => {
-        const c = clientesCache.find(x => x.id === p.clienteId);
-        const tel = c?.telefone?.replace(/\D/g, '');
-        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
-        return `<div class="hoje-card"><div><div class="hoje-card-nome">${c?.nome}</div><div class="hoje-card-valor">${fmtBRL(p.valor)}</div></div><div class="hoje-card-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Vencendo Hoje', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a><button class="btn btn-green btn-sm" onclick="window.marcarPago('${p.id}')">✔ Marcar Pago</button></div></div>`;
-      }).join('')}</div>`;
+      document.getElementById('hoje-content').innerHTML = !parcelas.length ? '<div class="empty">✅ Nenhuma cobrança para hoje</div>' : `<div class="hoje-cards">${parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="hoje-card"><div><div class="hoje-card-nome">${c?.nome}</div><div class="hoje-card-valor">${fmtBRL(p.valor)}</div></div><div class="hoje-card-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Vencendo Hoje', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a><button class="btn btn-green btn-sm" onclick="window.marcarPago('${p.id}')">✔ Marcar Pago</button></div></div>`; }).join('')}</div>`;
     };
-
-    window.marcarPago = async function (parcelaId) {
-      await db.collection('parcelas').doc(parcelaId).update({ status: 'pago' });
-      await refreshCache();
-      await addHistory(`Parcela marcada como paga`, 'green');
-      window.renderHoje();
-      window.renderDashboard();
-    };
+    window.marcarPago = async function (parcelaId) { await getUserCollection('parcelas').doc(parcelaId).update({ status: 'pago' }); await refreshCache(); await addHistory(`Parcela marcada como paga`, 'green'); window.renderHoje(); window.renderDashboard(); };
 
     // ============================================
     // DISPARO
     // ============================================
-    function getParcelasDisparo() {
-      const filtro = document.getElementById('disparo-filter-status').value;
-      const hoje = today();
-      let parcelas = parcelasCache;
-      if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago'));
-      else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
-      else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado');
-      else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente');
-      else parcelas = parcelas.filter(p => p.status !== 'pago');
-      return parcelas;
-    }
-
-    window.renderDisparoTable = async function () {
-      const parcelas = getParcelasDisparo();
-      const tbody = document.getElementById('disparo-tbody');
-      if (!parcelas.length) { tbody.innerHTML = '<table><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
-      tbody.innerHTML = parcelas.map(p => {
-        const c = clientesCache.find(x => x.id === p.clienteId);
-        const tel = c?.telefone?.replace(/\D/g, '');
-        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
-        return `<tr>
-          <td><strong>${c?.nome}</strong></td>
-          <td>${c?.telefone}</td>
-          <td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td>
-          <td>${p.numeroParcela}/${p.totalParcelas}</td>
-          <td>${fmtBRL(p.valor)}</span></td>
-          <td>${fmtDate(p.dataVencimento)}</span></td>
-          <td><span class="badge badge-${p.status}">${p.status}</span></td>
-          <td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td>
-          <td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></td>
-        </tr>`;
-      }).join('');
-    };
+    function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
+    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></td></tr>`; }).join(''); };
 
     // ============================================
     // ANIVERSARIANTES DA SEMANA
     // ============================================
     window.carregarAniversariantesSemana = async function () {
       const agora = new Date();
+      const inicioSemana = new Date(agora);
       const diaSemana = agora.getDay();
-      const horaAtual = agora.getHours();
-      const minutoAtual = agora.getMinutes();
-      const isDomingoAposHorario = (diaSemana === 0 && (horaAtual >= 23 && minutoAtual >= 59));
-
-      if (isDomingoAposHorario) {
-        document.getElementById('aniversariantes-semana-info').textContent = `0 aniversariante(s) - Semana encerrada`;
-        document.getElementById('aniversariantes-content').innerHTML = '<div class="empty">📅 Período de aniversariantes da semana encerrado. Volte na segunda-feira!</div>';
-        return;
-      }
-
-      let inicioSemana = new Date(agora);
       const diasParaSegunda = (diaSemana === 0 ? 6 : diaSemana - 1);
       inicioSemana.setDate(agora.getDate() - diasParaSegunda);
       inicioSemana.setHours(0, 0, 0, 0);
-
-      let fimSemana = new Date(inicioSemana);
+      const fimSemana = new Date(inicioSemana);
       fimSemana.setDate(inicioSemana.getDate() + 6);
       fimSemana.setHours(23, 59, 59, 999);
-
       const aniversariantes = clientesCache.filter(c => {
         if (!c.nascimento) return false;
         const [ano, mes, dia] = c.nascimento.split('-');
         const dataAniversarioEsteAno = new Date(agora.getFullYear(), parseInt(mes) - 1, parseInt(dia));
         if (dataAniversarioEsteAno < inicioSemana) dataAniversarioEsteAno.setFullYear(agora.getFullYear() + 1);
         return dataAniversarioEsteAno >= inicioSemana && dataAniversarioEsteAno <= fimSemana;
-      }).sort((a, b) => a.nascimento.slice(5).localeCompare(b.nascimento.slice(5)));
-
+      }).sort((a, b) => {
+        const aData = a.nascimento.slice(5); const bData = b.nascimento.slice(5);
+        return aData.localeCompare(bData);
+      });
       const infoElement = document.getElementById('aniversariantes-semana-info');
       const periodoStr = `${fmtDate(inicioSemana.toISOString().split('T')[0])} a ${fmtDate(fimSemana.toISOString().split('T')[0])}`;
       infoElement.textContent = `${aniversariantes.length} aniversariante(s) - ${periodoStr}`;
-
       const content = document.getElementById('aniversariantes-content');
-      if (!aniversariantes.length) {
-        content.innerHTML = '<div class="empty">🎂 Nenhum aniversariante nesta semana</div>';
-      } else {
-        content.innerHTML = `<div class="aniversariantes-grid">${aniversariantes.map(a => `
-          <div class="aniversariante-card">
-            <div class="aniversariante-icon">🎂</div>
-            <div class="aniversariante-info">
-              <div class="aniversariante-nome">${a.nome}</div>
-              <div class="aniversariante-data">${fmtDate(a.nascimento)}</div>
-              <div class="aniversariante-dia-semana">${new Date(agora.getFullYear(), parseInt(a.nascimento.split('-')[1]) - 1, parseInt(a.nascimento.split('-')[2])).toLocaleDateString('pt-BR', { weekday: 'long' })}</div>
-            </div>
-          </div>
-        `).join('')}</div>`;
-      }
+      if (!aniversariantes.length) { content.innerHTML = '<div class="empty">🎂 Nenhum aniversariante nesta semana</div>'; }
+      else { content.innerHTML = `<div class="aniversariantes-grid">${aniversariantes.map(a => `<div class="aniversariante-card"><div class="aniversariante-icon">🎂</div><div class="aniversariante-info"><div class="aniversariante-nome">${a.nome}</div><div class="aniversariante-data">${fmtDate(a.nascimento)}</div><div class="aniversariante-dia-semana">${new Date(agora.getFullYear(), parseInt(a.nascimento.split('-')[1]) - 1, parseInt(a.nascimento.split('-')[2])).toLocaleDateString('pt-BR', { weekday: 'long' })}</div></div></div>`).join('')}</div>`; }
     };
 
     // ============================================
@@ -3147,47 +2859,14 @@
       const mapa = {};
       horarios.forEach(h => { mapa[h] = {}; dias.forEach(d => mapa[h][d] = []); });
       clientesCache.forEach(c => { if (c.diasHorarios) c.diasHorarios.forEach(dh => { if (mapa[dh.horario]?.[dh.dia]) mapa[dh.horario][dh.dia].push(c.nome); }); });
-
       const tbody = document.getElementById('alunos-por-hora-tbody');
-      tbody.innerHTML = horarios.map(horario => `<td>
-        <th>${horario}</th>
-        ${dias.map(dia => `<td>${mapa[horario][dia].length ? `<span class="badge">${mapa[horario][dia].length}</span><ul class="alunos-lista">${mapa[horario][dia].map(n => `<li>👤 ${n}</li>`).join('')}</ul>` : '—'}</td>`).join('')}
-      </tr>`).join('');
+      tbody.innerHTML = horarios.map(horario => `<tr><th>${horario}</th>${dias.map(dia => `<td>${mapa[horario][dia].length ? `<span class="badge">${mapa[horario][dia].length}</span><ul class="alunos-lista">${mapa[horario][dia].map(n => `<li>👤 ${n}</li>`).join('')}</ul>` : '—'}</td>`).join('')}</tr>`).join('');
     };
-
-    // EXPORTAÇÃO ALUNOS POR HORA
-    window.exportarAlunosHoraExcel = function () {
-      const tabela = document.querySelector('.alunos-por-hora-table');
-      if (!tabela) {
-        alert('Nenhum dado para exportar');
-        return;
-      }
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.table_to_sheet(tabela, { raw: true });
-      XLSX.utils.book_append_sheet(wb, ws, 'Alunos por Hora');
-      XLSX.writeFile(wb, 'alunos-por-hora.xlsx');
-    };
-
-    window.exportarAlunosHoraPDF = function () {
-      const { jsPDF } = window.jspdf;
-      const tabela = document.querySelector('.alunos-por-hora-table');
-      if (!tabela) {
-        alert('Nenhum dado para exportar');
-        return;
-      }
-      const doc = new jsPDF('landscape');
-      doc.text('Relatório - Alunos por Hora', 14, 15);
-      doc.autoTable({
-        html: '.alunos-por-hora-table',
-        startY: 20,
-        styles: { fontSize: 7 },
-        headStyles: { fillColor: [59, 130, 246], textColor: 255 }
-      });
-      doc.save('alunos-por-hora.pdf');
-    };
+    window.exportarAlunosHoraExcel = function () { const tabela = document.querySelector('.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Alunos por Hora'); XLSX.writeFile(wb, 'alunos-por-hora.xlsx'); };
+    window.exportarAlunosHoraPDF = function () { const { jsPDF } = window.jspdf; const tabela = document.querySelector('.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const doc = new jsPDF('landscape'); doc.text('Relatório - Alunos por Hora', 14, 15); doc.autoTable({ html: '.alunos-por-hora-table', startY: 20, styles: { fontSize: 7 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save('alunos-por-hora.pdf'); };
 
     // ============================================
-    // REPOSICAO DE AULA (Corrigido)
+    // REPOSICAO DE AULA
     // ============================================
     window.carregarReposicao = async function () {
       document.getElementById('reposicao-aluno').innerHTML = '<option value="">-- Selecione --</option>' + clientesCache.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
@@ -3195,144 +2874,38 @@
       popularSelectHorarios();
       await carregarReposicoesAgendadas();
     };
-
     async function carregarFaltasAluno() {
       const alunoId = document.getElementById('reposicao-aluno').value;
-      if (!alunoId) {
-        document.getElementById('reposicao-faltas-list').innerHTML = '<div class="empty">Selecione um aluno</div>';
-        return;
-      }
-
-      const faltas = frequenciasCache.filter(f =>
-        f.clienteId === alunoId && f.status === 'falta' && !reposicoesCache.some(r => r.faltaOriginalId === f.id && !r.foiCumprida)
-      );
-
+      if (!alunoId) { document.getElementById('reposicao-faltas-list').innerHTML = '<div class="empty">Selecione um aluno</div>'; return; }
+      const faltas = frequenciasCache.filter(f => f.clienteId === alunoId && f.status === 'falta' && !reposicoesCache.some(r => r.faltaOriginalId === f.id && !r.foiCumprida));
       const container = document.getElementById('reposicao-faltas-list');
-      if (!faltas.length) {
-        container.innerHTML = '<div class="empty">Sem faltas pendentes para este aluno</div>';
-      } else {
-        container.innerHTML = faltas.map(f => {
-          const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === f.id && !r.foiCumprida);
-          const classeExtra = temReposicao ? 'has-reposicao' : '';
-          return `<div class="reposicao-falta-item ${classeExtra}" onclick="window.selecionarFalta('${f.id}', this)" data-falta-id="${f.id}">
-            <strong>Data:</strong> ${fmtDate(f.data)}
-            ${temReposicao ? '<br><small style="color:var(--yellow)">⚠️ Já possui reposição agendada</small>' : ''}
-          </div>`;
-        }).join('');
-      }
+      if (!faltas.length) { container.innerHTML = '<div class="empty">Sem faltas pendentes para este aluno</div>'; }
+      else { container.innerHTML = faltas.map(f => { const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === f.id && !r.foiCumprida); const classeExtra = temReposicao ? 'has-reposicao' : ''; return `<div class="reposicao-falta-item ${classeExtra}" onclick="window.selecionarFalta('${f.id}', this)" data-falta-id="${f.id}"><strong>Data:</strong> ${fmtDate(f.data)}${temReposicao ? '<br><small style="color:var(--yellow)">⚠️ Já possui reposição agendada</small>' : ''}</div>`; }).join(''); }
     }
-
-    window.selecionarFalta = function (faltaId, element) {
-      const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === faltaId && !r.foiCumprida);
-      if (temReposicao) {
-        alert('Esta falta já possui uma reposição agendada!');
-        return;
-      }
-      document.querySelectorAll('.reposicao-falta-item').forEach(el => el.classList.remove('selected'));
-      element.classList.add('selected');
-      faltaSelecionada = faltaId;
-    };
-
+    window.selecionarFalta = function (faltaId, element) { const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === faltaId && !r.foiCumprida); if (temReposicao) { alert('Esta falta já possui uma reposição agendada!'); return; } document.querySelectorAll('.reposicao-falta-item').forEach(el => el.classList.remove('selected')); element.classList.add('selected'); faltaSelecionada = faltaId; };
     window.salvarReposicao = async function () {
-      const alunoId = document.getElementById('reposicao-aluno').value;
-      const dataReposicao = document.getElementById('reposicao-data').value;
-      const horarioReposicao = document.getElementById('reposicao-horario').value;
-
-      if (!alunoId) { alert('Selecione um aluno!'); return; }
-      if (!faltaSelecionada) { alert('Selecione uma falta!'); return; }
-      if (!dataReposicao) { alert('Selecione a data da reposição!'); return; }
-
-      const saveBtn = event?.target;
-      const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar';
-      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
-
+      const alunoId = document.getElementById('reposicao-aluno').value; const dataReposicao = document.getElementById('reposicao-data').value; const horarioReposicao = document.getElementById('reposicao-horario').value;
+      if (!alunoId) { alert('Selecione um aluno!'); return; } if (!faltaSelecionada) { alert('Selecione uma falta!'); return; } if (!dataReposicao) { alert('Selecione a data da reposição!'); return; }
+      const saveBtn = event?.target; const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar'; if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
       try {
-        const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r.foiCumprida);
-        if (reposicaoExistente) { alert('Esta falta já possui uma reposição agendada!'); return; }
-
-        await db.collection('reposicoes').add({ alunoId, faltaOriginalId: faltaSelecionada, dataReposicao, horarioReposicao, foiCumprida: false });
-        await refreshCache();
-        await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green');
-        alert('Reposição agendada com sucesso!');
-
+        const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r.foiCumprida); if (reposicaoExistente) { alert('Esta falta já possui uma reposição agendada!'); return; }
+        await getUserCollection('reposicoes').add({ alunoId, faltaOriginalId: faltaSelecionada, dataReposicao, horarioReposicao, foiCumprida: false });
+        await refreshCache(); await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green'); alert('Reposição agendada com sucesso!');
         const alerta = alertasFaltasCache.find(a => a.alunoId === alunoId && !a.resolvido);
-        if (alerta) {
-          await db.collection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true });
-          await refreshCache();
-          window.renderFaltasConsecutivas();
-          window.renderWhatsAppFaltas();
-          window.renderDashboard();
-        }
-
-        faltaSelecionada = null;
-        document.getElementById('reposicao-data').value = '';
-        await carregarFaltasAluno();
-        await carregarReposicoesAgendadas();
-      } finally {
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalText; }
-      }
+        if (alerta) { await getUserCollection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true }); await refreshCache(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard(); }
+        faltaSelecionada = null; document.getElementById('reposicao-data').value = ''; await carregarFaltasAluno(); await carregarReposicoesAgendadas();
+      } finally { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalText; } }
     };
-
     async function carregarReposicoesAgendadas() {
-      const hoje = today();
-      const agora = new Date();
-      const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
-
-      // Filtra reposições que NÃO foram cumpridas e cujo horário AINDA NÃO chegou ou é exatamente agora
-      const reposFuturas = reposicoesCache.filter(r => {
-        if (r.foiCumprida) return false;
-        // Se é hoje, verifica se o horário ainda não passou
-        if (r.dataReposicao === hoje) {
-            const horario = horarioParaMinutos(r.horarioReposicao);
-            return minutosAtuais < horario;
-        }
-        // Se é uma data futura
-        return r.dataReposicao > hoje;
-      });
-
+      const hoje = today(); const agora = new Date(); const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
+      const reposFuturas = reposicoesCache.filter(r => { if (r.foiCumprida) return false; if (r.dataReposicao === hoje) { const horario = horarioParaMinutos(r.horarioReposicao); return minutosAtuais < horario; } return r.dataReposicao > hoje; });
       reposFuturas.sort((a, b) => a.dataReposicao.localeCompare(b.dataReposicao));
-
       const container = document.getElementById('reposicoes-agendadas-list');
-      if (!reposFuturas.length) {
-        container.innerHTML = '<div class="empty">Nenhuma reposição agendada</div>';
-        return;
-      }
-
-      container.innerHTML = `<div class="frequencia-grid">${reposFuturas.map(r => {
-        const aluno = clientesCache.find(c => c.id === r.alunoId);
-        const faltaOriginal = frequenciasCache.find(f => f.id === r.faltaOriginalId);
-        return `
-          <div class="frequencia-card" data-reposicao-id="${r.id}">
-            <div class="frequencia-aluno-nome">${aluno?.nome || 'Aluno não encontrado'}</div>
-            <div class="frequencia-dias">
-              <strong>Falta original:</strong> ${fmtDate(faltaOriginal?.data || 'Data não disponível')}<br>
-              <strong>Reposição:</strong> ${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}
-            </div>
-            <div class="frequencia-status"><span class="badge badge-pendente">⏳ Agendada</span></div>
-            <button class="btn btn-red btn-sm" onclick="window.cancelarReposicao('${r.id}')">Cancelar</button>
-          </div>
-        `;
-      }).join('')}</div>`;
+      if (!reposFuturas.length) { container.innerHTML = '<div class="empty">Nenhuma reposição agendada</div>'; return; }
+      container.innerHTML = `<div class="frequencia-grid">${reposFuturas.map(r => { const aluno = clientesCache.find(c => c.id === r.alunoId); const faltaOriginal = frequenciasCache.find(f => f.id === r.faltaOriginalId); return `<div class="frequencia-card" data-reposicao-id="${r.id}"><div class="frequencia-aluno-nome">${aluno?.nome || 'Aluno não encontrado'}</div><div class="frequencia-dias"><strong>Falta original:</strong> ${fmtDate(faltaOriginal?.data || 'Data não disponível')}<br><strong>Reposição:</strong> ${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}</div><div class="frequencia-status"><span class="badge badge-pendente">⏳ Agendada</span></div><button class="btn btn-red btn-sm" onclick="window.cancelarReposicao('${r.id}')">Cancelar</button></div>`; }).join('')}</div>`;
     }
-
-    window.cancelarReposicao = async function (id) {
-      if (!confirm('Cancelar esta reposição? A falta voltará a ficar disponível para novo agendamento.')) return;
-      await db.collection('reposicoes').doc(id).delete();
-      await refreshCache();
-      await carregarReposicoesAgendadas();
-      await carregarFaltasAluno();
-      await addHistory(`Reposição cancelada`, 'red');
-    };
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const reposicaoAlunoSelect = document.getElementById('reposicao-aluno');
-      if (reposicaoAlunoSelect) {
-        reposicaoAlunoSelect.addEventListener('change', function () {
-          faltaSelecionada = null;
-          carregarFaltasAluno();
-        });
-      }
-    });
+    window.cancelarReposicao = async function (id) { if (!confirm('Cancelar esta reposição? A falta voltará a ficar disponível para novo agendamento.')) return; await getUserCollection('reposicoes').doc(id).delete(); await refreshCache(); await carregarReposicoesAgendadas(); await carregarFaltasAluno(); await addHistory(`Reposição cancelada`, 'red'); };
+    document.addEventListener('DOMContentLoaded', function () { const reposicaoAlunoSelect = document.getElementById('reposicao-aluno'); if (reposicaoAlunoSelect) { reposicaoAlunoSelect.addEventListener('change', function () { faltaSelecionada = null; carregarFaltasAluno(); }); } });
 
     // ============================================
     // FREQUENCIA - Marcar Presença Manual
@@ -3342,141 +2915,34 @@
       const dataObj = new Date(data + 'T12:00:00');
       const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'long' });
       const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
-
       let alunos = clientesCache.filter(c => c.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized));
-
       const buscaInput = document.getElementById('buscar-frequencia');
-      if (buscaInput && buscaInput.value) {
-        const termoBusca = buscaInput.value.toLowerCase().trim();
-        alunos = alunos.filter(c => c.nome.toLowerCase().includes(termoBusca));
-      }
-
+      if (buscaInput && buscaInput.value) { const termoBusca = buscaInput.value.toLowerCase().trim(); alunos = alunos.filter(c => c.nome.toLowerCase().includes(termoBusca)); }
       const container = document.getElementById('frequencia-content');
-      if (!alunos.length) {
-        container.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>Nenhum aluno com aula neste dia<br><small>Dia selecionado: ${diaSemanaCapitalized}</small></div>`;
-        return;
-      }
-
+      if (!alunos.length) { container.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>Nenhum aluno com aula neste dia<br><small>Dia selecionado: ${diaSemanaCapitalized}</small></div>`; return; }
       let html = '<div class="frequencia-grid">';
       for (const a of alunos) {
         const freq = frequenciasCache.find(f => f.clienteId === a.id && f.data === data);
         const reposicaoParaHoje = reposicoesCache.find(r => r.alunoId === a.id && r.dataReposicao === data && !r.foiCumprida);
         const isAulaReposicao = !!reposicaoParaHoje;
         const aulaOriginalId = reposicaoParaHoje?.faltaOriginalId;
-
-        html += `
-          <div class="frequencia-card" data-nome="${a.nome.toLowerCase()}" data-aluno-id="${a.id}" data-data="${data}">
-            <div class="frequencia-aluno-nome">
-              ${a.nome}
-              ${isAulaReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : ''}
-            </div>
-            <div class="frequencia-dias">
-              ${a.diasHorarios?.filter(dh => dh.dia === diaSemanaCapitalized).map(dh => `Aula: ${dh.horario}`).join(', ')}
-            </div>
-            <div class="frequencia-status">
-              <button class="presenca-btn ${freq?.status === 'presente' ? 'presente' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'presente'${isAulaReposicao ? `, '${aulaOriginalId}'` : ''})">✅ Presente</button>
-              <button class="presenca-btn ${freq?.status === 'falta' ? 'falta' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'falta')">❌ Falta</button>
-              <button class="presenca-btn" onclick="window.marcarPresencaManual('${a.id}', '${data}', null)">🗑 Remover</button>
-            </div>
-            <div class="frequencia-data">${fmtDate(data)}${freq?.marcadoEm ? `<br><small>Marcado em: ${new Date(freq.marcadoEm).toLocaleString('pt-BR')}</small>` : ''}</div>
-          </div>
-        `;
+        html += `<div class="frequencia-card" data-nome="${a.nome.toLowerCase()}" data-aluno-id="${a.id}" data-data="${data}"><div class="frequencia-aluno-nome">${a.nome}${isAulaReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : ''}</div><div class="frequencia-dias">${a.diasHorarios?.filter(dh => dh.dia === diaSemanaCapitalized).map(dh => `Aula: ${dh.horario}`).join(', ')}</div><div class="frequencia-status"><button class="presenca-btn ${freq?.status === 'presente' ? 'presente' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'presente'${isAulaReposicao ? `, '${aulaOriginalId}'` : ''})">✅ Presente</button><button class="presenca-btn ${freq?.status === 'falta' ? 'falta' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'falta')">❌ Falta</button><button class="presenca-btn" onclick="window.marcarPresencaManual('${a.id}', '${data}', null)">🗑 Remover</button></div><div class="frequencia-data">${fmtDate(data)}${freq?.marcadoEm ? `<br><small>Marcado em: ${new Date(freq.marcadoEm).toLocaleString('pt-BR')}</small>` : ''}</div></div>`;
       }
       html += '</div>';
       container.innerHTML = html;
     };
-
     window.marcarPresencaManual = async function (clienteId, data, status, faltaOriginalId = null) {
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
-
-      if (status === null && existing) {
-        await db.collection('frequencias').doc(existing.id).delete();
-        await addHistory(`Presença removida para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`, 'yellow');
-      }
-      else if (existing) {
-        await db.collection('frequencias').doc(existing.id).update({ status, marcadoEm: new Date().toISOString(), ...(faltaOriginalId ? { isReposicao: true, faltaOriginalId } : {}) });
-        await addHistory(`Presença atualizada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}`, status === 'presente' ? 'green' : 'red');
-      }
-      else {
-        const newFreqData = { clienteId, data, status, marcadoEm: new Date().toISOString() };
-        if (faltaOriginalId) {
-          newFreqData.isReposicao = true;
-          newFreqData.faltaOriginalId = faltaOriginalId;
-          const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida);
-          if (reposicao) await db.collection('reposicoes').doc(reposicao.id).update({ foiCumprida: true });
-        }
-        await db.collection('frequencias').add(newFreqData);
-        await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}`, status === 'presente' ? 'green' : 'red');
-      }
-
-      await refreshCache();
-      await window.carregarFrequencia();
-      await carregarReposicoesAgendadas();
-      await verificarFaltasConsecutivas();
-      window.renderFaltasConsecutivas();
-      window.renderWhatsAppFaltas();
-      window.renderDashboard();
+      if (status === null && existing) { await getUserCollection('frequencias').doc(existing.id).delete(); await addHistory(`Presença removida para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`, 'yellow'); }
+      else if (existing) { await getUserCollection('frequencias').doc(existing.id).update({ status, marcadoEm: new Date().toISOString(), ...(faltaOriginalId ? { isReposicao: true, faltaOriginalId } : {}) }); await addHistory(`Presença atualizada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}`, status === 'presente' ? 'green' : 'red'); }
+      else { const newFreqData = { clienteId, data, status, marcadoEm: new Date().toISOString() }; if (faltaOriginalId) { newFreqData.isReposicao = true; newFreqData.faltaOriginalId = faltaOriginalId; const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida); if (reposicao) await getUserCollection('reposicoes').doc(reposicao.id).update({ foiCumprida: true }); } await getUserCollection('frequencias').add(newFreqData); await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}`, status === 'presente' ? 'green' : 'red'); }
+      await refreshCache(); await window.carregarFrequencia(); await carregarReposicoesAgendadas(); await verificarFaltasConsecutivas(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard();
     };
-
-    window.buscarAlunoFrequencia = function () {
-      clearTimeout(buscaFrequenciaTimeout);
-      buscaFrequenciaTimeout = setTimeout(() => {
-        const termo = document.getElementById('buscar-frequencia')?.value.toLowerCase().trim() || '';
-        document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => {
-          const nome = card.getAttribute('data-nome') || '';
-          card.style.display = nome.includes(termo) ? 'block' : 'none';
-        });
-      }, 300);
-    };
+    window.buscarAlunoFrequencia = function () { clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => { const termo = document.getElementById('buscar-frequencia')?.value.toLowerCase().trim() || ''; document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => { const nome = card.getAttribute('data-nome') || ''; card.style.display = nome.includes(termo) ? 'block' : 'none'; }); }, 300); };
+    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
 
     // ============================================
-    // BUSCAR PENDÊNCIAS DE FREQUÊNCIA
-    // ============================================
-    window.buscarPendenciasFrequencia = async function (nomeAluno) {
-      const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase()));
-      if (!aluno) {
-        alert('Aluno não encontrado!');
-        return;
-      }
-
-      const dataMatricula = aluno.dataMatricula || today();
-      const hoje = today();
-      const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || [];
-
-      const pendentes = [];
-      let dataAtual = new Date(dataMatricula + 'T12:00:00');
-      const dataFim = new Date(hoje + 'T12:00:00');
-
-      while (dataAtual <= dataFim) {
-        const dataStr = dataAtual.toISOString().split('T')[0];
-        const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' });
-        const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
-
-        if (diasAula.includes(diaSemanaCapitalized)) {
-          const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr);
-          if (!freqExistente) {
-            pendentes.push({ data: dataStr, dia: diaSemanaCapitalized });
-          }
-        }
-        dataAtual.setDate(dataAtual.getDate() + 1);
-      }
-
-      const container = document.getElementById('frequencia-content');
-      if (!pendentes.length) {
-        container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>';
-        return;
-      }
-
-      let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`;
-      for (const p of pendentes) {
-        html += `<tr><td>${fmtDate(p.data)}</td><td>${p.dia}</td><td><button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`;
-      }
-      html += `</tbody></table></div>`;
-      container.innerHTML = html;
-    };
-
-    // ============================================
-    // RELATORIO DE FREQUENCIA (com Dia da Semana e Feriados)
+    // RELATORIO DE FREQUENCIA (CORRIGIDO - FUNÇÃO SUBSTITUÍDA)
     // ============================================
     window.carregarRelatorioFrequencia = async function () {
       const mes = document.getElementById('rel-frequencia-mes').value;
@@ -3492,30 +2958,35 @@
       const container = document.getElementById('relatorio-frequencia-content');
 
       let html = `
-        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-          <button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button>
-          <button class="btn btn-red" onclick="window.exportarRelatorioDireto('pdf')">📕 PDF</button>
-        </div>
-        <div class="table-wrap">
-          <table id="tabela-relatorio-frequencia">
-            <thead>
-              <tr>
-                <th>Aluno</th>
-                ${diasDoMes.map(d => {
-                    const dataObj = new Date(d + 'T12:00:00');
-                    const diaSemanaNum = dataObj.getDay();
-                    const diasSemanaAbrev = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
-                    const diaSemana = diasSemanaAbrev[diaSemanaNum];
-                    const diaNum = d.slice(8);
-                    return `<th>${diaSemana}<br>${diaNum}/${mesNum}</th>`;
-                }).join('')}
-                <th>% Presença</th>
-                <th>Faltas</th>
-                <th>Reposições</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+      <button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button>
+      <button class="btn btn-red" onclick="window.exportarRelatorioDireto('pdf')">📕 PDF</button>
+    </div>
+    <div class="table-wrap">
+      <table id="tabela-relatorio-frequencia">
+        <thead>
+          <tr>
+            <th>Aluno</th>
+  `;
+
+      // Adiciona os cabeçalhos com dia da semana
+      for (const d of diasDoMes) {
+        const dataObj = new Date(d + 'T12:00:00');
+        const diaSemanaNum = dataObj.getDay();
+        const diasSemanaAbrev = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+        const diaSemana = diasSemanaAbrev[diaSemanaNum];
+        const diaNum = d.slice(8);
+        html += `<th>${diaSemana}<br>${diaNum}/${mesNum}</th>`;
+      }
+
+      html += `
+            <th>% Presença</th>
+            <th>Faltas</th>
+            <th>Reposições</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
 
       const alunosComAula = clientesCache.filter(c => c.diasHorarios && c.diasHorarios.length > 0);
 
@@ -3525,14 +2996,23 @@
         let faltas = 0;
         let reposicoes = 0;
 
-        const linha = diasDoMes.map(data => {
+        html += `<tr><td><strong>${aluno.nome}</strong></td>`;
+
+        for (const data of diasDoMes) {
           const dataObj = new Date(data + 'T12:00:00');
           const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'long' });
           const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
           const temAula = aluno.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized);
 
-          if (!temAula) return '<td class="empty-cell">-</td>';
-          if (ehFeriado(data)) return `<td class="feriado-cell" title="Feriado">🚫</td>`;
+          if (!temAula) {
+            html += '<td class="empty-cell">-</td>';
+            continue;
+          }
+
+          if (ehFeriado(data)) {
+            html += `<td class="feriado-cell" title="Feriado">🚫</td>`;
+            continue;
+          }
 
           totalDias++;
           const freq = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === data);
@@ -3540,262 +3020,111 @@
           if (freq?.status === 'presente') {
             presentes++;
             if (freq.isReposicao) reposicoes++;
-            return `<td style="background:var(--green);color:white;" title="Presente">✅</td>`;
+            html += `<td style="background:var(--green);color:white;" title="Presente">✅</td>`;
           }
-          if (freq?.status === 'falta') {
+          else if (freq?.status === 'falta') {
             faltas++;
             const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === freq.id && r.foiCumprida);
-            if (temReposicao) return `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</td>`;
-            return `<td style="background:var(--red);color:white;" title="Falta">❌</td>`;
+            if (temReposicao) {
+              html += `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</td>`;
+            } else {
+              html += `<td style="background:var(--red);color:white;" title="Falta">❌</td>`;
+            }
           }
-          return `<td class="empty-cell">-</td>`;
-        }).join('');
+          else {
+            html += `<td class="empty-cell">-</td>`;
+          }
+        }
 
         const percentual = totalDias ? ((presentes / totalDias) * 100).toFixed(1) : 0;
-        html += `<tr>
-          <td><strong>${aluno.nome}</strong></td>
-          ${linha}
-          <td>${percentual}%</span></td>
-          <td>${faltas}</span></td>
-          <td>${reposicoes}</span></td>
-        </tr>`;
+        html += `
+      <td>${percentual}%</td>
+      <td>${faltas}</td>
+      <td>${reposicoes}</td>
+    </tr>`;
       }
 
-      html += `</tbody></table></div>`;
+      html += `
+        </tbody>
+      </table>
+    </div>
+  `;
+
       container.innerHTML = html;
     };
 
-    // EXPORTAÇÃO DIRETA SEM MODAL
-    window.exportarRelatorioDireto = function (tipo) {
-      const tabela = document.getElementById('tabela-relatorio-frequencia');
-      if (!tabela) {
-        alert('Nenhum dado para exportar');
-        return;
-      }
-
-      if (tipo === 'excel') {
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.table_to_sheet(tabela, { raw: true });
-        XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência');
-        XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`);
-      } else if (tipo === 'pdf') {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('landscape');
-        doc.text('Relatório de Frequência', 14, 15);
-        doc.autoTable({
-          html: '#tabela-relatorio-frequencia',
-          startY: 20,
-          margin: { top: 10 },
-          theme: 'striped',
-          styles: { fontSize: 7, cellPadding: 2 },
-          headStyles: { fillColor: [59, 130, 246], textColor: 255 }
-        });
-        doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`);
-      }
-    };
+    window.exportarRelatorioDireto = function (tipo) { const tabela = document.getElementById('tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo === 'excel') { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência'); XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`); } else if (tipo === 'pdf') { const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape'); doc.text('Relatório de Frequência', 14, 15); doc.autoTable({ html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 }, theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`); } };
 
     // ============================================
-    // PRESENÇA AUTOMÁTICA (Corrigido para reposições e feriados)
+    // PRESENÇA AUTOMÁTICA
     // ============================================
-    function calcularFimAula(horarioInicio) {
-      const [hora, minuto] = horarioInicio.split(':').map(Number);
-      let horaFim = hora, minutoFim = minuto + 59;
-      if (minutoFim >= 60) { horaFim += Math.floor(minutoFim / 60); minutoFim = minutoFim % 60; }
-      return [horaFim, minutoFim];
-    }
-
+    function calcularFimAula(horarioInicio) { const [hora, minuto] = horarioInicio.split(':').map(Number); let horaFim = hora, minutoFim = minuto + 59; if (minutoFim >= 60) { horaFim += Math.floor(minutoFim / 60); minutoFim = minutoFim % 60; } return [horaFim, minutoFim]; }
     window.carregarPresencaAutomatica = async function () {
-      const agora = new Date();
-      const dataAtual = today();
-      
-      // Se for feriado, não exibe nenhum aluno para marcação
-      if (ehFeriado(dataAtual)) {
-          document.getElementById('presenca-auto-count').textContent = `0 alunos`;
-          document.getElementById('presenca-auto-dia').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long' });
-          document.getElementById('presenca-auto-horario').innerHTML = `Feriado hoje`;
-          const container = document.getElementById('presenca-automatica-content');
-          if (container) container.innerHTML = '<div class="empty">📅 Hoje é feriado. Nenhuma aula para marcar presença.</div>';
-          return;
-      }
-      
-      const diaSemana = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
-      const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
-      const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
-
-      const alunosComAula = clientesCache.filter(c => c.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized && (() => {
-        const horarioAluno = horarioParaMinutos(dh.horario);
-        return minutosAtuais >= horarioAluno && minutosAtuais <= horarioAluno + 59;
-      })()));
-
-      // Busca reposições ativas para hoje
-      const reposicoesAtivas = reposicoesCache.filter(r => {
-        return (
-          r.dataReposicao === dataAtual &&
-          horarioParaMinutos(r.horarioReposicao) <= minutosAtuais &&
-          minutosAtuais <= horarioParaMinutos(r.horarioReposicao) + 59 &&
-          !r.foiCumprida
-        );
-      });
-
+      const agora = new Date(); const dataAtual = today();
+      if (ehFeriado(dataAtual)) { document.getElementById('presenca-auto-count').textContent = `0 alunos`; document.getElementById('presenca-auto-dia').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long' }); document.getElementById('presenca-auto-horario').innerHTML = `Feriado hoje`; const container = document.getElementById('presenca-automatica-content'); if (container) container.innerHTML = '<div class="empty">📅 Hoje é feriado. Nenhuma aula para marcar presença.</div>'; return; }
+      const diaSemana = agora.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
+      const alunosComAula = clientesCache.filter(c => c.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized && (() => { const horarioAluno = horarioParaMinutos(dh.horario); return minutosAtuais >= horarioAluno && minutosAtuais <= horarioAluno + 59; })()));
+      const reposicoesAtivas = reposicoesCache.filter(r => { return (r.dataReposicao === dataAtual && horarioParaMinutos(r.horarioReposicao) <= minutosAtuais && minutosAtuais <= horarioParaMinutos(r.horarioReposicao) + 59 && !r.foiCumprida); });
       const alunosAgora = [...alunosComAula];
-      reposicoesAtivas.forEach(r => {
-        const aluno = clientesCache.find(c => c.id === r.alunoId);
-        if (aluno && !alunosAgora.some(a => a.id === aluno.id)) {
-          alunosAgora.push({ ...aluno, reposicao: true, reposicaoId: r.id, faltaOriginalId: r.faltaOriginalId, horarioAtual: r.horarioReposicao });
-        }
-      });
-
+      reposicoesAtivas.forEach(r => { const aluno = clientesCache.find(c => c.id === r.alunoId); if (aluno && !alunosAgora.some(a => a.id === aluno.id)) { alunosAgora.push({ ...aluno, reposicao: true, reposicaoId: r.id, faltaOriginalId: r.faltaOriginalId, horarioAtual: r.horarioReposicao }); } });
       const fimLimiteMarcacao = 20;
-      for (const aluno of alunosComAula) {
-        const horarioAula = aluno.diasHorarios?.find(dh => dh.dia === diaSemanaCapitalized)?.horario;
-        if (!horarioAula) continue;
-        const [hF, mF] = calcularFimAula(horarioAula);
-        const fimAula = new Date(agora); fimAula.setHours(hF, mF, 0, 0);
-        const limiteMarcacao = new Date(fimAula); limiteMarcacao.setMinutes(limiteMarcacao.getMinutes() + fimLimiteMarcacao);
-        const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataAtual);
-        if (!freqExistente && agora.getTime() > limiteMarcacao.getTime()) {
-          await db.collection('frequencias').add({ clienteId: aluno.id, data: dataAtual, status: 'falta', marcadoAutomaticamente: true, horarioAula: horarioAula, marcadoEm: new Date().toISOString() });
-          await refreshCache();
-        }
-      }
-
+      for (const aluno of alunosComAula) { const horarioAula = aluno.diasHorarios?.find(dh => dh.dia === diaSemanaCapitalized)?.horario; if (!horarioAula) continue; const [hF, mF] = calcularFimAula(horarioAula); const fimAula = new Date(agora); fimAula.setHours(hF, mF, 0, 0); const limiteMarcacao = new Date(fimAula); limiteMarcacao.setMinutes(limiteMarcacao.getMinutes() + fimLimiteMarcacao); const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataAtual); if (!freqExistente && agora.getTime() > limiteMarcacao.getTime()) { await getUserCollection('frequencias').add({ clienteId: aluno.id, data: dataAtual, status: 'falta', marcadoAutomaticamente: true, horarioAula: horarioAula, marcadoEm: new Date().toISOString() }); await refreshCache(); } }
       const alunosParaProcessar = [];
-      for (const aluno of alunosAgora) {
-        const horarioAula = aluno.reposicao ? aluno.horarioAtual : aluno.diasHorarios?.find(dh => dh.dia === diaSemanaCapitalized)?.horario;
-        if (!horarioAula) continue;
-        const [hF, mF] = calcularFimAula(horarioAula);
-        const fimAula = new Date(agora); fimAula.setHours(hF, mF, 0, 0);
-        const limiteMarcacao = new Date(fimAula); limiteMarcacao.setMinutes(limiteMarcacao.getMinutes() + 20);
-        const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataAtual);
-        if (!freqExistente && agora.getTime() <= limiteMarcacao.getTime()) {
-          alunosParaProcessar.push({ ...aluno, horarioAula, isReposicao: !!aluno.reposicao, faltaOriginalId: aluno.faltaOriginalId });
-        }
-      }
-
-      document.getElementById('presenca-auto-count').textContent = `${alunosParaProcessar.length} alunos`;
-      document.getElementById('presenca-auto-dia').textContent = diaSemanaCapitalized;
-      document.getElementById('presenca-auto-horario').innerHTML = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')} <span style="font-size:0.7rem;">(aulas com duração de 59min)</span>`;
-
+      for (const aluno of alunosAgora) { const horarioAula = aluno.reposicao ? aluno.horarioAtual : aluno.diasHorarios?.find(dh => dh.dia === diaSemanaCapitalized)?.horario; if (!horarioAula) continue; const [hF, mF] = calcularFimAula(horarioAula); const fimAula = new Date(agora); fimAula.setHours(hF, mF, 0, 0); const limiteMarcacao = new Date(fimAula); limiteMarcacao.setMinutes(limiteMarcacao.getMinutes() + 20); const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataAtual); if (!freqExistente && agora.getTime() <= limiteMarcacao.getTime()) { alunosParaProcessar.push({ ...aluno, horarioAula, isReposicao: !!aluno.reposicao, faltaOriginalId: aluno.faltaOriginalId }); } }
+      document.getElementById('presenca-auto-count').textContent = `${alunosParaProcessar.length} alunos`; document.getElementById('presenca-auto-dia').textContent = diaSemanaCapitalized; document.getElementById('presenca-auto-horario').innerHTML = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')} <span style="font-size:0.7rem;">(aulas com duração de 59min)</span>`;
       const container = document.getElementById('presenca-automatica-content');
-      if (!alunosParaProcessar.length) {
-        container.innerHTML = '<div class="empty">✅ Nenhum aluno com aula neste horário, ou período de marcação encerrado</div>';
-      } else {
-        let html = '<div class="frequencia-grid">';
-        for (const item of alunosParaProcessar) {
-          const [hF, mF] = calcularFimAula(item.horarioAula);
-          const fimAulaTemp = new Date(); fimAulaTemp.setHours(hF, mF, 0, 0);
-          const limiteTemp = new Date(fimAulaTemp); limiteTemp.setMinutes(limiteTemp.getMinutes() + 20);
-          const minutosRestantes = Math.max(0, Math.floor((limiteTemp.getTime() - new Date().getTime()) / 60000));
-          const badgeReposicao = item.isReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : '';
-          html += `<div class="frequencia-card" data-aluno="${item.id}">
-            <div class="frequencia-aluno-nome">${item.nome}${badgeReposicao}</div>
-            <div class="frequencia-dias">Aula: ${item.horarioAula} (duração: 59min)</div>
-            <div class="frequencia-status">
-              <button class="presenca-btn" onclick="window.marcarPresencaAuto('${item.id}', '${dataAtual}', 'presente', '${item.horarioAula}', ${item.isReposicao}, '${item.faltaOriginalId || ''}')">✅ Presente</button>
-              <button class="presenca-btn" onclick="window.marcarPresencaAuto('${item.id}', '${dataAtual}', 'falta', '${item.horarioAula}', ${item.isReposicao}, '${item.faltaOriginalId || ''}')">❌ Falta</button>
-            </div>
-            <div class="frequencia-data">⏱️ Tempo restante: ${minutosRestantes} min</div>
-          </div>`;
-        }
-        html += '</div>';
-        container.innerHTML = html;
-      }
+      if (!alunosParaProcessar.length) { container.innerHTML = '<div class="empty">✅ Nenhum aluno com aula neste horário, ou período de marcação encerrado</div>'; }
+      else { let html = '<div class="frequencia-grid">'; for (const item of alunosParaProcessar) { const [hF, mF] = calcularFimAula(item.horarioAula); const fimAulaTemp = new Date(); fimAulaTemp.setHours(hF, mF, 0, 0); const limiteTemp = new Date(fimAulaTemp); limiteTemp.setMinutes(limiteTemp.getMinutes() + 20); const minutosRestantes = Math.max(0, Math.floor((limiteTemp.getTime() - new Date().getTime()) / 60000)); const badgeReposicao = item.isReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : ''; html += `<div class="frequencia-card" data-aluno="${item.id}"><div class="frequencia-aluno-nome">${item.nome}${badgeReposicao}</div><div class="frequencia-dias">Aula: ${item.horarioAula} (duração: 59min)</div><div class="frequencia-status"><button class="presenca-btn" onclick="window.marcarPresencaAuto('${item.id}', '${dataAtual}', 'presente', '${item.horarioAula}', ${item.isReposicao}, '${item.faltaOriginalId || ''}')">✅ Presente</button><button class="presenca-btn" onclick="window.marcarPresencaAuto('${item.id}', '${dataAtual}', 'falta', '${item.horarioAula}', ${item.isReposicao}, '${item.faltaOriginalId || ''}')">❌ Falta</button></div><div class="frequencia-data">⏱️ Tempo restante: ${minutosRestantes} min</div></div>`; } html += '</div>'; container.innerHTML = html; }
     };
-
     window.marcarPresencaAuto = async function (clienteId, data, status, horarioAula, isReposicao, faltaOriginalId) {
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
       const newFreqData = { clienteId, data, status, horarioAula, marcadoEm: new Date().toISOString() };
-      if (isReposicao && faltaOriginalId) {
-        newFreqData.isReposicao = true;
-        newFreqData.faltaOriginalId = faltaOriginalId;
-        const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida);
-        if (reposicao) {
-          await db.collection('reposicoes').doc(reposicao.id).update({ foiCumprida: true });
-          // Atualiza cache de reposições
-          await refreshCache();
-        }
-      }
-      if (existing) await db.collection('frequencias').doc(existing.id).update(newFreqData);
-      else await db.collection('frequencias').add(newFreqData);
-      await refreshCache();
-      const card = document.querySelector(`.frequencia-card[data-aluno="${clienteId}"]`);
-      if (card) { card.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => card.remove(), 300); }
-      document.getElementById('presenca-auto-count').textContent = `${document.querySelectorAll('#presenca-automatica-content .frequencia-card').length} alunos`;
-      await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}${isReposicao ? ' (Reposição)' : ''}`, status === 'presente' ? 'green' : 'red');
-      await carregarReposicoesAgendadas();
-      await verificarFaltasConsecutivas();
-      window.renderFaltasConsecutivas();
-      window.renderWhatsAppFaltas();
-      window.renderDashboard();
+      if (isReposicao && faltaOriginalId) { newFreqData.isReposicao = true; newFreqData.faltaOriginalId = faltaOriginalId; const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida); if (reposicao) { await getUserCollection('reposicoes').doc(reposicao.id).update({ foiCumprida: true }); await refreshCache(); } }
+      if (existing) await getUserCollection('frequencias').doc(existing.id).update(newFreqData); else await getUserCollection('frequencias').add(newFreqData);
+      await refreshCache(); const card = document.querySelector(`.frequencia-card[data-aluno="${clienteId}"]`); if (card) { card.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => card.remove(), 300); } document.getElementById('presenca-auto-count').textContent = `${document.querySelectorAll('#presenca-automatica-content .frequencia-card').length} alunos`; await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}${isReposicao ? ' (Reposição)' : ''}`, status === 'presente' ? 'green' : 'red'); await carregarReposicoesAgendadas(); await verificarFaltasConsecutivas(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard();
     };
 
     // ============================================
     // HISTORICO
     // ============================================
-    window.renderHistorico = async function () {
-      document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join('');
-    };
+    window.renderHistorico = async function () { document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join(''); };
 
     // ============================================
     // RELATORIOS
     // ============================================
-    window.renderRelatorio = async function () {
-      const de = document.getElementById('rel-de').value;
-      const ate = document.getElementById('rel-ate').value;
-      const status = document.getElementById('rel-status').value;
-      let parcelas = parcelasCache;
-      if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de);
-      if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate);
-      if (status) parcelas = parcelas.filter(p => p.status === status);
-      document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => {
-        const c = clientesCache.find(x => x.id === p.clienteId);
-        return `<tr>
-          <td>${c?.nome}</td>
-          <td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td>
-          <td>${p.numeroParcela}/${p.totalParcelas}</td>
-          <td>${fmtBRL(p.valor)}</span></td>
-          <td>${fmtDate(p.dataVencimento)}</span></td>
-          <td><span class="badge badge-${p.status}">${p.status}</span></td>
-        </tr>`;
-      }).join('');
-    };
+    window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
 
     // ============================================
     // UTILITARIOS
     // ============================================
-    window.maskPhone = function (input) {
-      let v = input.value.replace(/\D/g, '');
-      if (v.length > 11) v = v.slice(0, 11);
-      if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
-      else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
-      else if (v.length > 0) v = `(${v}`;
-      input.value = v;
-    };
+    window.maskPhone = function (input) { let v = input.value.replace(/\D/g, ''); if (v.length > 11) v = v.slice(0, 11); if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`; else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`; else if (v.length > 0) v = `(${v}`; input.value = v; };
+    window.salvarBackupManual = async function () { try { const dados = { clientes: clientesCache, dividas: dividasCache, parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache, historico: historicoCache, dataBackup: new Date().toISOString() }; const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`; a.click(); URL.revokeObjectURL(url); alert('Backup salvo com sucesso!'); } catch (error) { alert('Erro ao salvar backup'); } };
+    async function criarDadosIniciais() { console.log('Sistema pronto para uso. Nenhum dado de exemplo foi criado.'); }
 
-    window.salvarBackupManual = async function () {
-      try {
-        const dados = { clientes: clientesCache, dividas: dividasCache, parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache, historico: historicoCache, dataBackup: new Date().toISOString() };
-        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        alert('Backup salvo com sucesso!');
-      } catch (error) { alert('Erro ao salvar backup'); }
-    };
-
-    async function criarDadosIniciais() {
-      if (clientesCache.length === 0) {
-        const hoje = today();
-        const aluno1 = await db.collection('clientes').add({ nome: 'João Silva', telefone: '(11) 99999-9999', endereco: 'Rua A, 123', nascimento: '1990-05-15', dataMatricula: hoje, diasHorarios: [{ dia: 'Segunda-feira', horario: '18:00' }, { dia: 'Quarta-feira', horario: '18:00' }] });
-        const aluno2 = await db.collection('clientes').add({ nome: 'Maria Oliveira', telefone: '(11) 88888-8888', endereco: 'Rua B, 456', nascimento: '1985-08-20', dataMatricula: hoje, diasHorarios: [{ dia: 'Terça-feira', horario: '19:00' }, { dia: 'Quinta-feira', horario: '19:00' }] });
-        await refreshCache();
-        const divida = await db.collection('dividas').add({ clienteId: aluno1.id, tipo: 'Mensalidade', descricao: 'Mensalidade Janeiro', valor: 350, vencimento: hoje, status: 'pendente', parcelado: false, totalParcelas: 1 });
-        await db.collection('parcelas').add({ dividaId: divida.id, clienteId: aluno1.id, numeroParcela: 1, totalParcelas: 1, valor: 350, dataVencimento: hoje, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
-        await refreshCache();
+    // ============================================
+    // MIGRAÇÃO DE DADOS
+    // ============================================
+    async function migrarDadosParaMultitenant() {
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+      const userDoc = await db.collection('usuarios').doc(uid).get();
+      const userData = userDoc.data();
+      if (userData && userData.dadosMigrados) return;
+      console.log(`Migrando dados para o usuário ${uid}...`);
+      const colecoes = ['clientes', 'dividas', 'parcelas', 'frequencias', 'reposicoes', 'historico', 'alertasFaltas', 'ultimosParabens'];
+      for (const colecao of colecoes) {
+        const snapshot = await db.collection(colecao).get();
+        const batch = db.batch();
+        snapshot.docs.forEach(doc => {
+          const newDocRef = db.collection('usuarios').doc(uid).collection(colecao).doc(doc.id);
+          batch.set(newDocRef, doc.data());
+        });
+        await batch.commit();
+        console.log(`Coleção ${colecao} migrada.`);
       }
+      await db.collection('usuarios').doc(uid).update({ dadosMigrados: true });
+      console.log('Migração concluída!');
+      await refreshCache();
     }
 
     // ============================================
@@ -3808,7 +3137,6 @@
       updateClock();
       setInterval(updateClock, 1000);
 
-      // Mostrar menu de gerenciar usuários apenas para admin
       if (currentUserRole === 'admin') {
         const menuAdmin = document.getElementById('menu-gerenciar-usuarios');
         if (menuAdmin) menuAdmin.style.display = 'block';
@@ -3820,52 +3148,35 @@
         buscaDiv.innerHTML = `<div class="search-box" style="margin-left: auto;"><span class="search-icon">🔍</span><input type="text" id="buscar-frequencia" placeholder="Buscar aluno por nome..." style="padding: 0.5rem 0.5rem 0.5rem 2rem;"></div>`;
         frequenciaHeader.appendChild(buscaDiv);
         const buscaInput = document.getElementById('buscar-frequencia');
-        if (buscaInput) {
-          buscaInput.addEventListener('input', function () {
-            if (buscaFrequenciaTimeout) clearTimeout(buscaFrequenciaTimeout);
-            buscaFrequenciaTimeout = setTimeout(() => window.carregarFrequencia(), 300);
-          });
-        }
+        if (buscaInput) { buscaInput.addEventListener('input', function () { if (buscaFrequenciaTimeout) clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => window.carregarFrequencia(), 300); }); }
       }
 
       const sidebarFooter = document.querySelector('.sidebar-footer');
       if (sidebarFooter && !document.getElementById('backup-btn')) {
         const backupBtn = document.createElement('button');
-        backupBtn.id = 'backup-btn';
-        backupBtn.className = 'logout-btn';
-        backupBtn.style.marginBottom = '0.5rem';
-        backupBtn.innerHTML = '💾 Backup Manual';
-        backupBtn.onclick = window.salvarBackupManual;
+        backupBtn.id = 'backup-btn'; backupBtn.className = 'logout-btn'; backupBtn.style.marginBottom = '0.5rem'; backupBtn.innerHTML = '💾 Backup Manual'; backupBtn.onclick = window.salvarBackupManual;
         sidebarFooter.insertBefore(backupBtn, sidebarFooter.firstChild);
       }
 
       const frequenciaDataInput = document.getElementById('frequencia-data');
       if (frequenciaDataInput && !frequenciaDataInput.value) frequenciaDataInput.value = today();
-
       const relFrequenciaMes = document.getElementById('rel-frequencia-mes');
       if (relFrequenciaMes && !relFrequenciaMes.value) relFrequenciaMes.value = new Date().toISOString().slice(0, 7);
 
       await refreshCache();
+      await migrarDadosParaMultitenant();
       await criarDadosIniciais();
       await criarUsuarioPadraoAdmin();
       loadHiddenItems();
       popularSelectHorarios();
       await verificarFaltasConsecutivas();
 
-      window.renderDashboard();
-      window.renderHoje();
-      window.renderClientes();
-      window.carregarAniversariantesSemana();
-      window.renderFaltasConsecutivas();
-      window.renderWhatsAppFaltas(); // Carrega a nova aba
+      window.renderDashboard(); window.renderHoje(); window.renderClientes(); window.carregarAniversariantesSemana(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas();
 
       const alunosPorHoraHeader = document.querySelector('#page-alunos-por-hora .section-header');
       if (alunosPorHoraHeader && !document.getElementById('btn-export-alunos-hora')) {
         const btnDiv = document.createElement('div');
-        btnDiv.innerHTML = `
-          <button class="btn btn-green btn-sm" onclick="window.exportarAlunosHoraExcel()">📗 Exportar Excel</button>
-          <button class="btn btn-red btn-sm" onclick="window.exportarAlunosHoraPDF()">📕 Salvar PDF</button>
-        `;
+        btnDiv.innerHTML = `<button class="btn btn-green btn-sm" onclick="window.exportarAlunosHoraExcel()">📗 Exportar Excel</button><button class="btn btn-red btn-sm" onclick="window.exportarAlunosHoraPDF()">📕 Salvar PDF</button>`;
         alunosPorHoraHeader.appendChild(btnDiv);
       }
     }
@@ -3886,8 +3197,7 @@
           await initApp();
         } catch (error) {
           await auth.signOut();
-          currentUser = null;
-          currentUserRole = null;
+          currentUser = null; currentUserRole = null;
           document.getElementById('login-screen').style.display = 'flex';
           document.getElementById('app').style.display = 'none';
           const errorDiv = document.getElementById('login-error');
