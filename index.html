@@ -1337,7 +1337,8 @@
             Aniversariantes da Semana</div>
 
           <div class="nav-item" onclick="window.toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade
-            <span style="margin-left:auto">▼</span></div>
+            <span style="margin-left:auto">▼</span>
+          </div>
           <div id="submenu-mensalidade" style="display:none; padding-left: 1.5rem;">
             <div class="nav-subitem" onclick="window.navigate('parcelas'); event.stopPropagation()"><span
                 class="icon">📋</span> Mensalidades / Controle</div>
@@ -1590,8 +1591,8 @@
                 <tbody id="alunos-por-hora-tbody">
                   <tr>
                     <td colspan="8" class="empty">Carregando...</td>
-              </table>
-              </tbody>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -1673,18 +1674,18 @@
                 <option value="atrasado">Atrasado</option>
               </select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
             <div class="table-wrap">
-              </table>
-              <thead>
-                <tr>
-                  <th>Aluno</th>
-                  <th>Mensalidade</th>
-                  <th>Parcela</th>
-                  <th>Valor</th>
-                  <th>Vencimento</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="relatorio-tbody"></tbody>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="relatorio-tbody"></tbody>
               </table>
             </div>
           </div>
@@ -1900,16 +1901,17 @@
     }
 
     // ============================================
-    // FUNÇÃO MULTITENANT
+    // FUNÇÃO MULTITENANT (CORRIGIDA)
     // ============================================
     function getUserCollection(collectionName) {
       if (!currentUser?.uid) {
         throw new Error('Usuário não autenticado');
       }
-      if (currentUserRole === 'admin') {
-        return db.collection(collectionName);
-      }
-      return db.collection('usuarios').doc(currentUser.uid).collection(collectionName);
+      // TODOS os usuários usam coleções próprias, inclusive administrador
+      return db
+        .collection('usuarios')
+        .doc(currentUser.uid)
+        .collection(collectionName);
     }
 
     // ============================================
@@ -1930,12 +1932,14 @@
     }
 
     // ============================================
-    // REFRESH CACHE (MULTITENANT)
+    // REFRESH CACHE (CORRIGIDO)
     // ============================================
     async function refreshCache() {
       const getCol = (name) => {
-        if (currentUserRole === 'admin') return db.collection(name);
-        return db.collection('usuarios').doc(currentUser.uid).collection(name);
+        return db
+          .collection('usuarios')
+          .doc(currentUser.uid)
+          .collection(name);
       };
 
       const clientesSnap = await getCol('clientes').get();
@@ -1968,28 +1972,30 @@
 
     async function addHistory(acao, tipo) {
       const getCol = () => {
-        if (currentUserRole === 'admin') return db.collection('historico');
-        return db.collection('usuarios').doc(currentUser.uid).collection('historico');
+        return db
+          .collection('usuarios')
+          .doc(currentUser.uid)
+          .collection('historico');
       };
       await getCol().add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
       await refreshCache();
     }
 
     // ============================================
-    // FUNÇÕES DE USUÁRIO
+    // FUNÇÕES DE USUÁRIO (CORRIGIDAS)
     // ============================================
     async function criarUsuarioPadraoAdmin() {
-      const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini@gmail.com').get();
+      const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini4375@gmail.com').get();
       if (usuariosSnap.empty) {
         try {
-          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini@gmail.com', '202606');
+          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini4375@gmail.com', '202606');
           await db.collection('usuarios').doc(userCredential.user.uid).set({
             nome: 'Administrador',
-            email: 'mario.bergamini@gmail.com',
+            email: 'mario.bergamini4375@gmail.com',
             status: 'ativo',
             role: 'admin',
             aprovado: true,
-            dadosMigrados: true,
+            dadosMigrados: false,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
           console.log('Usuário admin criado com sucesso');
@@ -2020,7 +2026,7 @@
     }
 
     // ============================================
-    // GERENCIAR USUÁRIOS
+    // GERENCIAR USUÁRIOS (CORRIGIDO)
     // ============================================
     window.aprovarUsuario = async function (userId) {
       if (currentUserRole !== 'admin') return;
@@ -2082,7 +2088,7 @@
         <td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR') : '—'}</td>
         <td>${u.ultimoLogin ? new Date(u.ultimoLogin).toLocaleDateString('pt-BR') : '—'}</td>
         <td>${roleBadge}</td>
-        <td class="td-actions">${actions}</span></td>
+        <td class="td-actions">${actions}</td>
       </tr>
     `;
       }).join('');
@@ -2132,13 +2138,52 @@
           alert('Usuário atualizado com sucesso!');
         } else {
           if (!senha) { alert('Preencha a senha!'); return; }
-          const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
-          await db.collection('usuarios').doc(userCredential.user.uid).set({
-            nome, email, status, role: 'user', aprovado: true,
-            dadosMigrados: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+
+          // salva sessão do admin
+          const adminEmail = currentUser.email;
+
+          // cria app secundário
+          const secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+          const secondaryAuth = secondaryApp.auth();
+
+          const userCredential = await secondaryAuth
+            .createUserWithEmailAndPassword(email, senha);
+
+          await db.collection('usuarios')
+            .doc(userCredential.user.uid)
+            .set({
+              nome,
+              email,
+              status,
+              role: 'user',
+              aprovado: true,
+              dadosMigrados: false,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+          // cria estrutura vazia do usuário
+          const userBaseRef = db
+            .collection('usuarios')
+            .doc(userCredential.user.uid);
+
+          await userBaseRef.collection('clientes').doc('_init').set({ created: true });
+          await userBaseRef.collection('dividas').doc('_init').set({ created: true });
+          await userBaseRef.collection('parcelas').doc('_init').set({ created: true });
+          await userBaseRef.collection('frequencias').doc('_init').set({ created: true });
+
+          // remove docs fake
+          await userBaseRef.collection('clientes').doc('_init').delete();
+          await userBaseRef.collection('dividas').doc('_init').delete();
+          await userBaseRef.collection('parcelas').doc('_init').delete();
+          await userBaseRef.collection('frequencias').doc('_init').delete();
+
+          await secondaryAuth.signOut();
+          await secondaryApp.delete();
+
           await refreshCache();
+
           await addHistory(`Usuário ${nome} criado pelo administrador`, 'green');
+
           alert('Usuário criado com sucesso!');
         }
         window.closeModal('modal-usuario');
@@ -2170,21 +2215,46 @@
 
     window.excluirUsuario = async function (id, email) {
       if (currentUserRole !== 'admin') return;
-      if (!confirm(`Deseja excluir o usuário ${email}? Esta ação é irreversível!`)) return;
+      if (!confirm(`Deseja excluir o usuário ${email}?`)) return;
+
       try {
-        const user = await auth.getUserByEmail(email);
-        await auth.deleteUser(user.uid);
+        // remove dados do firestore
+        const userRef = db.collection('usuarios').doc(id);
+
+        const collections = [
+          'clientes',
+          'dividas',
+          'parcelas',
+          'frequencias',
+          'reposicoes',
+          'historico',
+          'ultimosParabens',
+          'alertasFaltas'
+        ];
+
+        for (const col of collections) {
+          const snap = await userRef.collection(col).get();
+          for (const doc of snap.docs) {
+            await doc.ref.delete();
+          }
+        }
+
+        await userRef.delete();
+
+        await refreshCache();
+
+        await addHistory(`Usuário ${email} excluído`, 'red');
+
+        window.renderUsuarios();
+
+        alert('Usuário removido com sucesso!');
       } catch (error) {
-        console.log('Erro ao excluir do auth:', error);
+        alert(error.message);
       }
-      await db.collection('usuarios').doc(id).delete();
-      await refreshCache();
-      await addHistory(`Usuário ${email} excluído`, 'red');
-      window.renderUsuarios();
     };
 
     // ============================================
-    // LOGIN E REGISTER
+    // LOGIN E REGISTER (CORRIGIDO)
     // ============================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
@@ -2213,43 +2283,48 @@
     };
 
     window.doRegister = async function () {
-      const email = document.getElementById('login-user').value;
+      const email = document.getElementById('login-user').value.trim();
       const password = document.getElementById('login-pass').value;
       const errorDiv = document.getElementById('login-error');
+
       if (!email || !password) {
         errorDiv.textContent = '❌ Preencha email e senha!';
         errorDiv.style.display = 'block';
-        setTimeout(() => errorDiv.style.display = 'none', 3000);
+
+        setTimeout(() => {
+          errorDiv.style.display = 'none';
+        }, 3000);
+
         return;
       }
-      if (password.length < 6) {
-        errorDiv.textContent = '❌ A senha deve ter pelo menos 6 caracteres!';
-        errorDiv.style.display = 'block';
-        setTimeout(() => errorDiv.style.display = 'none', 3000);
-        return;
-      }
+
       try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const uid = userCredential.user.uid;
-        await db.collection('usuarios').doc(uid).set({
-          nome: email.split('@')[0],
-          email: email,
-          status: 'aguardando',
-          role: 'user',
-          aprovado: false,
-          dadosMigrados: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        const userCredential = await auth
+          .createUserWithEmailAndPassword(email, password);
+
+        await db.collection('usuarios')
+          .doc(userCredential.user.uid)
+          .set({
+            nome: email.split('@')[0],
+            email,
+            status: 'aguardando',
+            role: 'user',
+            aprovado: false,
+            dadosMigrados: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
         await auth.signOut();
-        errorDiv.textContent = '✅ Conta criada! Aguarde liberação pelo administrador.';
-        errorDiv.style.color = 'var(--green)';
+
+        errorDiv.textContent = '⏳ Cadastro enviado! Aguarde aprovação do administrador.';
         errorDiv.style.display = 'block';
-        setTimeout(() => errorDiv.style.display = 'none', 5000);
+
+        document.getElementById('login-user').value = '';
+        document.getElementById('login-pass').value = '';
+
       } catch (error) {
         errorDiv.textContent = '❌ ' + error.message;
-        errorDiv.style.color = 'var(--red)';
         errorDiv.style.display = 'block';
-        setTimeout(() => errorDiv.style.display = 'none', 3000);
       }
     };
 
@@ -2722,7 +2797,7 @@
       const search = document.getElementById('search-clientes')?.value.toLowerCase().trim() || '';
       let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
       const tbody = document.getElementById('clientes-tbody');
-      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td><tr>'; return; }
+      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
       tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td></tr>`).join('');
     };
 
@@ -2746,7 +2821,7 @@
         return matchBusca && matchData && matchStatus;
       });
       const tbody = document.getElementById('parcelas-tbody');
-      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
+      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty">Nenhuma parcela</div><tr></tr>'; return; }
       let html = '';
       for (const p of parcelas) {
         const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
@@ -2817,7 +2892,7 @@
     // DISPARO
     // ============================================
     function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
-    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></td></tr>`; }).join(''); };
+    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
 
     // ============================================
     // ANIVERSARIANTES DA SEMANA
@@ -2942,7 +3017,7 @@
     window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
 
     // ============================================
-    // RELATORIO DE FREQUENCIA (CORRIGIDO - FUNÇÃO SUBSTITUÍDA)
+    // RELATORIO DE FREQUENCIA (CORRIGIDO)
     // ============================================
     window.carregarRelatorioFrequencia = async function () {
       const mes = document.getElementById('rel-frequencia-mes').value;
@@ -3010,7 +3085,7 @@
           }
 
           if (ehFeriado(data)) {
-            html += `<td class="feriado-cell" title="Feriado">🚫</td>`;
+            html += `<td class="feriado-cell" title="Feriado">🚫</span></td>`;
             continue;
           }
 
@@ -3020,27 +3095,27 @@
           if (freq?.status === 'presente') {
             presentes++;
             if (freq.isReposicao) reposicoes++;
-            html += `<td style="background:var(--green);color:white;" title="Presente">✅</td>`;
+            html += `<td style="background:var(--green);color:white;" title="Presente">✅</span></td>`;
           }
           else if (freq?.status === 'falta') {
             faltas++;
             const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === freq.id && r.foiCumprida);
             if (temReposicao) {
-              html += `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</td>`;
+              html += `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</span></td>`;
             } else {
-              html += `<td style="background:var(--red);color:white;" title="Falta">❌</td>`;
+              html += `<td style="background:var(--red);color:white;" title="Falta">❌</span></td>`;
             }
           }
           else {
-            html += `<td class="empty-cell">-</td>`;
+            html += `<td class="empty-cell">-</span></td>`;
           }
         }
 
         const percentual = totalDias ? ((presentes / totalDias) * 100).toFixed(1) : 0;
         html += `
-      <td>${percentual}%</td>
-      <td>${faltas}</td>
-      <td>${reposicoes}</td>
+      <td>${percentual}%</span></td>
+      <td>${faltas}</span></td>
+      <td>${reposicoes}</span></td>
     </tr>`;
       }
 
@@ -3092,7 +3167,7 @@
     // ============================================
     // RELATORIOS
     // ============================================
-    window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
+    window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
 
     // ============================================
     // UTILITARIOS
