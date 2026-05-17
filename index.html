@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -62,7 +63,10 @@
       min-height: 100vh;
     }
 
-    h1, h2, h3, h4 {
+    h1,
+    h2,
+    h3,
+    h4 {
       font-family: 'Syne', sans-serif;
     }
 
@@ -469,6 +473,7 @@
         opacity: 0;
         transform: translateY(12px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -1203,6 +1208,7 @@
         opacity: 1;
         transform: scale(1);
       }
+
       to {
         opacity: 0;
         transform: scale(0.9);
@@ -1221,46 +1227,46 @@
         grid-template-columns: 1fr !important;
         gap: 1rem;
       }
-      
+
       .stat-card {
         padding: 1.2rem;
         min-height: auto;
       }
-      
+
       .stat-label {
         font-size: 0.9rem;
       }
-      
+
       .stat-value {
         font-size: 2rem;
       }
-      
+
       .cobranca-item {
         flex-direction: column;
         align-items: flex-start;
       }
-      
+
       .topbar-title {
         font-size: 0.9rem;
       }
-      
+
       .clock {
         display: none;
       }
-      
+
       .content {
         padding: 0.7rem;
       }
-      
+
       table {
         min-width: 900px;
       }
-      
+
       .section-header {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       .section-header .btn {
         width: 100%;
       }
@@ -1274,7 +1280,7 @@
       padding: 1rem;
       margin-bottom: 1rem;
     }
-    
+
     .faltas-consecutivas-card h3 {
       color: var(--orange);
       margin-bottom: 1rem;
@@ -1314,36 +1320,51 @@
         <div class="nav-section">
           <div class="nav-section-title">Principal</div>
           <div class="nav-item" onclick="window.navigate('dashboard')"><span class="icon">📊</span> Dashboard</div>
-          <div class="nav-item" onclick="window.navigate('alunos')"><span class="icon">👥</span> Cadastro de Alunos</div>
-          <div class="nav-item" onclick="window.navigate('aniversariantes')"><span class="icon">🎂</span> Aniversariantes da Semana</div>
+          <div class="nav-item" onclick="window.navigate('alunos')"><span class="icon">👥</span> Cadastro de Alunos
+          </div>
+          <div class="nav-item" onclick="window.navigate('aniversariantes')"><span class="icon">🎂</span>
+            Aniversariantes da Semana</div>
 
-          <div class="nav-item" onclick="window.toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade <span style="margin-left:auto">▼</span></div>
+          <div class="nav-item" onclick="window.toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade
+            <span style="margin-left:auto">▼</span></div>
           <div id="submenu-mensalidade" style="display:none; padding-left: 1.5rem;">
-            <div class="nav-subitem" onclick="window.navigate('parcelas'); event.stopPropagation()"><span class="icon">📋</span> Mensalidades / Controle</div>
-            <div class="nav-subitem" onclick="window.navigate('hoje'); event.stopPropagation()"><span class="icon">🔥</span> Vencendo Hoje</div>
-            <div class="nav-subitem" onclick="window.navigate('disparo'); event.stopPropagation()"><span class="icon">✏️</span> Enviar Mensagem WhatsApp</div>
+            <div class="nav-subitem" onclick="window.navigate('parcelas'); event.stopPropagation()"><span
+                class="icon">📋</span> Mensalidades / Controle</div>
+            <div class="nav-subitem" onclick="window.navigate('hoje'); event.stopPropagation()"><span
+                class="icon">🔥</span> Vencendo Hoje</div>
+            <div class="nav-subitem" onclick="window.navigate('disparo'); event.stopPropagation()"><span
+                class="icon">✏️</span> Enviar Mensagem WhatsApp</div>
           </div>
 
-          <div class="nav-item" onclick="window.toggleSubmenuFrequencia()"><span class="icon">📅</span> Frequência <span style="margin-left:auto">▼</span></div>
+          <div class="nav-item" onclick="window.toggleSubmenuFrequencia()"><span class="icon">📅</span> Frequência <span
+              style="margin-left:auto">▼</span></div>
           <div id="submenu-frequencia" style="display:none; padding-left: 1.5rem;">
-            <div class="nav-subitem" onclick="window.navigate('presenca-automatica'); event.stopPropagation()"><span class="icon">🕐</span> Marcar Presença</div>
-            <div class="nav-subitem" onclick="window.navigate('alunos-por-hora'); event.stopPropagation()"><span class="icon">📊</span> Alunos por Hora</div>
-            <div class="nav-subitem" onclick="window.navigate('reposicao'); event.stopPropagation()"><span class="icon">🔄</span> Reposição de Aula</div>
-            <div class="nav-subitem" onclick="window.navigate('frequencia'); event.stopPropagation()"><span class="icon">✅</span> Marcar Presença Manual</div>
-            <div class="nav-subitem" onclick="window.navigate('relatorio-frequencia'); event.stopPropagation()"><span class="icon">📊</span> Relatório</div>
+            <div class="nav-subitem" onclick="window.navigate('presenca-automatica'); event.stopPropagation()"><span
+                class="icon">🕐</span> Marcar Presença</div>
+            <div class="nav-subitem" onclick="window.navigate('alunos-por-hora'); event.stopPropagation()"><span
+                class="icon">📊</span> Alunos por Hora</div>
+            <div class="nav-subitem" onclick="window.navigate('reposicao'); event.stopPropagation()"><span
+                class="icon">🔄</span> Reposição de Aula</div>
+            <div class="nav-subitem" onclick="window.navigate('frequencia'); event.stopPropagation()"><span
+                class="icon">✅</span> Marcar Presença Manual</div>
+            <div class="nav-subitem" onclick="window.navigate('relatorio-frequencia'); event.stopPropagation()"><span
+                class="icon">📊</span> Relatório</div>
           </div>
           <!-- Menu Gerenciar Usuários - visível apenas para admin via JS -->
           <div id="menu-gerenciar-usuarios" style="display:none;">
             <div class="nav-section">
               <div class="nav-section-title">Administração</div>
-              <div class="nav-item" onclick="window.navigate('usuarios')"><span class="icon">👥</span> Gerenciar Usuários</div>
+              <div class="nav-item" onclick="window.navigate('usuarios')"><span class="icon">👥</span> Gerenciar
+                Usuários</div>
             </div>
           </div>
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Análise</div>
-          <div class="nav-item" onclick="window.navigate('historico')" style="display:none;"><span class="icon">📜</span> Histórico</div>
-          <div class="nav-item" onclick="window.navigate('relatorios')" style="display:none;"><span class="icon">📈</span> Relatórios</div>
+          <div class="nav-item" onclick="window.navigate('historico')" style="display:none;"><span
+              class="icon">📜</span> Histórico</div>
+          <div class="nav-item" onclick="window.navigate('relatorios')" style="display:none;"><span
+              class="icon">📈</span> Relatórios</div>
         </div>
         <div class="sidebar-footer">
           <button class="logout-btn" onclick="window.doLogout()">🚪 Sair</button>
@@ -1427,9 +1448,12 @@
               <h2>📋 Mensalidades / Controle</h2>
             </div>
             <div class="search-row">
-              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-parcelas" placeholder="Buscar..." oninput="window.renderParcelas()"></div>
-              <input type="date" class="date-filter" id="filter-data-de" placeholder="Data de" onchange="window.renderParcelas()">
-              <input type="date" class="date-filter" id="filter-data-ate" placeholder="Data até" onchange="window.renderParcelas()">
+              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-parcelas"
+                  placeholder="Buscar..." oninput="window.renderParcelas()"></div>
+              <input type="date" class="date-filter" id="filter-data-de" placeholder="Data de"
+                onchange="window.renderParcelas()">
+              <input type="date" class="date-filter" id="filter-data-ate" placeholder="Data até"
+                onchange="window.renderParcelas()">
               <select class="filter-select" id="filter-parcela-status" onchange="window.renderParcelas()">
                 <option value="">Todos</option>
                 <option value="pendente">Pendente</option>
@@ -1453,7 +1477,7 @@
                   </tr>
                 </thead>
                 <tbody id="parcelas-tbody"></tbody>
-              </table>
+                </table>
             </div>
           </div>
 
@@ -1472,7 +1496,8 @@
             <div class="section-header">
               <h2>✏️ Enviar Mensagem WhatsApp</h2>
             </div>
-            <div class="disparo-filters"><label>Filtrar:</label><select class="filter-select" id="disparo-filter-status" onchange="window.renderDisparoTable()">
+            <div class="disparo-filters"><label>Filtrar:</label><select class="filter-select" id="disparo-filter-status"
+                onchange="window.renderDisparoTable()">
                 <option value="urgente">🚨 Atrasadas + Hoje</option>
                 <option value="vencendo_hoje">🔥 Vencendo hoje</option>
                 <option value="atrasado">⚠️ Atrasadas</option>
@@ -1483,7 +1508,8 @@
               <div class="disparo-toolbar-left">
                 <h3>💬 WhatsApp</h3>
               </div>
-              <div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openModal('modal-msg')">✏️ Mensagem</button></div>
+              <div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openModal('modal-msg')">✏️
+                  Mensagem</button></div>
             </div>
             <div class="table-wrap">
               <tr>
@@ -1501,7 +1527,7 @@
                   </tr>
                 </thead>
                 <tbody id="disparo-tbody"></tbody>
-              </table>
+                </table>
             </div>
           </div>
 
@@ -1555,7 +1581,8 @@
               <h2>🔄 Reposição de Aula</h2>
             </div>
             <div class="reposicao-card">
-              <div class="reposicao-form-group"><label>Selecione o Aluno</label><select id="reposicao-aluno" class="filter-select" style="width:100%">
+              <div class="reposicao-form-group"><label>Selecione o Aluno</label><select id="reposicao-aluno"
+                  class="filter-select" style="width:100%">
                   <option value="">-- Selecione --</option>
                 </select></div>
               <div class="reposicao-form-group"><label>Faltas do Aluno</label>
@@ -1563,9 +1590,12 @@
                   <div class="empty">Selecione um aluno</div>
                 </div>
               </div>
-              <div class="reposicao-form-group"><label>Data da Reposição</label><input type="date" id="reposicao-data" class="filter-select" style="width:100%"></div>
-              <div class="reposicao-form-group"><label>Horário</label><select id="reposicao-horario" class="filter-select" style="width:100%"></select></div>
-              <div class="modal-footer" style="justify-content:center;padding:1rem 0 0 0;"><button class="btn btn-primary" onclick="window.salvarReposicao()">Salvar Reposição</button></div>
+              <div class="reposicao-form-group"><label>Data da Reposição</label><input type="date" id="reposicao-data"
+                  class="filter-select" style="width:100%"></div>
+              <div class="reposicao-form-group"><label>Horário</label><select id="reposicao-horario"
+                  class="filter-select" style="width:100%"></select></div>
+              <div class="modal-footer" style="justify-content:center;padding:1rem 0 0 0;"><button
+                  class="btn btn-primary" onclick="window.salvarReposicao()">Salvar Reposição</button></div>
             </div>
             <div class="section-header" style="margin-top:1rem;">
               <h3>📋 Reposições Agendadas</h3>
@@ -1576,7 +1606,8 @@
           <div class="page" id="page-frequencia">
             <div class="section-header">
               <h2>✅ Marcar Presença Manual</h2>
-              <div><input type="date" id="frequencia-data" value="" style="padding:0.5rem;"><button class="btn btn-primary btn-sm" onclick="window.carregarFrequencia()">Carregar</button></div>
+              <div><input type="date" id="frequencia-data" value="" style="padding:0.5rem;"><button
+                  class="btn btn-primary btn-sm" onclick="window.carregarFrequencia()">Carregar</button></div>
             </div>
             <div class="faltas-consecutivas-card" id="faltas-consecutivas-card">
               <h3>⚠️ Alunos com 2 faltas consecutivas</h3>
@@ -1588,7 +1619,8 @@
           <div class="page" id="page-relatorio-frequencia">
             <div class="section-header">
               <h2>📊 Relatório de Frequência</h2>
-              <div><input type="month" id="rel-frequencia-mes" value=""><button class="btn btn-primary btn-sm" onclick="window.carregarRelatorioFrequencia()">Gerar</button></div>
+              <div><input type="month" id="rel-frequencia-mes" value=""><button class="btn btn-primary btn-sm"
+                  onclick="window.carregarRelatorioFrequencia()">Gerar</button></div>
             </div>
             <div id="relatorio-frequencia-content"></div>
           </div>
@@ -1604,7 +1636,9 @@
             <div class="section-header">
               <h2>Relatórios</h2>
             </div>
-            <div class="report-filters" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem"><input type="date" id="rel-de" style="padding:.6rem"><input type="date" id="rel-ate" style="padding:.6rem"><select id="rel-status" style="padding:.6rem">
+            <div class="report-filters" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem"><input
+                type="date" id="rel-de" style="padding:.6rem"><input type="date" id="rel-ate"
+                style="padding:.6rem"><select id="rel-status" style="padding:.6rem">
                 <option value="">Todos</option>
                 <option value="pendente">Pendente</option>
                 <option value="pago">Pago</option>
@@ -1636,7 +1670,8 @@
             <div class="search-row">
               <div class="search-box">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="search-usuarios" placeholder="Buscar usuário..." oninput="window.renderUsuarios()">
+                <input type="text" id="search-usuarios" placeholder="Buscar usuário..."
+                  oninput="window.renderUsuarios()">
               </div>
             </div>
             <div class="table-wrap">
@@ -1668,7 +1703,8 @@
       <div class="modal-body">
         <input type="hidden" id="cliente-id">
         <div class="form-group"><label>Nome *</label><input type="text" id="cliente-nome"></div>
-        <div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone" placeholder="(11) 99999-9999" oninput="window.maskPhone(this)"></div>
+        <div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone"
+            placeholder="(11) 99999-9999" oninput="window.maskPhone(this)"></div>
         <div class="form-group"><label>Endereço</label><input type="text" id="cliente-endereco"></div>
         <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cliente-nascimento"></div>
         <div class="form-group">
@@ -1686,20 +1722,26 @@
                 <option value="Sexta-feira">Sexta</option>
                 <option value="Sábado">Sábado</option>
                 <option value="Domingo">Domingo</option>
-              </select><select id="novo-horario"></select><button class="btn btn-primary btn-sm" onclick="window.adicionarDiaHorario()">+ Adicionar</button></div>
+              </select><select id="novo-horario"></select><button class="btn btn-primary btn-sm"
+                onclick="window.adicionarDiaHorario()">+ Adicionar</button></div>
           </div>
         </div>
         <div class="form-divider"></div>
         <div class="form-group"><label style="color:var(--accent);">📅 INFORMAÇÕES DA MENSALIDADE</label></div>
         <div class="form-row">
-          <div class="form-group"><label>Valor *</label><input type="number" id="cliente-mensalidade-valor" step="0.01"></div>
-          <div class="form-group"><label>Vencimento *</label><input type="date" id="cliente-mensalidade-vencimento"></div>
+          <div class="form-group"><label>Valor *</label><input type="number" id="cliente-mensalidade-valor" step="0.01">
+          </div>
+          <div class="form-group"><label>Vencimento *</label><input type="date" id="cliente-mensalidade-vencimento">
+          </div>
         </div>
-        <div class="form-group"><label>Descrição</label><input type="text" id="cliente-mensalidade-descricao" placeholder="Ex: Mensalidade"></div>
-        <div class="form-group"><label><input type="checkbox" id="cliente-mensalidade-parcelado" onchange="window.toggleClienteParcelamento()"> Parcelado</label></div>
+        <div class="form-group"><label>Descrição</label><input type="text" id="cliente-mensalidade-descricao"
+            placeholder="Ex: Mensalidade"></div>
+        <div class="form-group"><label><input type="checkbox" id="cliente-mensalidade-parcelado"
+              onchange="window.toggleClienteParcelamento()"> Parcelado</label></div>
         <div id="cliente-parcelamento-fields" style="display:none">
           <div class="form-row">
-            <div class="form-group"><label>Nº Parcelas</label><input type="number" id="cliente-mensalidade-parcelas" min="2" value="2"></div>
+            <div class="form-group"><label>Nº Parcelas</label><input type="number" id="cliente-mensalidade-parcelas"
+                min="2" value="2"></div>
             <div class="form-group"><label>Intervalo</label><select id="cliente-mensalidade-intervalo">
                 <option value="mensal">Mensal</option>
                 <option value="quinzenal">Quinzenal</option>
@@ -1708,7 +1750,9 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-cliente')">Cancelar</button><button class="btn btn-primary" onclick="window.saveCliente()">Salvar</button></div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.closeModal('modal-cliente')">Cancelar</button><button class="btn btn-primary"
+          onclick="window.saveCliente()">Salvar</button></div>
     </div>
   </div>
 
@@ -1716,13 +1760,17 @@
   <div class="modal-overlay" id="modal-usuario">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="modal-usuario-title">Novo Usuário</h3><button class="modal-close" onclick="window.closeModal('modal-usuario')">×</button>
+        <h3 id="modal-usuario-title">Novo Usuário</h3><button class="modal-close"
+          onclick="window.closeModal('modal-usuario')">×</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="usuario-id">
-        <div class="form-group"><label>Nome</label><input type="text" id="usuario-nome" placeholder="Nome completo"></div>
-        <div class="form-group"><label>Email</label><input type="email" id="usuario-email" placeholder="email@exemplo.com"></div>
-        <div class="form-group" id="usuario-senha-group"><label>Senha</label><input type="password" id="usuario-senha" placeholder="******"></div>
+        <div class="form-group"><label>Nome</label><input type="text" id="usuario-nome" placeholder="Nome completo">
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="usuario-email"
+            placeholder="email@exemplo.com"></div>
+        <div class="form-group" id="usuario-senha-group"><label>Senha</label><input type="password" id="usuario-senha"
+            placeholder="******"></div>
         <div class="form-group"><label>Status</label>
           <select id="usuario-status" class="filter-select">
             <option value="ativo">Ativo</option>
@@ -1730,7 +1778,9 @@
           </select>
         </div>
       </div>
-      <div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary" onclick="window.saveUsuario()">Salvar</button></div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary"
+          onclick="window.saveUsuario()">Salvar</button></div>
     </div>
   </div>
 
@@ -1746,7 +1796,9 @@
             <option value="atrasado">Atrasado</option>
           </select></div>
       </div>
-      <div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-status')">Cancelar</button><button class="btn btn-primary" onclick="window.saveStatus()">Confirmar</button></div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.closeModal('modal-status')">Cancelar</button><button class="btn btn-primary"
+          onclick="window.saveStatus()">Confirmar</button></div>
     </div>
   </div>
 
@@ -1756,9 +1808,12 @@
         <h3>Mensagem Padrão</h3><button class="modal-close" onclick="window.closeModal('modal-msg')">×</button>
       </div>
       <div class="modal-body">
-        <div class="form-group"><label>Template</label><textarea id="msg-template" rows="4" placeholder="{nome}, {tipo}, {parcela}, {total_parcelas}, {valor}, {vencimento}"></textarea></div>
+        <div class="form-group"><label>Template</label><textarea id="msg-template" rows="4"
+            placeholder="{nome}, {tipo}, {parcela}, {total_parcelas}, {valor}, {vencimento}"></textarea></div>
       </div>
-      <div class="modal-footer"><button class="btn btn-ghost" onclick="window.resetMsgTemplate()">Restaurar</button><button class="btn btn-primary" onclick="window.salvarMsgTemplate()">Salvar</button></div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.resetMsgTemplate()">Restaurar</button><button class="btn btn-primary"
+          onclick="window.salvarMsgTemplate()">Salvar</button></div>
     </div>
   </div>
 
@@ -1905,39 +1960,85 @@
     }
 
     async function verificarAcessoUsuario(user) {
-      const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+      let usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+      let usuarioData = null;
+
+      // Caso o documento não exista pelo UID,
+      // tenta localizar pelo e-mail e recriar corretamente.
       if (!usuarioDoc.exists) {
-        throw new Error('Usuário não autorizado');
+        const usuarioPorEmail = await db.collection('usuarios')
+          .where('email', '==', user.email)
+          .limit(1)
+          .get();
+
+        if (!usuarioPorEmail.empty) {
+          usuarioData = usuarioPorEmail.docs[0].data();
+
+          // recria o documento usando o UID atual do Firebase Auth
+          await db.collection('usuarios').doc(user.uid).set({
+            ...usuarioData,
+            email: user.email,
+            aprovado: usuarioData.aprovado !== false,
+            role: usuarioData.role || (user.email === ADMIN_EMAIL ? 'admin' : 'user'),
+            status: usuarioData.status || 'ativo'
+          }, { merge: true });
+
+          usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+        } else if (user.email === ADMIN_EMAIL) {
+
+          // Corrige automaticamente o administrador principal
+          const adminData = {
+            nome: 'Administrador',
+            email: ADMIN_EMAIL,
+            status: 'ativo',
+            role: 'admin',
+            aprovado: true
+          };
+
+          await db.collection('usuarios').doc(user.uid).set(adminData, { merge: true });
+          usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+        } else {
+          throw new Error('Usuário não autorizado');
+        }
       }
-      
-      const usuarioData = usuarioDoc.data();
-      
+
+      usuarioData = usuarioDoc.data();
+
       if (usuarioData.status === 'bloqueado') {
         throw new Error('Usuário bloqueado');
       }
-      
+
       if (usuarioData.aprovado === false) {
         throw new Error('Aguardando liberação pelo administrador');
       }
-      
+
+      // Garante role válida
+      if (!usuarioData.role) {
+        usuarioData.role = user.email === ADMIN_EMAIL ? 'admin' : 'user';
+
+        await db.collection('usuarios').doc(user.uid).set({
+          role: usuarioData.role
+        }, { merge: true });
+      }
+
       currentUserRole = usuarioData.role;
       return usuarioData;
     }
 
-    window.renderUsuarios = async function() {
+    window.renderUsuarios = async function () {
       if (currentUserRole !== 'admin') return;
-      
+
       const search = document.getElementById('search-usuarios')?.value.toLowerCase().trim() || '';
-      let usuarios = usuariosCache.filter(u => 
+      let usuarios = usuariosCache.filter(u =>
         !search || u.nome.toLowerCase().includes(search) || u.email.toLowerCase().includes(search)
       );
-      
+
       const tbody = document.getElementById('usuarios-tbody');
       if (!usuarios.length) {
         tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></td>';
         return;
       }
-      
+
       tbody.innerHTML = usuarios.map(u => `<tr>
         <td><strong>${u.nome || '—'}</strong></td>
         <td>${u.email}</td>
@@ -1951,9 +2052,9 @@
       </tr>`).join('');
     };
 
-    window.openUsuarioModal = function(id = null) {
+    window.openUsuarioModal = function (id = null) {
       if (currentUserRole !== 'admin') return;
-      
+
       document.getElementById('usuario-id').value = '';
       document.getElementById('usuario-nome').value = '';
       document.getElementById('usuario-email').value = '';
@@ -1961,7 +2062,7 @@
       document.getElementById('usuario-status').value = 'ativo';
       document.getElementById('modal-usuario-title').textContent = 'Novo Usuário';
       document.getElementById('usuario-senha-group').style.display = 'block';
-      
+
       if (id) {
         const u = usuariosCache.find(x => x.id === id);
         if (u) {
@@ -1976,28 +2077,28 @@
       window.openModal('modal-usuario');
     };
 
-    window.editarUsuario = function(id) {
+    window.editarUsuario = function (id) {
       window.openUsuarioModal(id);
     };
 
-    window.saveUsuario = async function() {
+    window.saveUsuario = async function () {
       if (currentUserRole !== 'admin') return;
-      
+
       const id = document.getElementById('usuario-id').value;
       const nome = document.getElementById('usuario-nome').value.trim();
       const email = document.getElementById('usuario-email').value.trim();
       const senha = document.getElementById('usuario-senha').value;
       const status = document.getElementById('usuario-status').value;
-      
+
       if (!nome || !email) {
         alert('Preencha nome e email!');
         return;
       }
-      
+
       const saveBtn = event?.target;
       const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar';
       if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
-      
+
       try {
         if (id) {
           await db.collection('usuarios').doc(id).update({ nome, status });
@@ -2030,7 +2131,7 @@
       }
     };
 
-    window.bloquearUsuario = async function(id) {
+    window.bloquearUsuario = async function (id) {
       if (currentUserRole !== 'admin') return;
       if (!confirm('Deseja bloquear este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'bloqueado' });
@@ -2039,7 +2140,7 @@
       window.renderUsuarios();
     };
 
-    window.ativarUsuario = async function(id) {
+    window.ativarUsuario = async function (id) {
       if (currentUserRole !== 'admin') return;
       if (!confirm('Deseja ativar este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'ativo' });
@@ -2048,17 +2149,17 @@
       window.renderUsuarios();
     };
 
-    window.excluirUsuario = async function(id, email) {
+    window.excluirUsuario = async function (id, email) {
       if (currentUserRole !== 'admin') return;
       if (!confirm(`Deseja excluir o usuário ${email}?`)) return;
-      
+
       try {
         const user = await auth.getUserByEmail(email);
         await auth.deleteUser(user.uid);
       } catch (error) {
         console.log('Erro ao excluir do auth:', error);
       }
-      
+
       await db.collection('usuarios').doc(id).delete();
       await refreshCache();
       await addHistory(`Usuário ${email} excluído`, 'red');
@@ -2188,7 +2289,7 @@
       if (page === 'presenca-automatica') window.carregarPresencaAutomatica();
       if (page === 'alunos-por-hora') window.carregarAlunosPorHora();
       if (page === 'reposicao') window.carregarReposicao();
-      if (page === 'frequencia') { 
+      if (page === 'frequencia') {
         window.carregarFrequencia();
         window.renderFaltasConsecutivas();
       }
@@ -2353,16 +2454,16 @@
         const faltasAluno = frequenciasCache
           .filter(f => f.clienteId === aluno.id && f.status === 'falta')
           .sort((a, b) => a.data.localeCompare(b.data));
-        
+
         let faltasConsecutivas = [];
         let dataAnterior = null;
-        
+
         for (const falta of faltasAluno) {
           if (dataAnterior) {
             const dataFalta = new Date(falta.data + 'T12:00:00');
             const dataAnteriorDate = new Date(dataAnterior + 'T12:00:00');
             const diffDias = Math.ceil((dataFalta - dataAnteriorDate) / (1000 * 60 * 60 * 24));
-            
+
             if (diffDias <= 7) {
               faltasConsecutivas.push(falta.data);
             } else {
@@ -2371,16 +2472,16 @@
           } else {
             faltasConsecutivas = [falta.data];
           }
-          
+
           dataAnterior = falta.data;
-          
+
           if (faltasConsecutivas.length >= 2) {
-            const alertaExistente = alertasFaltasCache.find(a => 
-              a.alunoId === aluno.id && 
+            const alertaExistente = alertasFaltasCache.find(a =>
+              a.alunoId === aluno.id &&
               !a.resolvido &&
               a.faltas && a.faltas[0] === faltasConsecutivas[0]
             );
-            
+
             if (!alertaExistente) {
               await db.collection('alertasFaltas').add({
                 alunoId: aluno.id,
@@ -2403,17 +2504,17 @@
     // ============================================
     // RENDER FALTAS CONSECUTIVAS
     // ============================================
-    window.renderFaltasConsecutivas = function() {
+    window.renderFaltasConsecutivas = function () {
       const container = document.getElementById('faltas-consecutivas-lista');
       if (!container) return;
-      
+
       const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-      
+
       if (alertas.length === 0) {
         container.innerHTML = '<div class="empty">✅ Nenhum aluno com 2 faltas consecutivas</div>';
         return;
       }
-      
+
       container.innerHTML = alertas.map(alerta => `
         <div class="cobranca-item" style="border-left: 3px solid var(--orange);">
           <div class="cobranca-info">
@@ -2433,7 +2534,7 @@
       `).join('');
     };
 
-    window.enviarWhatsappFalta = function(telefone, nome) {
+    window.enviarWhatsappFalta = function (telefone, nome) {
       const mensagem = MSG_FALTAS_CONSECUTIVAS.replace(/{nome}/g, nome);
       const numero = telefone?.replace(/\D/g, '') || '';
       if (!numero) {
@@ -2443,7 +2544,7 @@
       window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
     };
 
-    window.darBaixaFalta = async function(id) {
+    window.darBaixaFalta = async function (id) {
       await db.collection('alertasFaltas').doc(id).update({ resolvido: true });
       await refreshCache();
       window.renderFaltasConsecutivas();
@@ -2465,7 +2566,7 @@
       const cliente = clientesCache.find(c => c.id === clienteId);
       await addHistory(`WhatsApp enviado para ${cliente?.nome} - Tela: ${telaOrigem}`, 'whatsapp');
       await refreshCache();
-      
+
       window.renderParcelas();
       window.renderHoje();
       window.renderDisparoTable();
@@ -2479,7 +2580,7 @@
       });
       await addHistory(`Parabéns enviado para aniversariante - Tela: ${telaOrigem}`, 'pink');
       await refreshCache();
-      
+
       window.renderParcelas();
       window.renderHoje();
       window.renderDisparoTable();
@@ -2978,7 +3079,7 @@
     };
 
     // EXPORTAÇÃO ALUNOS POR HORA
-    window.exportarAlunosHoraExcel = function() {
+    window.exportarAlunosHoraExcel = function () {
       const tabela = document.querySelector('.alunos-por-hora-table');
       if (!tabela) {
         alert('Nenhum dado para exportar');
@@ -2990,7 +3091,7 @@
       XLSX.writeFile(wb, 'alunos-por-hora.xlsx');
     };
 
-    window.exportarAlunosHoraPDF = function() {
+    window.exportarAlunosHoraPDF = function () {
       const { jsPDF } = window.jspdf;
       const tabela = document.querySelector('.alunos-por-hora-table');
       if (!tabela) {
@@ -3256,16 +3357,16 @@
       const dataMatricula = aluno.dataMatricula || today();
       const hoje = today();
       const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || [];
-      
+
       const pendentes = [];
       let dataAtual = new Date(dataMatricula + 'T12:00:00');
       const dataFim = new Date(hoje + 'T12:00:00');
-      
+
       while (dataAtual <= dataFim) {
         const dataStr = dataAtual.toISOString().split('T')[0];
         const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' });
         const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
-        
+
         if (diasAula.includes(diaSemanaCapitalized)) {
           const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr);
           if (!freqExistente) {
@@ -3274,13 +3375,13 @@
         }
         dataAtual.setDate(dataAtual.getDate() + 1);
       }
-      
+
       const container = document.getElementById('frequencia-content');
       if (!pendentes.length) {
         container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>';
         return;
       }
-      
+
       let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`;
       for (const p of pendentes) {
         html += `<tr><td>${fmtDate(p.data)}</td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`;
@@ -3304,7 +3405,7 @@
       const diasDoMes = Array.from({ length: diasNoMes }, (_, i) => `${ano}-${mesNum}-${String(i + 1).padStart(2, '0')}`);
 
       const container = document.getElementById('relatorio-frequencia-content');
-      
+
       let html = `
         <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
           <button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button>
@@ -3325,24 +3426,24 @@
       `;
 
       const alunosComAula = clientesCache.filter(c => c.diasHorarios && c.diasHorarios.length > 0);
-      
+
       for (const aluno of alunosComAula) {
         let totalDias = 0;
         let presentes = 0;
         let faltas = 0;
         let reposicoes = 0;
-        
+
         const linha = diasDoMes.map(data => {
           const dataObj = new Date(data + 'T12:00:00');
           const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'long' });
           const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
           const temAula = aluno.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized);
-          
+
           if (!temAula) return '<td class="empty-cell">-</td>';
-          
+
           totalDias++;
           const freq = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === data);
-          
+
           if (freq?.status === 'presente') {
             presentes++;
             if (freq.isReposicao) reposicoes++;
@@ -3356,7 +3457,7 @@
           }
           return `<td class="empty-cell">-</td>`;
         }).join('');
-        
+
         const percentual = totalDias ? ((presentes / totalDias) * 100).toFixed(1) : 0;
         html += `<tr>
           <td><strong>${aluno.nome}</strong></td>
@@ -3366,24 +3467,24 @@
           <td>${reposicoes}</span></td>
         </tr>`;
       }
-      
+
       html += `</tbody></table></div>`;
       container.innerHTML = html;
     };
 
     // EXPORTAÇÃO DIRETA SEM MODAL
-    window.exportarRelatorioDireto = function(tipo) {
+    window.exportarRelatorioDireto = function (tipo) {
       const tabela = document.getElementById('tabela-relatorio-frequencia');
       if (!tabela) {
         alert('Nenhum dado para exportar');
         return;
       }
-      
+
       if (tipo === 'excel') {
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.table_to_sheet(tabela, { raw: true });
         XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência');
-        XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0,7)}.xlsx`);
+        XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`);
       } else if (tipo === 'pdf') {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('landscape');
@@ -3396,7 +3497,7 @@
           styles: { fontSize: 7, cellPadding: 2 },
           headStyles: { fillColor: [59, 130, 246], textColor: 255 }
         });
-        doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0,7)}.pdf`);
+        doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`);
       }
     };
 
@@ -3646,7 +3747,7 @@
       window.renderClientes();
       window.carregarAniversariantesSemana();
       window.renderFaltasConsecutivas();
-      
+
       const alunosPorHoraHeader = document.querySelector('#page-alunos-por-hora .section-header');
       if (alunosPorHoraHeader && !document.getElementById('btn-export-alunos-hora')) {
         const btnDiv = document.createElement('div');
@@ -3662,6 +3763,15 @@
     const registerBtn = document.getElementById('register-btn');
     if (loginBtn) loginBtn.onclick = window.doLogin;
     if (registerBtn) registerBtn.onclick = window.doRegister;
+
+    // limpa mensagens antigas ao digitar
+    document.getElementById('login-user')?.addEventListener('input', () => {
+      document.getElementById('login-error').style.display = 'none';
+    });
+
+    document.getElementById('login-pass')?.addEventListener('input', () => {
+      document.getElementById('login-error').style.display = 'none';
+    });
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
