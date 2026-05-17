@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -1285,6 +1284,20 @@
       color: var(--orange);
       margin-bottom: 1rem;
     }
+    
+    /* Estilo para células de feriado no relatório */
+    .feriado-cell {
+      background-color: rgba(239, 68, 68, 0.15) !important;
+      color: var(--red) !important;
+      font-weight: bold;
+      position: relative;
+      cursor: help;
+    }
+    .feriado-cell::after {
+      content: "📅";
+      margin-left: 4px;
+      font-size: 0.7rem;
+    }
   </style>
 </head>
 
@@ -1349,6 +1362,8 @@
                 class="icon">✅</span> Marcar Presença Manual</div>
             <div class="nav-subitem" onclick="window.navigate('relatorio-frequencia'); event.stopPropagation()"><span
                 class="icon">📊</span> Relatório</div>
+            <div class="nav-subitem" onclick="window.navigate('whatsapp-faltas'); event.stopPropagation()"><span
+                class="icon">💬</span> WhatsApp Faltas</div>
           </div>
           <!-- Menu Gerenciar Usuários - visível apenas para admin via JS -->
           <div id="menu-gerenciar-usuarios" style="display:none;">
@@ -1403,6 +1418,13 @@
                 <div class="stat-value" id="dashboard-stat-aniversariantes">0</div>
                 <div class="stat-cobrancas" id="dashboard-lista-aniversariantes"></div>
               </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card alert">
+                  <div class="stat-label">⚠️ Alunos com Faltas Consecutivas</div>
+                  <div class="stat-value" id="dashboard-stat-faltas">0</div>
+                  <div class="stat-cobrancas" id="dashboard-lista-faltas"></div>
+                </div>
             </div>
           </div>
 
@@ -1463,7 +1485,7 @@
               <button class="btn btn-ghost btn-sm" onclick="window.limparFiltrosParcelas()">Limpar</button>
             </div>
             <div class="table-wrap">
-              <tr>
+              <table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1477,7 +1499,7 @@
                   </tr>
                 </thead>
                 <tbody id="parcelas-tbody"></tbody>
-                </table>
+              </table>
             </div>
           </div>
 
@@ -1512,7 +1534,7 @@
                   Mensagem</button></div>
             </div>
             <div class="table-wrap">
-              <tr>
+              <table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1527,7 +1549,7 @@
                   </tr>
                 </thead>
                 <tbody id="disparo-tbody"></tbody>
-                </table>
+              </table>
             </div>
           </div>
 
@@ -1614,6 +1636,14 @@
               <div id="faltas-consecutivas-lista"></div>
             </div>
             <div id="frequencia-content"></div>
+          </div>
+          
+          <div class="page" id="page-whatsapp-faltas">
+            <div class="section-header">
+              <h2>💬 WhatsApp Faltas</h2>
+              <div><span class="badge badge-pendente" id="whatsapp-faltas-count">Carregando...</span></div>
+            </div>
+            <div id="whatsapp-faltas-content"></div>
           </div>
 
           <div class="page" id="page-relatorio-frequencia">
@@ -1843,12 +1873,6 @@
     const db = firebase.firestore();
 
     // ============================================
-    // CONSTANTES DO ADMINISTRADOR
-    // ============================================
-    const ADMIN_EMAIL = 'mario.bergamini4375@gmail.com';
-    const ADMIN_PASSWORD = '202606';
-
-    // ============================================
     // VARIÁVEIS GLOBAIS
     // ============================================
     let clientesCache = [];
@@ -1865,6 +1889,28 @@
     let buscaFrequenciaTimeout = null;
     let currentUser = null;
     let currentUserRole = null;
+
+    // Lista de Feriados (Nacionais, SP, Ourinhos)
+    const feriadosList = [
+      "2024-01-01", "2025-01-01", "2026-01-01", // Confraternização Universal
+      "2024-04-21", "2025-04-21", "2026-04-21", // Tiradentes
+      "2024-05-01", "2025-05-01", "2026-05-01", // Dia do Trabalhador
+      "2024-09-07", "2025-09-07", "2026-09-07", // Independência do Brasil
+      "2024-10-12", "2025-10-12", "2026-10-12", // Nossa Senhora Aparecida
+      "2024-11-02", "2025-11-02", "2026-11-02", // Finados
+      "2024-11-15", "2025-11-15", "2026-11-15", // Proclamação da República
+      "2024-12-25", "2025-12-25", "2026-12-25", // Natal
+      "2024-02-13", "2025-03-04", "2026-02-17", // Carnaval (datas aproximadas, ajuste manual se necessário)
+      "2024-03-29", "2025-04-18", "2026-04-03", // Sexta-feira Santa
+      "2024-05-30", "2025-06-19", "2026-06-04", // Corpus Christi
+      "2024-07-09", "2025-07-09", "2026-07-09", // Revolução Constitucionalista (SP)
+      "2024-11-20", "2025-11-20", "2026-11-20", // Consciência Negra (Ourinhos/SP)
+    ];
+    
+    function ehFeriado(dataStr) {
+        if (!dataStr) return false;
+        return feriadosList.includes(dataStr);
+    }
 
     // ============================================
     // FUNÇÕES AUXILIARES
@@ -1925,84 +1971,31 @@
     // FUNÇÕES DE USUÁRIO
     // ============================================
     async function criarUsuarioPadraoAdmin() {
-      const usuariosSnap = await db.collection('usuarios').where('email', '==', ADMIN_EMAIL).get();
-
+      const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini@gmail.com').get();
       if (usuariosSnap.empty) {
         try {
-          const userCredential = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini@gmail.com', '202606');
           await db.collection('usuarios').doc(userCredential.user.uid).set({
             nome: 'Administrador',
-            email: ADMIN_EMAIL,
+            email: 'mario.bergamini@gmail.com',
             status: 'ativo',
             role: 'admin',
             aprovado: true
           });
-          console.log('Administrador criado com sucesso');
+          console.log('Usuário admin criado com sucesso');
         } catch (error) {
-          if (error.code === "auth/email-already-in-use") {
-            try {
-              const login = await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
-              await db.collection('usuarios').doc(login.user.uid).set({
-                nome: 'Administrador',
-                email: ADMIN_EMAIL,
-                status: 'ativo',
-                role: 'admin',
-                aprovado: true
-              }, { merge: true });
-              console.log('Documento do administrador atualizado');
-            } catch (loginError) {
-              console.log('Erro ao fazer login do administrador:', loginError);
-            }
-          }
-          console.log('Erro ao criar administrador:', error);
+          console.log('Erro ao criar usuário admin:', error);
         }
       }
     }
 
     async function verificarAcessoUsuario(user) {
-      let usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
-      let usuarioData = null;
-
-      // Caso o documento não exista pelo UID,
-      // tenta localizar pelo e-mail e recriar corretamente.
+      const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
       if (!usuarioDoc.exists) {
-        const usuarioPorEmail = await db.collection('usuarios')
-          .where('email', '==', user.email)
-          .limit(1)
-          .get();
-
-        if (!usuarioPorEmail.empty) {
-          usuarioData = usuarioPorEmail.docs[0].data();
-
-          // recria o documento usando o UID atual do Firebase Auth
-          await db.collection('usuarios').doc(user.uid).set({
-            ...usuarioData,
-            email: user.email,
-            aprovado: usuarioData.aprovado !== false,
-            role: usuarioData.role || (user.email === ADMIN_EMAIL ? 'admin' : 'user'),
-            status: usuarioData.status || 'ativo'
-          }, { merge: true });
-
-          usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
-        } else if (user.email === ADMIN_EMAIL) {
-
-          // Corrige automaticamente o administrador principal
-          const adminData = {
-            nome: 'Administrador',
-            email: ADMIN_EMAIL,
-            status: 'ativo',
-            role: 'admin',
-            aprovado: true
-          };
-
-          await db.collection('usuarios').doc(user.uid).set(adminData, { merge: true });
-          usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
-        } else {
-          throw new Error('Usuário não autorizado');
-        }
+        throw new Error('Usuário não autorizado');
       }
 
-      usuarioData = usuarioDoc.data();
+      const usuarioData = usuarioDoc.data();
 
       if (usuarioData.status === 'bloqueado') {
         throw new Error('Usuário bloqueado');
@@ -2010,15 +2003,6 @@
 
       if (usuarioData.aprovado === false) {
         throw new Error('Aguardando liberação pelo administrador');
-      }
-
-      // Garante role válida
-      if (!usuarioData.role) {
-        usuarioData.role = user.email === ADMIN_EMAIL ? 'admin' : 'user';
-
-        await db.collection('usuarios').doc(user.uid).set({
-          role: usuarioData.role
-        }, { merge: true });
       }
 
       currentUserRole = usuarioData.role;
@@ -2035,7 +2019,7 @@
 
       const tbody = document.getElementById('usuarios-tbody');
       if (!usuarios.length) {
-        tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></td>';
+        tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
         return;
       }
 
@@ -2272,6 +2256,7 @@
       else if (page === 'alunos-por-hora') title = 'Alunos por Hora';
       else if (page === 'reposicao') title = 'Reposição de Aula';
       else if (page === 'frequencia') title = 'Marcar Presença Manual';
+      else if (page === 'whatsapp-faltas') title = 'WhatsApp Faltas';
       else if (page === 'relatorio-frequencia') title = 'Relatório de Frequência';
       else if (page === 'historico') title = 'Histórico';
       else if (page === 'relatorios') title = 'Relatórios';
@@ -2293,6 +2278,7 @@
         window.carregarFrequencia();
         window.renderFaltasConsecutivas();
       }
+      if (page === 'whatsapp-faltas') window.renderWhatsAppFaltas();
       if (page === 'relatorio-frequencia') window.carregarRelatorioFrequencia();
       if (page === 'historico') window.renderHistorico();
       if (page === 'relatorios') window.renderRelatorio();
@@ -2447,7 +2433,7 @@
     setInterval(verificarRestauracaoAtrasadas, 60 * 60 * 1000);
 
     // ============================================
-    // VERIFICAR FALTAS CONSECUTIVAS
+    // VERIFICAR FALTAS CONSECUTIVAS (Melhorada)
     // ============================================
     async function verificarFaltasConsecutivas() {
       for (const aluno of clientesCache) {
@@ -2502,7 +2488,7 @@
     }
 
     // ============================================
-    // RENDER FALTAS CONSECUTIVAS
+    // RENDER FALTAS CONSECUTIVAS (na página de frequência)
     // ============================================
     window.renderFaltasConsecutivas = function () {
       const container = document.getElementById('faltas-consecutivas-lista');
@@ -2520,38 +2506,104 @@
           <div class="cobranca-info">
             <div class="cobranca-nome">${alerta.nome}</div>
             <div class="cobranca-valor">⚠️ 2 faltas consecutivas</div>
-            <div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div>
+            <div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div>
           </div>
           <div class="td-actions">
-            <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.telefone}', '${alerta.nome}')">
+            <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">
               📲 WhatsApp
             </button>
-            <button class="btn btn-green btn-sm" onclick="window.darBaixaFalta('${alerta.id}')">
+            <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">
               ✔ Dar baixa
             </button>
           </div>
         </div>
       `).join('');
     };
+    
+    // ============================================
+    // RENDER WHATSAPP FALTAS (Nova Subaba)
+    // ============================================
+    window.renderWhatsAppFaltas = function () {
+      const container = document.getElementById('whatsapp-faltas-content');
+      const countSpan = document.getElementById('whatsapp-faltas-count');
+      if (!container) return;
 
-    window.enviarWhatsappFalta = function (telefone, nome) {
+      const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
+
+      if (!countSpan) return;
+      countSpan.textContent = `${alertas.length} alerta(s)`;
+      countSpan.className = alertas.length > 0 ? 'badge badge-pendente' : 'badge badge-pago';
+
+      if (alertas.length === 0) {
+        container.innerHTML = '<div class="empty">✅ Nenhum alerta de faltas consecutivas pendente</div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="frequencia-grid">
+          ${alertas.map(alerta => {
+            // Busca dados atualizados do aluno caso o nome no alerta esteja desatualizado (segurança)
+            const aluno = clientesCache.find(c => c.id === alerta.alunoId) || { nome: alerta.nome, telefone: alerta.telefone };
+            return `
+              <div class="frequencia-card" style="border-left: 3px solid var(--orange);">
+                <div class="frequencia-aluno-nome">${aluno.nome || alerta.nome}</div>
+                <div class="frequencia-dias">
+                  <strong>Telefone:</strong> ${aluno.telefone || alerta.telefone}<br>
+                  <strong>Faltas consecutivas:</strong> ${alerta.faltas.map(f => fmtDate(f)).join(', ')}
+                </div>
+                <div class="td-actions" style="margin-top: 10px;">
+                  <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${aluno.telefone || alerta.telefone}', '${aluno.nome || alerta.nome}')">
+                    ✏️ Enviar Mensagem WhatsApp
+                  </button>
+                  <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">
+                    Ocultar Alerta
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    };
+
+    window.enviarWhatsappFalta = async function (alertaId, telefone, nome) {
       const mensagem = MSG_FALTAS_CONSECUTIVAS.replace(/{nome}/g, nome);
       const numero = telefone?.replace(/\D/g, '') || '';
       if (!numero) {
         alert('Número de telefone não cadastrado para este aluno!');
         return;
       }
+      
+      // Registrar envio no Firebase
+      try {
+          await db.collection('logsWhatsApp').add({
+              tipo: 'alerta_falta',
+              alertaId: alertaId,
+              alunoNome: nome,
+              telefone: telefone,
+              mensagem: mensagem,
+              dataHora: new Date().toISOString(),
+              status: 'enviado'
+          });
+          await addHistory(`Mensagem de falta consecutiva enviada para ${nome}`, 'whatsapp');
+      } catch(error) {
+          console.error("Erro ao registrar envio de WhatsApp:", error);
+      }
+      
       window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
     };
 
-    window.darBaixaFalta = async function (id) {
+    window.ocultarAlertaFalta = async function (id) {
+      if (!confirm('Dar baixa neste alerta? Ele será removido da lista.')) return;
       await db.collection('alertasFaltas').doc(id).update({ resolvido: true });
       await refreshCache();
       window.renderFaltasConsecutivas();
+      window.renderWhatsAppFaltas();
+      window.renderDashboard(); // Atualiza dashboard também
     };
 
     // ============================================
-    // REGISTRO DE ENVIO WHATSAPP
+    // REGISTRO DE ENVIO WHATSAPP (Financeiro)
     // ============================================
     async function registrarEnvioWhatsApp(parcelaId, clienteId, telaOrigem) {
       const agora = new Date();
@@ -2903,7 +2955,7 @@
     };
 
     // ============================================
-    // DASHBOARD
+    // DASHBOARD (Atualizado para mostrar faltas)
     // ============================================
     window.renderDashboard = async function () {
       const hoje = today();
@@ -2944,6 +2996,31 @@
         const msg = encodeURIComponent(buildMsgAniversario(c));
         return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="#" onclick="window.enviarParabensComRegistro('${c.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`;
       }).join('') : '<div class="empty">🎂 Nenhum aniversariante</div>';
+      
+      // Alertas de Faltas Consecutivas no Dashboard
+      const alertasFaltas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
+      const dashboardFaltasContainer = document.getElementById('dashboard-lista-faltas');
+      const dashboardFaltasStat = document.getElementById('dashboard-stat-faltas');
+      if (dashboardFaltasContainer) {
+          dashboardFaltasStat.textContent = alertasFaltas.length;
+          if (alertasFaltas.length === 0) {
+              dashboardFaltasContainer.innerHTML = '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>';
+          } else {
+              dashboardFaltasContainer.innerHTML = alertasFaltas.map(alerta => `
+                  <div class="cobranca-item" style="border-left: 3px solid var(--orange);">
+                      <div class="cobranca-info">
+                          <div class="cobranca-nome">${alerta.nome}</div>
+                          <div class="cobranca-valor">⚠️ 2 faltas consecutivas</div>
+                          <div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div>
+                      </div>
+                      <div class="td-actions">
+                          <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">📲 WhatsApp</button>
+                          <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button>
+                      </div>
+                  </div>
+              `).join('');
+          }
+      }
     };
 
     // ============================================
@@ -2988,7 +3065,7 @@
     window.renderDisparoTable = async function () {
       const parcelas = getParcelasDisparo();
       const tbody = document.getElementById('disparo-tbody');
-      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
+      if (!parcelas.length) { tbody.innerHTML = '<table><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
       tbody.innerHTML = parcelas.map(p => {
         const c = clientesCache.find(x => x.id === p.clienteId);
         const tel = c?.telefone?.replace(/\D/g, '');
@@ -3072,7 +3149,7 @@
       clientesCache.forEach(c => { if (c.diasHorarios) c.diasHorarios.forEach(dh => { if (mapa[dh.horario]?.[dh.dia]) mapa[dh.horario][dh.dia].push(c.nome); }); });
 
       const tbody = document.getElementById('alunos-por-hora-tbody');
-      tbody.innerHTML = horarios.map(horario => `<tr>
+      tbody.innerHTML = horarios.map(horario => `<td>
         <th>${horario}</th>
         ${dias.map(dia => `<td>${mapa[horario][dia].length ? `<span class="badge">${mapa[horario][dia].length}</span><ul class="alunos-lista">${mapa[horario][dia].map(n => `<li>👤 ${n}</li>`).join('')}</ul>` : '—'}</td>`).join('')}
       </tr>`).join('');
@@ -3110,7 +3187,7 @@
     };
 
     // ============================================
-    // REPOSICAO DE AULA
+    // REPOSICAO DE AULA (Corrigido)
     // ============================================
     window.carregarReposicao = async function () {
       document.getElementById('reposicao-aluno').innerHTML = '<option value="">-- Selecione --</option>' + clientesCache.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
@@ -3183,6 +3260,8 @@
           await db.collection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true });
           await refreshCache();
           window.renderFaltasConsecutivas();
+          window.renderWhatsAppFaltas();
+          window.renderDashboard();
         }
 
         faltaSelecionada = null;
@@ -3199,11 +3278,16 @@
       const agora = new Date();
       const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
 
+      // Filtra reposições que NÃO foram cumpridas e cujo horário AINDA NÃO chegou ou é exatamente agora
       const reposFuturas = reposicoesCache.filter(r => {
         if (r.foiCumprida) return false;
-        if (r.dataReposicao !== hoje) return true;
-        const horario = horarioParaMinutos(r.horarioReposicao);
-        return minutosAtuais < horario;
+        // Se é hoje, verifica se o horário ainda não passou
+        if (r.dataReposicao === hoje) {
+            const horario = horarioParaMinutos(r.horarioReposicao);
+            return minutosAtuais < horario;
+        }
+        // Se é uma data futura
+        return r.dataReposicao > hoje;
       });
 
       reposFuturas.sort((a, b) => a.dataReposicao.localeCompare(b.dataReposicao));
@@ -3330,6 +3414,7 @@
       await carregarReposicoesAgendadas();
       await verificarFaltasConsecutivas();
       window.renderFaltasConsecutivas();
+      window.renderWhatsAppFaltas();
       window.renderDashboard();
     };
 
@@ -3384,14 +3469,14 @@
 
       let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`;
       for (const p of pendentes) {
-        html += `<tr><td>${fmtDate(p.data)}</td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`;
+        html += `<tr><td>${fmtDate(p.data)}</td><td>${p.dia}</td><td><button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`;
       }
       html += `</tbody></table></div>`;
       container.innerHTML = html;
     };
 
     // ============================================
-    // RELATORIO DE FREQUENCIA (formato lista)
+    // RELATORIO DE FREQUENCIA (com Dia da Semana e Feriados)
     // ============================================
     window.carregarRelatorioFrequencia = async function () {
       const mes = document.getElementById('rel-frequencia-mes').value;
@@ -3416,7 +3501,14 @@
             <thead>
               <tr>
                 <th>Aluno</th>
-                ${diasDoMes.map(d => `<th>${d.slice(8)}/${mesNum}</th>`).join('')}
+                ${diasDoMes.map(d => {
+                    const dataObj = new Date(d + 'T12:00:00');
+                    const diaSemanaNum = dataObj.getDay();
+                    const diasSemanaAbrev = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+                    const diaSemana = diasSemanaAbrev[diaSemanaNum];
+                    const diaNum = d.slice(8);
+                    return `<th>${diaSemana}<br>${diaNum}/${mesNum}</th>`;
+                }).join('')}
                 <th>% Presença</th>
                 <th>Faltas</th>
                 <th>Reposições</th>
@@ -3440,6 +3532,7 @@
           const temAula = aluno.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized);
 
           if (!temAula) return '<td class="empty-cell">-</td>';
+          if (ehFeriado(data)) return `<td class="feriado-cell" title="Feriado">🚫</td>`;
 
           totalDias++;
           const freq = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === data);
@@ -3502,7 +3595,7 @@
     };
 
     // ============================================
-    // PRESENÇA AUTOMÁTICA
+    // PRESENÇA AUTOMÁTICA (Corrigido para reposições e feriados)
     // ============================================
     function calcularFimAula(horarioInicio) {
       const [hora, minuto] = horarioInicio.split(':').map(Number);
@@ -3514,6 +3607,17 @@
     window.carregarPresencaAutomatica = async function () {
       const agora = new Date();
       const dataAtual = today();
+      
+      // Se for feriado, não exibe nenhum aluno para marcação
+      if (ehFeriado(dataAtual)) {
+          document.getElementById('presenca-auto-count').textContent = `0 alunos`;
+          document.getElementById('presenca-auto-dia').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long' });
+          document.getElementById('presenca-auto-horario').innerHTML = `Feriado hoje`;
+          const container = document.getElementById('presenca-automatica-content');
+          if (container) container.innerHTML = '<div class="empty">📅 Hoje é feriado. Nenhuma aula para marcar presença.</div>';
+          return;
+      }
+      
       const diaSemana = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
       const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
       const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
@@ -3523,6 +3627,7 @@
         return minutosAtuais >= horarioAluno && minutosAtuais <= horarioAluno + 59;
       })()));
 
+      // Busca reposições ativas para hoje
       const reposicoesAtivas = reposicoesCache.filter(r => {
         return (
           r.dataReposicao === dataAtual &&
@@ -3604,7 +3709,11 @@
         newFreqData.isReposicao = true;
         newFreqData.faltaOriginalId = faltaOriginalId;
         const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida);
-        if (reposicao) await db.collection('reposicoes').doc(reposicao.id).update({ foiCumprida: true });
+        if (reposicao) {
+          await db.collection('reposicoes').doc(reposicao.id).update({ foiCumprida: true });
+          // Atualiza cache de reposições
+          await refreshCache();
+        }
       }
       if (existing) await db.collection('frequencias').doc(existing.id).update(newFreqData);
       else await db.collection('frequencias').add(newFreqData);
@@ -3616,6 +3725,7 @@
       await carregarReposicoesAgendadas();
       await verificarFaltasConsecutivas();
       window.renderFaltasConsecutivas();
+      window.renderWhatsAppFaltas();
       window.renderDashboard();
     };
 
@@ -3747,6 +3857,7 @@
       window.renderClientes();
       window.carregarAniversariantesSemana();
       window.renderFaltasConsecutivas();
+      window.renderWhatsAppFaltas(); // Carrega a nova aba
 
       const alunosPorHoraHeader = document.querySelector('#page-alunos-por-hora .section-header');
       if (alunosPorHoraHeader && !document.getElementById('btn-export-alunos-hora')) {
@@ -3763,15 +3874,6 @@
     const registerBtn = document.getElementById('register-btn');
     if (loginBtn) loginBtn.onclick = window.doLogin;
     if (registerBtn) registerBtn.onclick = window.doRegister;
-
-    // limpa mensagens antigas ao digitar
-    document.getElementById('login-user')?.addEventListener('input', () => {
-      document.getElementById('login-error').style.display = 'none';
-    });
-
-    document.getElementById('login-pass')?.addEventListener('input', () => {
-      document.getElementById('login-error').style.display = 'none';
-    });
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
