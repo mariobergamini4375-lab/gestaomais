@@ -643,6 +643,21 @@
       color: var(--red);
     }
 
+    .badge-ativo {
+      background: rgba(16, 185, 129, .15);
+      color: var(--green);
+    }
+
+    .badge-bloqueado {
+      background: rgba(239, 68, 68, .15);
+      color: var(--red);
+    }
+
+    .badge-aguardando {
+      background: rgba(245, 158, 11, .15);
+      color: var(--yellow);
+    }
+
     .search-row {
       display: flex;
       gap: .5rem;
@@ -1280,8 +1295,10 @@
       <input type="email" id="login-user" placeholder="seu@email.com">
       <label>Senha</label>
       <input type="password" id="login-pass" placeholder="******">
-      <button class="btn btn-primary" style="width:100%; margin-bottom:0.5rem" id="login-btn">Entrar</button>
-      <button class="btn btn-ghost" style="width:100%" id="register-btn">Criar Conta</button>
+      <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+        <button class="btn btn-primary" style="width:100%" id="login-btn">Entrar</button>
+        <button class="btn btn-ghost" style="width:100%" id="register-btn">Criar Conta</button>
+      </div>
     </div>
   </div>
 
@@ -1315,10 +1332,16 @@
             <div class="nav-subitem" onclick="window.navigate('frequencia'); event.stopPropagation()"><span class="icon">✅</span> Marcar Presença Manual</div>
             <div class="nav-subitem" onclick="window.navigate('relatorio-frequencia'); event.stopPropagation()"><span class="icon">📊</span> Relatório</div>
           </div>
+          <!-- Menu Gerenciar Usuários - visível apenas para admin via JS -->
+          <div id="menu-gerenciar-usuarios" style="display:none;">
+            <div class="nav-section">
+              <div class="nav-section-title">Administração</div>
+              <div class="nav-item" onclick="window.navigate('usuarios')"><span class="icon">👥</span> Gerenciar Usuários</div>
+            </div>
+          </div>
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Análise</div>
-          <!-- Histórico e Relatórios ocultados conforme solicitado -->
           <div class="nav-item" onclick="window.navigate('historico')" style="display:none;"><span class="icon">📜</span> Histórico</div>
           <div class="nav-item" onclick="window.navigate('relatorios')" style="display:none;"><span class="icon">📈</span> Relatórios</div>
         </div>
@@ -1416,7 +1439,7 @@
               <button class="btn btn-ghost btn-sm" onclick="window.limparFiltrosParcelas()">Limpar</button>
             </div>
             <div class="table-wrap">
-              <table>
+              <tr>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1555,7 +1578,6 @@
               <h2>✅ Marcar Presença Manual</h2>
               <div><input type="date" id="frequencia-data" value="" style="padding:0.5rem;"><button class="btn btn-primary btn-sm" onclick="window.carregarFrequencia()">Carregar</button></div>
             </div>
-            <!-- Card de faltas consecutivas -->
             <div class="faltas-consecutivas-card" id="faltas-consecutivas-card">
               <h3>⚠️ Alunos com 2 faltas consecutivas</h3>
               <div id="faltas-consecutivas-lista"></div>
@@ -1589,7 +1611,7 @@
                 <option value="atrasado">Atrasado</option>
               </select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
             <div class="table-wrap">
-              <tr>
+              <table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1601,6 +1623,34 @@
                   </tr>
                 </thead>
                 <tbody id="relatorio-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Página Gerenciar Usuários -->
+          <div class="page" id="page-usuarios">
+            <div class="section-header">
+              <h2>👥 Gerenciar Usuários</h2>
+              <button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo Usuário</button>
+            </div>
+            <div class="search-row">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-usuarios" placeholder="Buscar usuário..." oninput="window.renderUsuarios()">
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Tipo</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="usuarios-tbody"></tbody>
               </table>
             </div>
           </div>
@@ -1659,6 +1709,28 @@
         </div>
       </div>
       <div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-cliente')">Cancelar</button><button class="btn btn-primary" onclick="window.saveCliente()">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- Modal Usuário -->
+  <div class="modal-overlay" id="modal-usuario">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-usuario-title">Novo Usuário</h3><button class="modal-close" onclick="window.closeModal('modal-usuario')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="usuario-id">
+        <div class="form-group"><label>Nome</label><input type="text" id="usuario-nome" placeholder="Nome completo"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="usuario-email" placeholder="email@exemplo.com"></div>
+        <div class="form-group" id="usuario-senha-group"><label>Senha</label><input type="password" id="usuario-senha" placeholder="******"></div>
+        <div class="form-group"><label>Status</label>
+          <select id="usuario-status" class="filter-select">
+            <option value="ativo">Ativo</option>
+            <option value="bloqueado">Bloqueado</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary" onclick="window.saveUsuario()">Salvar</button></div>
     </div>
   </div>
 
@@ -1726,9 +1798,12 @@
     let historicoCache = [];
     let ultimosParabensCache = [];
     let alertasFaltasCache = [];
+    let usuariosCache = [];
     let currentDiasHorarios = [];
     let faltaSelecionada = null;
     let buscaFrequenciaTimeout = null;
+    let currentUser = null;
+    let currentUserRole = null;
 
     // ============================================
     // FUNÇÕES AUXILIARES
@@ -1775,6 +1850,9 @@
 
       const alertasSnap = await db.collection('alertasFaltas').get();
       alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      const usuariosSnap = await db.collection('usuarios').get();
+      usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
 
     async function addHistory(acao, tipo) {
@@ -1783,7 +1861,190 @@
     }
 
     // ============================================
-    // LOGIN
+    // FUNÇÕES DE USUÁRIO
+    // ============================================
+    async function criarUsuarioPadraoAdmin() {
+      const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini@gmail.com').get();
+      if (usuariosSnap.empty) {
+        try {
+          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini@gmail.com', '202606');
+          await db.collection('usuarios').doc(userCredential.user.uid).set({
+            nome: 'Administrador',
+            email: 'mario.bergamini@gmail.com',
+            status: 'ativo',
+            role: 'admin',
+            aprovado: true
+          });
+          console.log('Usuário admin criado com sucesso');
+        } catch (error) {
+          console.log('Erro ao criar usuário admin:', error);
+        }
+      }
+    }
+
+    async function verificarAcessoUsuario(user) {
+      const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+      if (!usuarioDoc.exists) {
+        throw new Error('Usuário não autorizado');
+      }
+      
+      const usuarioData = usuarioDoc.data();
+      
+      if (usuarioData.status === 'bloqueado') {
+        throw new Error('Usuário bloqueado');
+      }
+      
+      if (usuarioData.aprovado === false) {
+        throw new Error('Aguardando liberação pelo administrador');
+      }
+      
+      currentUserRole = usuarioData.role;
+      return usuarioData;
+    }
+
+    window.renderUsuarios = async function() {
+      if (currentUserRole !== 'admin') return;
+      
+      const search = document.getElementById('search-usuarios')?.value.toLowerCase().trim() || '';
+      let usuarios = usuariosCache.filter(u => 
+        !search || u.nome.toLowerCase().includes(search) || u.email.toLowerCase().includes(search)
+      );
+      
+      const tbody = document.getElementById('usuarios-tbody');
+      if (!usuarios.length) {
+        tbody.innerHTML = '<tr><td colspan="5"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = usuarios.map(u => `<tr>
+        <td><strong>${u.nome || '—'}</strong></td>
+        <td>${u.email}</td>
+        <td><span class="badge badge-${u.status === 'ativo' ? 'ativo' : (u.status === 'bloqueado' ? 'bloqueado' : 'aguardando')}">${u.status === 'ativo' ? '✅ Ativo' : (u.status === 'bloqueado' ? '🔒 Bloqueado' : '⏳ Aguardando')}</span></td>
+        <td><span class="badge ${u.role === 'admin' ? 'badge-pendente' : 'badge-pago'}">${u.role === 'admin' ? '👑 Administrador' : '👤 Usuário'}</span></td>
+        <td class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="window.editarUsuario('${u.id}')">✏️</button>
+          ${u.status !== 'bloqueado' ? `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>` : `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`}
+          ${u.role !== 'admin' ? `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>` : ''}
+        </span></td>
+      </tr>`).join('');
+    };
+
+    window.openUsuarioModal = function(id = null) {
+      if (currentUserRole !== 'admin') return;
+      
+      document.getElementById('usuario-id').value = '';
+      document.getElementById('usuario-nome').value = '';
+      document.getElementById('usuario-email').value = '';
+      document.getElementById('usuario-senha').value = '';
+      document.getElementById('usuario-status').value = 'ativo';
+      document.getElementById('modal-usuario-title').textContent = 'Novo Usuário';
+      document.getElementById('usuario-senha-group').style.display = 'block';
+      
+      if (id) {
+        const u = usuariosCache.find(x => x.id === id);
+        if (u) {
+          document.getElementById('usuario-id').value = u.id;
+          document.getElementById('usuario-nome').value = u.nome || '';
+          document.getElementById('usuario-email').value = u.email;
+          document.getElementById('usuario-status').value = u.status || 'ativo';
+          document.getElementById('modal-usuario-title').textContent = 'Editar Usuário';
+          document.getElementById('usuario-senha-group').style.display = 'none';
+        }
+      }
+      window.openModal('modal-usuario');
+    };
+
+    window.editarUsuario = function(id) {
+      window.openUsuarioModal(id);
+    };
+
+    window.saveUsuario = async function() {
+      if (currentUserRole !== 'admin') return;
+      
+      const id = document.getElementById('usuario-id').value;
+      const nome = document.getElementById('usuario-nome').value.trim();
+      const email = document.getElementById('usuario-email').value.trim();
+      const senha = document.getElementById('usuario-senha').value;
+      const status = document.getElementById('usuario-status').value;
+      
+      if (!nome || !email) {
+        alert('Preencha nome e email!');
+        return;
+      }
+      
+      const saveBtn = event?.target;
+      const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar';
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
+      
+      try {
+        if (id) {
+          await db.collection('usuarios').doc(id).update({ nome, status });
+          await refreshCache();
+          await addHistory(`Usuário ${nome} atualizado`, 'green');
+          alert('Usuário atualizado com sucesso!');
+        } else {
+          if (!senha) {
+            alert('Preencha a senha!');
+            return;
+          }
+          const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+          await db.collection('usuarios').doc(userCredential.user.uid).set({
+            nome,
+            email,
+            status,
+            role: 'user',
+            aprovado: true
+          });
+          await refreshCache();
+          await addHistory(`Usuário ${nome} criado pelo administrador`, 'green');
+          alert('Usuário criado com sucesso!');
+        }
+        window.closeModal('modal-usuario');
+        window.renderUsuarios();
+      } catch (error) {
+        alert('Erro: ' + error.message);
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalText; }
+      }
+    };
+
+    window.bloquearUsuario = async function(id) {
+      if (currentUserRole !== 'admin') return;
+      if (!confirm('Deseja bloquear este usuário?')) return;
+      await db.collection('usuarios').doc(id).update({ status: 'bloqueado' });
+      await refreshCache();
+      await addHistory(`Usuário bloqueado`, 'red');
+      window.renderUsuarios();
+    };
+
+    window.ativarUsuario = async function(id) {
+      if (currentUserRole !== 'admin') return;
+      if (!confirm('Deseja ativar este usuário?')) return;
+      await db.collection('usuarios').doc(id).update({ status: 'ativo' });
+      await refreshCache();
+      await addHistory(`Usuário ativado`, 'green');
+      window.renderUsuarios();
+    };
+
+    window.excluirUsuario = async function(id, email) {
+      if (currentUserRole !== 'admin') return;
+      if (!confirm(`Deseja excluir o usuário ${email}?`)) return;
+      
+      try {
+        const user = await auth.getUserByEmail(email);
+        await auth.deleteUser(user.uid);
+      } catch (error) {
+        console.log('Erro ao excluir do auth:', error);
+      }
+      
+      await db.collection('usuarios').doc(id).delete();
+      await refreshCache();
+      await addHistory(`Usuário ${email} excluído`, 'red');
+      window.renderUsuarios();
+    };
+
+    // ============================================
+    // LOGIN MODIFICADO
     // ============================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
@@ -1798,8 +2059,11 @@
       }
 
       try {
-        await auth.signInWithEmailAndPassword(email, password);
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const usuarioData = await verificarAcessoUsuario(userCredential.user);
         errorDiv.style.display = 'none';
+        currentUser = userCredential.user;
+        currentUserRole = usuarioData.role;
       } catch (error) {
         errorDiv.textContent = '❌ ' + error.message;
         errorDiv.style.display = 'block';
@@ -1827,10 +2091,22 @@
       }
 
       try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        errorDiv.style.display = 'none';
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await db.collection('usuarios').doc(userCredential.user.uid).set({
+          nome: email.split('@')[0],
+          email: email,
+          status: 'aguardando',
+          role: 'user',
+          aprovado: false
+        });
+        await auth.signOut();
+        errorDiv.textContent = '✅ Conta criada! Aguarde liberação pelo administrador.';
+        errorDiv.style.color = 'var(--green)';
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 5000);
       } catch (error) {
         errorDiv.textContent = '❌ ' + error.message;
+        errorDiv.style.color = 'var(--red)';
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 3000);
       }
@@ -1838,6 +2114,8 @@
 
     window.doLogout = async function () {
       await auth.signOut();
+      currentUser = null;
+      currentUserRole = null;
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('app').style.display = 'none';
     };
@@ -1874,6 +2152,7 @@
       else if (page === 'relatorio-frequencia') title = 'Relatório de Frequência';
       else if (page === 'historico') title = 'Histórico';
       else if (page === 'relatorios') title = 'Relatórios';
+      else if (page === 'usuarios') title = 'Gerenciar Usuários';
 
       document.getElementById('topbar-title').innerText = title;
       window.closeSidebar();
@@ -1894,6 +2173,7 @@
       if (page === 'relatorio-frequencia') window.carregarRelatorioFrequencia();
       if (page === 'historico') window.renderHistorico();
       if (page === 'relatorios') window.renderRelatorio();
+      if (page === 'usuarios') window.renderUsuarios();
     };
 
     window.toggleSidebar = function () {
@@ -2585,7 +2865,7 @@
     window.renderDisparoTable = async function () {
       const parcelas = getParcelasDisparo();
       const tbody = document.getElementById('disparo-tbody');
-      if (!parcelas.length) { tbody.innerHTML = '<td><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
+      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
       tbody.innerHTML = parcelas.map(p => {
         const c = clientesCache.find(x => x.id === p.clienteId);
         const tel = c?.telefone?.replace(/\D/g, '');
@@ -2775,7 +3055,6 @@
         await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green');
         alert('Reposição agendada com sucesso!');
 
-        // Marcar alerta de falta como resolvido se existir
         const alerta = alertasFaltasCache.find(a => a.alunoId === alunoId && !a.resolvido);
         if (alerta) {
           await db.collection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true });
@@ -3235,7 +3514,7 @@
       if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de);
       if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate);
       if (status) parcelas = parcelas.filter(p => p.status === status);
-      document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></tr></tr>' : parcelas.map(p => {
+      document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => {
         const c = clientesCache.find(x => x.id === p.clienteId);
         return `<tr>
           <td>${c?.nome}</td>
@@ -3244,7 +3523,7 @@
           <td>${fmtBRL(p.valor)}</span></td>
           <td>${fmtDate(p.dataVencimento)}</span></td>
           <td><span class="badge badge-${p.status}">${p.status}</span></td>
-        </table>`;
+        </tr>`;
       }).join('');
     };
 
@@ -3296,6 +3575,12 @@
       updateClock();
       setInterval(updateClock, 1000);
 
+      // Mostrar menu de gerenciar usuários apenas para admin
+      if (currentUserRole === 'admin') {
+        const menuAdmin = document.getElementById('menu-gerenciar-usuarios');
+        if (menuAdmin) menuAdmin.style.display = 'block';
+      }
+
       const frequenciaHeader = document.querySelector('#page-frequencia .section-header');
       if (frequenciaHeader && !document.getElementById('buscar-frequencia')) {
         const buscaDiv = document.createElement('div');
@@ -3329,6 +3614,7 @@
 
       await refreshCache();
       await criarDadosIniciais();
+      await criarUsuarioPadraoAdmin();
       loadHiddenItems();
       popularSelectHorarios();
       await verificarFaltasConsecutivas();
@@ -3339,7 +3625,6 @@
       window.carregarAniversariantesSemana();
       window.renderFaltasConsecutivas();
       
-      // Adicionar botões na página Alunos por Hora
       const alunosPorHoraHeader = document.querySelector('#page-alunos-por-hora .section-header');
       if (alunosPorHoraHeader && !document.getElementById('btn-export-alunos-hora')) {
         const btnDiv = document.createElement('div');
@@ -3358,9 +3643,24 @@
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        await initApp();
+        try {
+          const usuarioData = await verificarAcessoUsuario(user);
+          currentUser = user;
+          currentUserRole = usuarioData.role;
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+          await initApp();
+        } catch (error) {
+          await auth.signOut();
+          currentUser = null;
+          currentUserRole = null;
+          document.getElementById('login-screen').style.display = 'flex';
+          document.getElementById('app').style.display = 'none';
+          const errorDiv = document.getElementById('login-error');
+          errorDiv.textContent = '❌ ' + error.message;
+          errorDiv.style.display = 'block';
+          setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
       } else {
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('app').style.display = 'none';
