@@ -62,7 +62,10 @@
       min-height: 100vh;
     }
 
-    h1, h2, h3, h4 {
+    h1,
+    h2,
+    h3,
+    h4 {
       font-family: 'Syne', sans-serif;
     }
 
@@ -469,6 +472,7 @@
         opacity: 0;
         transform: translateY(12px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -1203,6 +1207,7 @@
         opacity: 1;
         transform: scale(1);
       }
+
       to {
         opacity: 0;
         transform: scale(0.9);
@@ -1220,36 +1225,46 @@
         grid-template-columns: 1fr !important;
         gap: 1rem;
       }
+
       .stat-card {
         padding: 1.2rem;
         min-height: auto;
       }
+
       .stat-label {
         font-size: 0.9rem;
       }
+
       .stat-value {
         font-size: 2rem;
       }
+
       .cobranca-item {
         flex-direction: column;
         align-items: flex-start;
       }
+
       .topbar-title {
         font-size: 0.9rem;
       }
+
       .clock {
         display: none;
       }
+
       .content {
         padding: 0.7rem;
       }
+
       table {
         min-width: 900px;
       }
+
       .section-header {
         flex-direction: column;
         align-items: stretch;
       }
+
       .section-header .btn {
         width: 100%;
       }
@@ -1327,7 +1342,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="window.closeModal('modal-register-publico')">Cancelar</button>
-        <button class="btn btn-primary" id="register-confirm-btn">Criar Conta</button>
+        <button class="btn btn-primary" id="register-confirm-btn" onclick="window.doRegister()">Criar Conta</button>
       </div>
     </div>
   </div>
@@ -1344,37 +1359,54 @@
         <div class="nav-section">
           <div class="nav-section-title">Principal</div>
           <div class="nav-item" onclick="window.navigate('dashboard')"><span class="icon">📊</span> Dashboard</div>
-          <div class="nav-item" onclick="window.navigate('alunos')"><span class="icon">👥</span> Cadastro de Alunos</div>
-          <div class="nav-item" onclick="window.navigate('aniversariantes')"><span class="icon">🎂</span> Aniversariantes da Semana</div>
+          <div class="nav-item" onclick="window.navigate('alunos')"><span class="icon">👥</span> Cadastro de Alunos
+          </div>
+          <div class="nav-item" onclick="window.navigate('aniversariantes')"><span class="icon">🎂</span>
+            Aniversariantes da Semana</div>
 
-          <div class="nav-item" onclick="window.toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade <span style="margin-left:auto">▼</span></div>
+          <div class="nav-item" onclick="window.toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade
+            <span style="margin-left:auto">▼</span>
+          </div>
           <div id="submenu-mensalidade" style="display:none; padding-left: 1.5rem;">
-            <div class="nav-subitem" onclick="window.navigate('parcelas'); event.stopPropagation()"><span class="icon">📋</span> Mensalidades / Controle</div>
-            <div class="nav-subitem" onclick="window.navigate('hoje'); event.stopPropagation()"><span class="icon">🔥</span> Vencendo Hoje</div>
-            <div class="nav-subitem" onclick="window.navigate('disparo'); event.stopPropagation()"><span class="icon">✏️</span> Enviar Mensagem WhatsApp</div>
+            <div class="nav-subitem" onclick="window.navigate('parcelas'); event.stopPropagation()"><span
+                class="icon">📋</span> Mensalidades / Controle</div>
+            <div class="nav-subitem" onclick="window.navigate('hoje'); event.stopPropagation()"><span
+                class="icon">🔥</span> Vencendo Hoje</div>
+            <div class="nav-subitem" onclick="window.navigate('disparo'); event.stopPropagation()"><span
+                class="icon">✏️</span> Enviar Mensagem WhatsApp</div>
           </div>
 
-          <div class="nav-item" onclick="window.toggleSubmenuFrequencia()"><span class="icon">📅</span> Frequência <span style="margin-left:auto">▼</span></div>
+          <div class="nav-item" onclick="window.toggleSubmenuFrequencia()"><span class="icon">📅</span> Frequência <span
+              style="margin-left:auto">▼</span></div>
           <div id="submenu-frequencia" style="display:none; padding-left: 1.5rem;">
-            <div class="nav-subitem" onclick="window.navigate('presenca-automatica'); event.stopPropagation()"><span class="icon">🕐</span> Marcar Presença</div>
-            <div class="nav-subitem" onclick="window.navigate('alunos-por-hora'); event.stopPropagation()"><span class="icon">📊</span> Alunos por Hora</div>
-            <div class="nav-subitem" onclick="window.navigate('reposicao'); event.stopPropagation()"><span class="icon">🔄</span> Reposição de Aula</div>
-            <div class="nav-subitem" onclick="window.navigate('frequencia'); event.stopPropagation()"><span class="icon">✅</span> Marcar Presença Manual</div>
-            <div class="nav-subitem" onclick="window.navigate('relatorio-frequencia'); event.stopPropagation()"><span class="icon">📊</span> Relatório</div>
-            <div class="nav-subitem" onclick="window.navigate('whatsapp-faltas'); event.stopPropagation()"><span class="icon">💬</span> WhatsApp Faltas</div>
+            <div class="nav-subitem" onclick="window.navigate('presenca-automatica'); event.stopPropagation()"><span
+                class="icon">🕐</span> Marcar Presença</div>
+            <div class="nav-subitem" onclick="window.navigate('alunos-por-hora'); event.stopPropagation()"><span
+                class="icon">📊</span> Alunos por Hora</div>
+            <div class="nav-subitem" onclick="window.navigate('reposicao'); event.stopPropagation()"><span
+                class="icon">🔄</span> Reposição de Aula</div>
+            <div class="nav-subitem" onclick="window.navigate('frequencia'); event.stopPropagation()"><span
+                class="icon">✅</span> Marcar Presença Manual</div>
+            <div class="nav-subitem" onclick="window.navigate('relatorio-frequencia'); event.stopPropagation()"><span
+                class="icon">📊</span> Relatório</div>
+            <div class="nav-subitem" onclick="window.navigate('whatsapp-faltas'); event.stopPropagation()"><span
+                class="icon">💬</span> WhatsApp Faltas</div>
           </div>
 
           <div id="menu-gerenciar-usuarios" style="display:none;">
             <div class="nav-section">
               <div class="nav-section-title">Administração</div>
-              <div class="nav-item" onclick="window.navigate('usuarios')"><span class="icon">👥</span> Gerenciar Usuários</div>
+              <div class="nav-item" onclick="window.navigate('usuarios')"><span class="icon">👥</span> Gerenciar
+                Usuários</div>
             </div>
           </div>
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Análise</div>
-          <div class="nav-item" onclick="window.navigate('historico')" style="display:none;"><span class="icon">📜</span> Histórico</div>
-          <div class="nav-item" onclick="window.navigate('relatorios')" style="display:none;"><span class="icon">📈</span> Relatórios</div>
+          <div class="nav-item" onclick="window.navigate('historico')" style="display:none;"><span
+              class="icon">📜</span> Histórico</div>
+          <div class="nav-item" onclick="window.navigate('relatorios')" style="display:none;"><span
+              class="icon">📈</span> Relatórios</div>
         </div>
         <div class="sidebar-footer">
           <button class="logout-btn" onclick="window.doLogout()">🚪 Sair</button>
@@ -1437,7 +1469,15 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Nome</th><th>Telefone</th><th>Endereço</th><th>Aniversário</th><th>Data Matrícula</th><th>Dias/Horários Aula</th><th>Ações</th></tr>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Endereço</th>
+                    <th>Aniversário</th>
+                    <th>Data Matrícula</th>
+                    <th>Dias/Horários Aula</th>
+                    <th>Ações</th>
+                  </tr>
                 </thead>
                 <tbody id="clientes-tbody"></tbody>
               </table>
@@ -1457,9 +1497,12 @@
               <h2>📋 Mensalidades / Controle</h2>
             </div>
             <div class="search-row">
-              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-parcelas" placeholder="Buscar..." oninput="window.renderParcelas()"></div>
-              <input type="date" class="date-filter" id="filter-data-de" placeholder="Data de" onchange="window.renderParcelas()">
-              <input type="date" class="date-filter" id="filter-data-ate" placeholder="Data até" onchange="window.renderParcelas()">
+              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-parcelas"
+                  placeholder="Buscar..." oninput="window.renderParcelas()"></div>
+              <input type="date" class="date-filter" id="filter-data-de" placeholder="Data de"
+                onchange="window.renderParcelas()">
+              <input type="date" class="date-filter" id="filter-data-ate" placeholder="Data até"
+                onchange="window.renderParcelas()">
               <select class="filter-select" id="filter-parcela-status" onchange="window.renderParcelas()">
                 <option value="">Todos</option>
                 <option value="pendente">Pendente</option>
@@ -1470,7 +1513,18 @@
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Aluno</th><th>Mensalidade</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Último Envio</th><th>Ações</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Último Envio</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
                 <tbody id="parcelas-tbody"></tbody>
               </table>
             </div>
@@ -1478,7 +1532,10 @@
 
           <div class="page" id="page-hoje">
             <div class="hoje-header-bar">
-              <div><div class="hoje-title">🔥 Vencendo Hoje <span class="hoje-count" id="hoje-count-badge">0</span></div><div class="hoje-date" id="hoje-date-label"></div></div>
+              <div>
+                <div class="hoje-title">🔥 Vencendo Hoje <span class="hoje-count" id="hoje-count-badge">0</span></div>
+                <div class="hoje-date" id="hoje-date-label"></div>
+              </div>
               <button class="btn btn-ghost btn-sm" onclick="window.renderHoje()">↻ Atualizar</button>
             </div>
             <div id="hoje-content"></div>
@@ -1488,22 +1545,38 @@
             <div class="section-header">
               <h2>✏️ Enviar Mensagem WhatsApp</h2>
             </div>
-            <div class="disparo-filters"><label>Filtrar:</label><select class="filter-select" id="disparo-filter-status" onchange="window.renderDisparoTable()">
-              <option value="urgente">🚨 Atrasadas + Hoje</option>
-              <option value="vencendo_hoje">🔥 Vencendo hoje</option>
-              <option value="atrasado">⚠️ Atrasadas</option>
-              <option value="pendente">🕐 Pendentes</option>
-              <option value="todos">Todos (não pagos)</option>
-            </select></div>
+            <div class="disparo-filters"><label>Filtrar:</label><select class="filter-select" id="disparo-filter-status"
+                onchange="window.renderDisparoTable()">
+                <option value="urgente">🚨 Atrasadas + Hoje</option>
+                <option value="vencendo_hoje">🔥 Vencendo hoje</option>
+                <option value="atrasado">⚠️ Atrasadas</option>
+                <option value="pendente">🕐 Pendentes</option>
+                <option value="todos">Todos (não pagos)</option>
+              </select></div>
             <div class="disparo-toolbar">
-              <div class="disparo-toolbar-left"><h3>💬 WhatsApp</h3></div>
-              <div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openModal('modal-msg')">✏️ Mensagem</button></div>
+              <div class="disparo-toolbar-left">
+                <h3>💬 WhatsApp</h3>
+              </div>
+              <div class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openModal('modal-msg')">✏️
+                  Mensagem</button></div>
             </div>
             <div class="table-wrap">
-              <table>
-                <thead><tr><th>Aluno</th><th>Telefone</th><th>Mensalidade</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Último Envio</th><th>Enviar</th></tr></thead>
-                <tbody id="disparo-tbody"></tbody>
               </table>
+              <thead>
+                <tr>
+                  <th>Aluno</th>
+                  <th>Telefone</th>
+                  <th>Mensalidade</th>
+                  <th>Parcela</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Status</th>
+                  <th>Último Envio</th>
+                  <th>Enviar</th>
+                </tr>
+              </thead>
+              <tbody id="disparo-tbody"></tbody>
+            </table>
             </div>
           </div>
 
@@ -1514,7 +1587,10 @@
             </div>
             <div class="presenca-auto-header">
               <div class="presenca-auto-info">
-                <div><div class="presenca-auto-dia" id="presenca-auto-dia">--</div><div class="presenca-auto-horario" id="presenca-auto-horario">--:--</div></div>
+                <div>
+                  <div class="presenca-auto-dia" id="presenca-auto-dia">--</div>
+                  <div class="presenca-auto-horario" id="presenca-auto-horario">--:--</div>
+                </div>
                 <div><span class="badge badge-pendente">📅 Aulas no horário atual (59min de duração)</span></div>
               </div>
             </div>
@@ -1528,8 +1604,23 @@
             </div>
             <div class="table-wrap">
               <table class="alunos-por-hora-table">
-                <thead id="alunos-por-hora-thead"><tr><th>Horário</th><th>Segunda</th><th>Terça</th><th>Quarta</th><th>Quinta</th><th>Sexta</th><th>Sábado</th><th>Domingo</th></tr></thead>
-                <tbody id="alunos-por-hora-tbody"><tr><td colspan="8" class="empty">Carregando...</td></tr></tbody>
+                <thead id="alunos-por-hora-thead">
+                  <tr>
+                    <th>Horário</th>
+                    <th>Segunda</th>
+                    <th>Terça</th>
+                    <th>Quarta</th>
+                    <th>Quinta</th>
+                    <th>Sexta</th>
+                    <th>Sábado</th>
+                    <th>Domingo</th>
+                  </tr>
+                </thead>
+                <tbody id="alunos-por-hora-tbody">
+                  <tr>
+                    <td colspan="8" class="empty">Carregando...</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -1539,20 +1630,33 @@
               <h2>🔄 Reposição de Aula</h2>
             </div>
             <div class="reposicao-card">
-              <div class="reposicao-form-group"><label>Selecione o Aluno</label><select id="reposicao-aluno" class="filter-select" style="width:100%"><option value="">-- Selecione --</option></select></div>
-              <div class="reposicao-form-group"><label>Faltas do Aluno</label><div id="reposicao-faltas-list" style="max-height:200px;overflow-y:auto;"><div class="empty">Selecione um aluno</div></div></div>
-              <div class="reposicao-form-group"><label>Data da Reposição</label><input type="date" id="reposicao-data" class="filter-select" style="width:100%"></div>
-              <div class="reposicao-form-group"><label>Horário</label><select id="reposicao-horario" class="filter-select" style="width:100%"></select></div>
-              <div class="modal-footer" style="justify-content:center;padding:1rem 0 0 0;"><button class="btn btn-primary" onclick="window.salvarReposicao()">Salvar Reposição</button></div>
+              <div class="reposicao-form-group"><label>Selecione o Aluno</label><select id="reposicao-aluno"
+                  class="filter-select" style="width:100%">
+                  <option value="">-- Selecione --</option>
+                </select></div>
+              <div class="reposicao-form-group"><label>Faltas do Aluno</label>
+                <div id="reposicao-faltas-list" style="max-height:200px;overflow-y:auto;">
+                  <div class="empty">Selecione um aluno</div>
+                </div>
+              </div>
+              <div class="reposicao-form-group"><label>Data da Reposição</label><input type="date" id="reposicao-data"
+                  class="filter-select" style="width:100%"></div>
+              <div class="reposicao-form-group"><label>Horário</label><select id="reposicao-horario"
+                  class="filter-select" style="width:100%"></select></div>
+              <div class="modal-footer" style="justify-content:center;padding:1rem 0 0 0;"><button
+                  class="btn btn-primary" onclick="window.salvarReposicao()">Salvar Reposição</button></div>
             </div>
-            <div class="section-header" style="margin-top:1rem;"><h3>📋 Reposições Agendadas</h3></div>
+            <div class="section-header" style="margin-top:1rem;">
+              <h3>📋 Reposições Agendadas</h3>
+            </div>
             <div id="reposicoes-agendadas-list"></div>
           </div>
 
           <div class="page" id="page-frequencia">
             <div class="section-header">
               <h2>✅ Marcar Presença Manual</h2>
-              <div><input type="date" id="frequencia-data" value="" style="padding:0.5rem;"><button class="btn btn-primary btn-sm" onclick="window.carregarFrequencia()">Carregar</button></div>
+              <div><input type="date" id="frequencia-data" value="" style="padding:0.5rem;"><button
+                  class="btn btn-primary btn-sm" onclick="window.carregarFrequencia()">Carregar</button></div>
             </div>
             <div class="faltas-consecutivas-card" id="faltas-consecutivas-card">
               <h3>⚠️ Alunos com 2 faltas consecutivas</h3>
@@ -1572,35 +1676,72 @@
           <div class="page" id="page-relatorio-frequencia">
             <div class="section-header">
               <h2>📊 Relatório de Frequência</h2>
-              <div><input type="month" id="rel-frequencia-mes" value=""><button class="btn btn-primary btn-sm" onclick="window.carregarRelatorioFrequencia()">Gerar</button></div>
+              <div><input type="month" id="rel-frequencia-mes" value=""><button class="btn btn-primary btn-sm"
+                  onclick="window.carregarRelatorioFrequencia()">Gerar</button></div>
             </div>
             <div id="relatorio-frequencia-content"></div>
           </div>
 
           <div class="page" id="page-historico" style="display:none;">
-            <div class="section-header"><h2>Histórico</h2></div>
+            <div class="section-header">
+              <h2>Histórico</h2>
+            </div>
             <div class="history-list" id="historico-list"></div>
           </div>
 
           <div class="page" id="page-relatorios" style="display:none;">
-            <div class="section-header"><h2>Relatórios</h2></div>
-            <div class="report-filters" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem"><input type="date" id="rel-de" style="padding:.6rem"><input type="date" id="rel-ate" style="padding:.6rem"><select id="rel-status" style="padding:.6rem"><option value="">Todos</option><option value="pendente">Pendente</option><option value="pago">Pago</option><option value="atrasado">Atrasado</option></select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
+            <div class="section-header">
+              <h2>Relatórios</h2>
+            </div>
+            <div class="report-filters" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem"><input
+                type="date" id="rel-de" style="padding:.6rem"><input type="date" id="rel-ate"
+                style="padding:.6rem"><select id="rel-status" style="padding:.6rem">
+                <option value="">Todos</option>
+                <option value="pendente">Pendente</option>
+                <option value="pago">Pago</option>
+                <option value="atrasado">Atrasado</option>
+              </select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
             <div class="table-wrap">
-              <table><thead><tr><th>Aluno</th><th>Mensalidade</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th></tr></thead>
-              <tbody id="relatorio-tbody"></tbody></table>
+              </tr>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="relatorio-tbody"></tbody>
+              </table>
             </div>
           </div>
 
           <div class="page" id="page-usuarios">
             <div class="section-header">
-              <h2>👥 Gerenciar Usuários</h2><button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo Usuário</button>
+              <h2>👥 Gerenciar Usuários</h2><button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo
+                Usuário</button>
             </div>
             <div class="search-row">
-              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-usuarios" placeholder="Buscar usuário..." oninput="window.renderUsuarios()"></div>
+              <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-usuarios"
+                  placeholder="Buscar usuário..." oninput="window.renderUsuarios()"></div>
             </div>
             <div class="table-wrap">
-              <table><thead><tr><th>Nome</th><th>Email</th><th>Status</th><th>Data Cadastro</th><th>Último Login</th><th>Tipo</th><th>Ações</th></tr></thead>
-              <tbody id="usuarios-tbody"></tbody></table>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Data Cadastro</th>
+                    <th>Último Login</th>
+                    <th>Tipo</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="usuarios-tbody"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -1609,13 +1750,119 @@
   </div>
 
   <!-- MODALS -->
-  <div class="modal-overlay" id="modal-cliente"><div class="modal"><div class="modal-header"><h3>Aluno</h3><button class="modal-close" onclick="window.closeModal('modal-cliente')">×</button></div><div class="modal-body"><input type="hidden" id="cliente-id"><div class="form-group"><label>Nome *</label><input type="text" id="cliente-nome"></div><div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone" placeholder="(11) 99999-9999" oninput="window.maskPhone(this)"></div><div class="form-group"><label>Endereço</label><input type="text" id="cliente-endereco"></div><div class="form-group"><label>Data de Nascimento</label><input type="date" id="cliente-nascimento"></div><div class="form-group"><label>Data da Matrícula</label><input type="date" id="cliente-matricula"></div><div class="form-group"><label>Dias e Horários das Aulas</label><div id="dias-horarios-container"><div id="dias-horarios-list" class="dias-horarios-list"></div><div class="add-dia-row"><select id="novo-dia"><option value="Segunda-feira">Segunda</option><option value="Terça-feira">Terça</option><option value="Quarta-feira">Quarta</option><option value="Quinta-feira">Quinta</option><option value="Sexta-feira">Sexta</option><option value="Sábado">Sábado</option><option value="Domingo">Domingo</option></select><select id="novo-horario"></select><button class="btn btn-primary btn-sm" onclick="window.adicionarDiaHorario()">+ Adicionar</button></div></div></div><div class="form-divider"></div><div class="form-group"><label style="color:var(--accent);">📅 INFORMAÇÕES DA MENSALIDADE</label></div><div class="form-row"><div class="form-group"><label>Valor *</label><input type="number" id="cliente-mensalidade-valor" step="0.01"></div><div class="form-group"><label>Vencimento *</label><input type="date" id="cliente-mensalidade-vencimento"></div></div><div class="form-group"><label>Descrição</label><input type="text" id="cliente-mensalidade-descricao" placeholder="Ex: Mensalidade"></div><div class="form-group"><label><input type="checkbox" id="cliente-mensalidade-parcelado" onchange="window.toggleClienteParcelamento()"> Parcelado</label></div><div id="cliente-parcelamento-fields" style="display:none"><div class="form-row"><div class="form-group"><label>Nº Parcelas</label><input type="number" id="cliente-mensalidade-parcelas" min="2" value="2"></div><div class="form-group"><label>Intervalo</label><select id="cliente-mensalidade-intervalo"><option value="mensal">Mensal</option><option value="quinzenal">Quinzenal</option><option value="semanal">Semanal</option></select></div></div></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-cliente')">Cancelar</button><button class="btn btn-primary" onclick="window.saveCliente()">Salvar</button></div></div></div>
+  <div class="modal-overlay" id="modal-cliente">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Aluno</h3><button class="modal-close" onclick="window.closeModal('modal-cliente')">×</button>
+      </div>
+      <div class="modal-body"><input type="hidden" id="cliente-id">
+        <div class="form-group"><label>Nome *</label><input type="text" id="cliente-nome"></div>
+        <div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone"
+            placeholder="(11) 99999-9999" oninput="window.maskPhone(this)"></div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="cliente-endereco"></div>
+        <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cliente-nascimento"></div>
+        <div class="form-group"><label>Data da Matrícula</label><input type="date" id="cliente-matricula"></div>
+        <div class="form-group"><label>Dias e Horários das Aulas</label>
+          <div id="dias-horarios-container">
+            <div id="dias-horarios-list" class="dias-horarios-list"></div>
+            <div class="add-dia-row"><select id="novo-dia">
+                <option value="Segunda-feira">Segunda</option>
+                <option value="Terça-feira">Terça</option>
+                <option value="Quarta-feira">Quarta</option>
+                <option value="Quinta-feira">Quinta</option>
+                <option value="Sexta-feira">Sexta</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
+              </select><select id="novo-horario"></select><button class="btn btn-primary btn-sm"
+                onclick="window.adicionarDiaHorario()">+ Adicionar</button></div>
+          </div>
+        </div>
+        <div class="form-divider"></div>
+        <div class="form-group"><label style="color:var(--accent);">📅 INFORMAÇÕES DA MENSALIDADE</label></div>
+        <div class="form-row">
+          <div class="form-group"><label>Valor *</label><input type="number" id="cliente-mensalidade-valor" step="0.01">
+          </div>
+          <div class="form-group"><label>Vencimento *</label><input type="date" id="cliente-mensalidade-vencimento">
+          </div>
+        </div>
+        <div class="form-group"><label>Descrição</label><input type="text" id="cliente-mensalidade-descricao"
+            placeholder="Ex: Mensalidade"></div>
+        <div class="form-group"><label><input type="checkbox" id="cliente-mensalidade-parcelado"
+              onchange="window.toggleClienteParcelamento()"> Parcelado</label></div>
+        <div id="cliente-parcelamento-fields" style="display:none">
+          <div class="form-row">
+            <div class="form-group"><label>Nº Parcelas</label><input type="number" id="cliente-mensalidade-parcelas"
+                min="2" value="2"></div>
+            <div class="form-group"><label>Intervalo</label><select id="cliente-mensalidade-intervalo">
+                <option value="mensal">Mensal</option>
+                <option value="quinzenal">Quinzenal</option>
+                <option value="semanal">Semanal</option>
+              </select></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.closeModal('modal-cliente')">Cancelar</button><button class="btn btn-primary"
+          onclick="window.saveCliente()">Salvar</button></div>
+    </div>
+  </div>
 
-  <div class="modal-overlay" id="modal-usuario"><div class="modal"><div class="modal-header"><h3 id="modal-usuario-title">Novo Usuário</h3><button class="modal-close" onclick="window.closeModal('modal-usuario')">×</button></div><div class="modal-body"><input type="hidden" id="usuario-id"><div class="form-group"><label>Nome</label><input type="text" id="usuario-nome" placeholder="Nome completo"></div><div class="form-group"><label>Email</label><input type="email" id="usuario-email" placeholder="email@exemplo.com"></div><div class="form-group" id="usuario-senha-group"><label>Senha</label><input type="password" id="usuario-senha" placeholder="******"></div><div class="form-group"><label>Status</label><select id="usuario-status" class="filter-select"><option value="ativo">Ativo</option><option value="bloqueado">Bloqueado</option></select></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary" onclick="window.saveUsuario()">Salvar</button></div></div></div>
+  <div class="modal-overlay" id="modal-usuario">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-usuario-title">Novo Usuário</h3><button class="modal-close"
+          onclick="window.closeModal('modal-usuario')">×</button>
+      </div>
+      <div class="modal-body"><input type="hidden" id="usuario-id">
+        <div class="form-group"><label>Nome</label><input type="text" id="usuario-nome" placeholder="Nome completo">
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="usuario-email"
+            placeholder="email@exemplo.com"></div>
+        <div class="form-group" id="usuario-senha-group"><label>Senha</label><input type="password" id="usuario-senha"
+            placeholder="******"></div>
+        <div class="form-group"><label>Status</label><select id="usuario-status" class="filter-select">
+            <option value="ativo">Ativo</option>
+            <option value="bloqueado">Bloqueado</option>
+          </select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary"
+          onclick="window.saveUsuario()">Salvar</button></div>
+    </div>
+  </div>
 
-  <div class="modal-overlay" id="modal-status"><div class="modal"><div class="modal-header"><h3>Status</h3><button class="modal-close" onclick="window.closeModal('modal-status')">×</button></div><div class="modal-body"><input type="hidden" id="status-id"><input type="hidden" id="status-tipo"><div class="form-group"><label>Novo Status</label><select id="status-novo"><option value="pendente">Pendente</option><option value="pago">Pago</option><option value="atrasado">Atrasado</option></select></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="window.closeModal('modal-status')">Cancelar</button><button class="btn btn-primary" onclick="window.saveStatus()">Confirmar</button></div></div></div>
+  <div class="modal-overlay" id="modal-status">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Status</h3><button class="modal-close" onclick="window.closeModal('modal-status')">×</button>
+      </div>
+      <div class="modal-body"><input type="hidden" id="status-id"><input type="hidden" id="status-tipo">
+        <div class="form-group"><label>Novo Status</label><select id="status-novo">
+            <option value="pendente">Pendente</option>
+            <option value="pago">Pago</option>
+            <option value="atrasado">Atrasado</option>
+          </select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.closeModal('modal-status')">Cancelar</button><button class="btn btn-primary"
+          onclick="window.saveStatus()">Confirmar</button></div>
+    </div>
+  </div>
 
-  <div class="modal-overlay" id="modal-msg"><div class="modal"><div class="modal-header"><h3>Mensagem Padrão</h3><button class="modal-close" onclick="window.closeModal('modal-msg')">×</button></div><div class="modal-body"><div class="form-group"><label>Template</label><textarea id="msg-template" rows="4" placeholder="{nome}, {tipo}, {parcela}, {total_parcelas}, {valor}, {vencimento}"></textarea></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="window.resetMsgTemplate()">Restaurar</button><button class="btn btn-primary" onclick="window.salvarMsgTemplate()">Salvar</button></div></div></div>
+  <div class="modal-overlay" id="modal-msg">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Mensagem Padrão</h3><button class="modal-close" onclick="window.closeModal('modal-msg')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label>Template</label><textarea id="msg-template" rows="4"
+            placeholder="{nome}, {tipo}, {parcela}, {total_parcelas}, {valor}, {vencimento}"></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost"
+          onclick="window.resetMsgTemplate()">Restaurar</button><button class="btn btn-primary"
+          onclick="window.salvarMsgTemplate()">Salvar</button></div>
+    </div>
+  </div>
 
   <button class="btn btn-primary btn-topo" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">⬆</button>
 
@@ -1637,8 +1884,10 @@
       appId: "1:652867293678:web:364b3e1d5275ea680a3eff"
     };
 
-    // Inicializa app principal
-    firebase.initializeApp(firebaseConfig);
+    // Inicializa app principal (apenas uma vez)
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.firestore();
 
@@ -1683,11 +1932,11 @@
     }
 
     // ============================================
-    // FUNÇÃO MULTITENANT CORRIGIDA
+    // FUNÇÃO MULTITENANT
     // ============================================
     function getUserCollection(collectionName) {
       if (!currentUser?.uid) {
-        throw new Error('Usuário não autenticado - faça login novamente');
+        throw new Error('Usuário não autenticado');
       }
       return db
         .collection('usuarios')
@@ -1713,63 +1962,64 @@
     }
 
     // ============================================
-    // REFRESH CACHE CORRIGIDO
+    // REFRESH CACHE
     // ============================================
     async function refreshCache() {
-      if (!currentUser?.uid) {
-        console.warn('refreshCache: usuário não autenticado');
-        return;
-      }
+      if (!currentUser?.uid) return;
+      
+      const getCol = (name) => {
+        return db
+          .collection('usuarios')
+          .doc(currentUser.uid)
+          .collection(name);
+      };
 
-      try {
-        const clientesSnap = await getUserCollection('clientes').get();
-        clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const clientesSnap = await getCol('clientes').get();
+      clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const dividasSnap = await getUserCollection('dividas').get();
-        dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const dividasSnap = await getCol('dividas').get();
+      dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const parcelasSnap = await getUserCollection('parcelas').get();
-        parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const parcelasSnap = await getCol('parcelas').get();
+      parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const frequenciasSnap = await getUserCollection('frequencias').get();
-        frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const frequenciasSnap = await getCol('frequencias').get();
+      frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const reposicoesSnap = await getUserCollection('reposicoes').get();
-        reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const reposicoesSnap = await getCol('reposicoes').get();
+      reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const historicoSnap = await getUserCollection('historico').orderBy('dt', 'desc').get();
-        historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const historicoSnap = await getCol('historico').orderBy('dt', 'desc').get();
+      historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const ultimosParabensSnap = await getUserCollection('ultimosParabens').get();
-        ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const ultimosParabensSnap = await getCol('ultimosParabens').get();
+      ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        const alertasSnap = await getUserCollection('alertasFaltas').get();
-        alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const alertasSnap = await getCol('alertasFaltas').get();
+      alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        if (currentUserRole === 'admin') {
-          const usuariosSnap = await db.collection('usuarios').get();
-          usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        } else {
-          usuariosCache = [];
-        }
-      } catch (error) {
-        console.error('Erro ao refreshCache:', error);
-        throw error;
+      if (currentUserRole === 'admin') {
+        const usuariosSnap = await db.collection('usuarios').get();
+        usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } else {
+        usuariosCache = [];
       }
     }
 
     async function addHistory(acao, tipo) {
       if (!currentUser?.uid) return;
-      try {
-        await getUserCollection('historico').add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
-        await refreshCache();
-      } catch (error) {
-        console.error('Erro ao adicionar histórico:', error);
-      }
+      const getCol = () => {
+        return db
+          .collection('usuarios')
+          .doc(currentUser.uid)
+          .collection('historico');
+      };
+      await getCol().add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
+      await refreshCache();
     }
 
     // ============================================
-    // FUNÇÕES DE USUÁRIO CORRIGIDAS
+    // FUNÇÕES DE USUÁRIO
     // ============================================
     async function criarUsuarioPadraoAdmin() {
       try {
@@ -1793,47 +2043,43 @@
     }
 
     async function verificarAcessoUsuario(user) {
-      let tentativas = 0;
-      const maxTentativas = 5;
-      
-      while (tentativas < maxTentativas) {
-        const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
-        
-        if (usuarioDoc.exists) {
-          const usuarioData = usuarioDoc.data();
-          
-          if (usuarioData.status === 'bloqueado') {
-            throw new Error('Usuário bloqueado. Entre em contato com o administrador.');
-          }
-          
-          if (usuarioData.aprovado === false) {
-            throw new Error('Aguardando liberação pelo administrador.');
-          }
-          
-          currentUserRole = usuarioData.role;
-          
-          await db.collection('usuarios').doc(user.uid).update({
-            ultimoLogin: new Date().toISOString()
-          });
-          
-          return usuarioData;
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        tentativas++;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+
+      if (!usuarioDoc.exists) {
+        // Cria o documento do usuário se não existir
+        await db.collection('usuarios').doc(user.uid).set({
+          nome: user.email?.split('@')[0] || 'Usuário',
+          email: user.email,
+          status: 'ativo',
+          role: 'user',
+          aprovado: true,
+          dadosMigrados: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return { role: 'user', status: 'ativo' };
       }
-      
-      throw new Error('Documento do usuário não encontrado após várias tentativas. Tente novamente.');
+
+      const usuarioData = usuarioDoc.data();
+
+      if (usuarioData.status === 'bloqueado') {
+        throw new Error('Usuário bloqueado');
+      }
+
+      if (usuarioData.aprovado === false) {
+        throw new Error('Aguardando liberação pelo administrador');
+      }
+
+      currentUserRole = usuarioData.role;
+      return usuarioData;
     }
 
     // ============================================
     // GERENCIAR USUÁRIOS
     // ============================================
     window.aprovarUsuario = async function (userId) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') return;
       if (!confirm('Aprovar este usuário?')) return;
 
       await db.collection('usuarios').doc(userId).update({
@@ -1892,17 +2138,14 @@
         <td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR') : '—'}</td>
         <td>${u.ultimoLogin ? new Date(u.ultimoLogin).toLocaleDateString('pt-BR') : '—'}</td>
         <td>${roleBadge}</td>
-        <td class="td-actions">${actions}</span></td>
+        <td class="td-actions">${actions}</td>
       </tr>
     `;
       }).join('');
     };
 
     window.openUsuarioModal = function (id = null) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') return;
       document.getElementById('usuario-id').value = '';
       document.getElementById('usuario-nome').value = '';
       document.getElementById('usuario-email').value = '';
@@ -1927,10 +2170,7 @@
     window.editarUsuario = function (id) { window.openUsuarioModal(id); };
 
     window.saveUsuario = async function () {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') return;
       const id = document.getElementById('usuario-id').value;
       const nome = document.getElementById('usuario-nome').value.trim();
       const email = document.getElementById('usuario-email').value.trim();
@@ -1949,14 +2189,8 @@
         } else {
           if (!senha) { alert('Preencha a senha!'); return; }
 
-          let secondaryApp = firebase.apps.find(app => app.name === 'Secondary');
-          if (!secondaryApp) {
-            secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
-          }
-          const secondaryAuth = secondaryApp.auth();
-
-          const userCredential = await secondaryAuth
-            .createUserWithEmailAndPassword(email, senha);
+          // Usa a mesma instância do Firebase para criar usuário
+          const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
 
           await db.collection('usuarios')
             .doc(userCredential.user.uid)
@@ -1984,8 +2218,6 @@
           await userBaseRef.collection('parcelas').doc('_init').delete();
           await userBaseRef.collection('frequencias').doc('_init').delete();
 
-          await secondaryAuth.signOut();
-
           await refreshCache();
 
           await addHistory(`Usuário ${nome} criado pelo administrador`, 'green');
@@ -2002,10 +2234,7 @@
     };
 
     window.bloquearUsuario = async function (id) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') return;
       if (!confirm('Deseja bloquear este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'bloqueado' });
       await refreshCache();
@@ -2014,10 +2243,7 @@
     };
 
     window.ativarUsuario = async function (id) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') return;
       if (!confirm('Deseja ativar este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'ativo', aprovado: true });
       await refreshCache();
@@ -2026,10 +2252,7 @@
     };
 
     window.excluirUsuario = async function (id, email) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') return;
       if (!confirm(`Deseja excluir o usuário ${email}? Esta ação não pode ser desfeita.`)) return;
 
       try {
@@ -2063,12 +2286,12 @@
 
         alert('Usuário removido com sucesso!');
       } catch (error) {
-        alert('Erro ao excluir usuário: ' + error.message);
+        alert(error.message);
       }
     };
 
     // ============================================
-    // LOGIN E REGISTER CORRIGIDOS
+    // LOGIN E REGISTER
     // ============================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
@@ -2088,18 +2311,14 @@
       
       try {
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        
         await db.collection('usuarios').doc(userCredential.user.uid).update({
           ultimoLogin: new Date().toISOString()
         });
-        
         errorDiv.style.display = 'none';
-        
       } catch (error) {
         errorDiv.textContent = '❌ ' + error.message;
         errorDiv.style.display = 'block';
-        setTimeout(() => errorDiv.style.display = 'none', 5000);
-        await auth.signOut();
+        setTimeout(() => errorDiv.style.display = 'none', 3000);
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerHTML = originalText;
@@ -2121,45 +2340,34 @@
       registerBtn.disabled = true;
       registerBtn.innerHTML = '⏳ Cadastrando...';
 
-      let secondaryApp = null;
-
       try {
-        secondaryApp = firebase.apps.find(app => app.name === 'Secondary');
-        if (!secondaryApp) {
-          secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
-        }
-
-        const secondaryAuth = secondaryApp.auth();
-
-        const userCredential = await secondaryAuth
-          .createUserWithEmailAndPassword(email, senha);
+        const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
 
         await db.collection('usuarios')
           .doc(userCredential.user.uid)
           .set({
             nome,
             email,
-            status: 'aguardando',
+            status: 'ativo',
             role: 'user',
-            aprovado: false,
+            aprovado: true,
             dadosMigrados: false,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            ultimoLogin: null
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
-        await secondaryAuth.signOut();
-
-        alert('Cadastro enviado com sucesso! Aguarde aprovação do administrador.');
+        alert('Cadastro realizado com sucesso! Faça login para continuar.');
 
         window.closeModal('modal-register-publico');
 
         document.getElementById('register-nome').value = '';
         document.getElementById('register-email').value = '';
         document.getElementById('register-senha').value = '';
+        
+        document.getElementById('login-user').value = email;
+        document.getElementById('login-pass').value = senha;
 
       } catch (error) {
-        console.error(error);
-        alert('Erro no cadastro: ' + error.message);
+        alert('Erro: ' + error.message);
       } finally {
         registerBtn.disabled = false;
         registerBtn.innerHTML = originalText;
@@ -2175,7 +2383,7 @@
     };
 
     // ============================================
-    // NAVEGAÇÃO COM PROTEÇÃO
+    // NAVEGAÇÃO
     // ============================================
     window.toggleSubmenuMensalidade = function () {
       const submenu = document.getElementById('submenu-mensalidade');
@@ -2186,9 +2394,8 @@
       submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
     };
     window.navigate = function (page) {
-      // Proteção: apenas admin pode acessar página de usuários
       if (page === 'usuarios' && currentUserRole !== 'admin') {
-        alert('Acesso negado. Apenas administradores podem gerenciar usuários.');
+        alert('Acesso negado. Apenas administradores podem acessar esta página.');
         return;
       }
       
@@ -2323,7 +2530,6 @@
     }
     function saveHiddenItems() { localStorage.setItem('hiddenDashboardItems', JSON.stringify(hiddenItems)); }
     async function ocultarItemAposEnvio(tipo, id, clienteId = null) {
-      if (!currentUser?.uid) return;
       if (tipo === 'hoje') { if (!hiddenItems.hoje.includes(id)) hiddenItems.hoje.push(id); window.renderDashboard(); }
       else if (tipo === 'atrasada') { if (!hiddenItems.atrasadas.some(item => item.id === id)) { hiddenItems.atrasadas.push({ id: id, hiddenAt: Date.now() }); } window.renderDashboard(); }
       else if (tipo === 'aniversariante') { if (!hiddenItems.aniversariantes.includes(id)) { hiddenItems.aniversariantes.push(id); await getUserCollection('ultimosParabens').add({ clienteId: id, data: today(), enviadoEm: new Date().toISOString() }); await refreshCache(); } window.renderDashboard(); }
@@ -2342,8 +2548,6 @@
     // VERIFICAR FALTAS CONSECUTIVAS
     // ============================================
     async function verificarFaltasConsecutivas() {
-      if (!currentUser?.uid) return;
-      
       for (const aluno of clientesCache) {
         const faltasAluno = frequenciasCache
           .filter(f => f.clienteId === aluno.id && f.status === 'falta')
@@ -2524,10 +2728,6 @@
     }
     window.toggleClienteParcelamento = function () { const show = document.getElementById('cliente-mensalidade-parcelado').checked; document.getElementById('cliente-parcelamento-fields').style.display = show ? 'block' : 'none'; };
     window.openClienteModal = function (id = null) {
-      if (!currentUser?.uid) {
-        alert('Usuário não autenticado');
-        return;
-      }
       popularSelectHorarios();
       document.getElementById('cliente-id').value = '';
       document.getElementById('cliente-nome').value = '';
@@ -2568,10 +2768,6 @@
       window.openModal('modal-cliente');
     };
     window.saveCliente = async function () {
-      if (!currentUser?.uid) {
-        alert('Usuário não autenticado');
-        return;
-      }
       const saveBtn = document.querySelector('#modal-cliente .btn-primary');
       const originalText = saveBtn.innerHTML;
       saveBtn.disabled = true;
@@ -2605,9 +2801,6 @@
         window.closeModal('modal-cliente');
         window.renderClientes();
         window.renderDashboard();
-      } catch (error) {
-        console.error('Erro ao salvar cliente:', error);
-        alert('Erro ao salvar: ' + error.message);
       } finally {
         saveBtn.disabled = false;
         saveBtn.innerHTML = originalText;
@@ -2655,7 +2848,7 @@
       const search = document.getElementById('search-clientes')?.value.toLowerCase().trim() || '';
       let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
       const tbody = document.getElementById('clientes-tbody');
-      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
+      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td><tr>'; return; }
       tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></span><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td></tr>`).join('');
     };
 
@@ -2683,7 +2876,7 @@
       let html = '';
       for (const p of parcelas) {
         const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
-        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</span></td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></span></td></tr>`;
+        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</span></td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span></td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></span></td></tr>`;
       }
       tbody.innerHTML = html;
     };
@@ -2750,7 +2943,7 @@
     // DISPARO
     // ============================================
     function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
-    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</span></td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</span><td>${p.numeroParcela}/${p.totalParcelas}</span><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
+    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</span><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</span><td>${p.numeroParcela}/${p.totalParcelas}</span><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
 
     // ============================================
     // ANIVERSARIANTES DA SEMANA
@@ -2872,7 +3065,7 @@
       await refreshCache(); await window.carregarFrequencia(); await carregarReposicoesAgendadas(); await verificarFaltasConsecutivas(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard();
     };
     window.buscarAlunoFrequencia = function () { clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => { const termo = document.getElementById('buscar-frequencia')?.value.toLowerCase().trim() || ''; document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => { const nome = card.getAttribute('data-nome') || ''; card.style.display = nome.includes(termo) ? 'block' : 'none'; }); }, 300); };
-    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"></table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span></td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
+    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span></td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
 
     // ============================================
     // RELATORIO DE FREQUENCIA
@@ -3034,7 +3227,7 @@
     async function criarDadosIniciais() { console.log('Sistema pronto para uso. Nenhum dado de exemplo foi criado.'); }
 
     // ============================================
-    // MIGRAÇÃO DE DADOS CORRIGIDA
+    // MIGRAÇÃO DE DADOS
     // ============================================
     async function migrarDadosParaMultitenant() {
       if (!currentUser) return;
@@ -3119,21 +3312,19 @@
     }
 
     const loginBtn = document.getElementById('login-btn');
-    const registerBtn = document.getElementById('register-confirm-btn');
+    const registerBtn = document.getElementById('register-btn');
 
     if (loginBtn) loginBtn.onclick = window.doLogin;
     if (registerBtn) {
-      registerBtn.onclick = window.doRegister;
+      registerBtn.onclick = () => {
+        window.openModal('modal-register-publico');
+      };
     }
 
     // Criar admin antes do auth state change
-    (async () => {
-      try {
-        await criarUsuarioPadraoAdmin();
-      } catch (e) {
-        console.log('Erro ao criar admin:', e);
-      }
-    })();
+    setTimeout(() => {
+      criarUsuarioPadraoAdmin().catch(console.error);
+    }, 2000);
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
