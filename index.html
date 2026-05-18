@@ -1319,7 +1319,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE CADASTRO PÚBLICO (CORRIGIDO) -->
+  <!-- MODAL DE CADASTRO PÚBLICO -->
   <div class="modal-overlay" id="modal-register-publico">
     <div class="modal">
       <div class="modal-header">
@@ -1561,7 +1561,7 @@
                   Mensagem</button></div>
             </div>
             <div class="table-wrap">
-              <table>
+              </table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1930,13 +1930,12 @@
     }
 
     // ============================================
-    // FUNÇÃO MULTITENANT (CORRIGIDA)
+    // FUNÇÃO MULTITENANT
     // ============================================
     function getUserCollection(collectionName) {
       if (!currentUser?.uid) {
         throw new Error('Usuário não autenticado');
       }
-      // TODOS os usuários usam coleções próprias, inclusive administrador
       return db
         .collection('usuarios')
         .doc(currentUser.uid)
@@ -1961,7 +1960,7 @@
     }
 
     // ============================================
-    // REFRESH CACHE (CORRIGIDO)
+    // REFRESH CACHE
     // ============================================
     async function refreshCache() {
       const getCol = (name) => {
@@ -1995,7 +1994,6 @@
       const alertasSnap = await getCol('alertasFaltas').get();
       alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // CORREÇÃO: Apenas admin pode ver todos os usuários
       if (currentUserRole === 'admin') {
         const usuariosSnap = await db.collection('usuarios').get();
         usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -2016,7 +2014,7 @@
     }
 
     // ============================================
-    // FUNÇÕES DE USUÁRIO (CORRIGIDAS)
+    // FUNÇÕES DE USUÁRIO
     // ============================================
     async function criarUsuarioPadraoAdmin() {
       const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini4375@gmail.com').get();
@@ -2039,10 +2037,15 @@
       }
     }
 
+    // CORREÇÃO: Função verificarAcessoUsuario com validação adicional e delay
     async function verificarAcessoUsuario(user) {
+      // Aguardar 2 segundos para garantir que o documento foi criado/atualizado
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+      
       if (!usuarioDoc.exists) {
-        throw new Error('Usuário não autorizado');
+        throw new Error('Usuário não autorizado - documento não encontrado');
       }
 
       const usuarioData = usuarioDoc.data();
@@ -2060,7 +2063,7 @@
     }
 
     // ============================================
-    // GERENCIAR USUÁRIOS (CORRIGIDO)
+    // GERENCIAR USUÁRIOS
     // ============================================
     window.aprovarUsuario = async function (userId) {
       if (currentUserRole !== 'admin') return;
@@ -2088,7 +2091,7 @@
 
       const tbody = document.getElementById('usuarios-tbody');
       if (!usuarios.length) {
-        tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></table>';
         return;
       }
 
@@ -2173,7 +2176,6 @@
         } else {
           if (!senha) { alert('Preencha a senha!'); return; }
 
-          // CORREÇÃO: Verificar se o app Secondary já existe
           const secondaryApp = firebase.apps.find(app => app.name === 'Secondary')
             || firebase.initializeApp(firebaseConfig, 'Secondary');
           const secondaryAuth = secondaryApp.auth();
@@ -2193,7 +2195,6 @@
               createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-          // cria estrutura vazia do usuário
           const userBaseRef = db
             .collection('usuarios')
             .doc(userCredential.user.uid);
@@ -2203,7 +2204,6 @@
           await userBaseRef.collection('parcelas').doc('_init').set({ created: true });
           await userBaseRef.collection('frequencias').doc('_init').set({ created: true });
 
-          // remove docs fake
           await userBaseRef.collection('clientes').doc('_init').delete();
           await userBaseRef.collection('dividas').doc('_init').delete();
           await userBaseRef.collection('parcelas').doc('_init').delete();
@@ -2249,7 +2249,6 @@
       if (!confirm(`Deseja excluir o usuário ${email}?`)) return;
 
       try {
-        // remove dados do firestore
         const userRef = db.collection('usuarios').doc(id);
 
         const collections = [
@@ -2285,7 +2284,7 @@
     };
 
     // ============================================
-    // LOGIN E REGISTER (CORRIGIDO)
+    // LOGIN E REGISTER
     // ============================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
@@ -2313,12 +2312,10 @@
       }
     };
 
-    // CORREÇÃO: Nova função doRegister com modal
     window.doRegister = async function () {
       const nome = document.getElementById('register-nome').value.trim();
       const email = document.getElementById('register-email').value.trim();
       const senha = document.getElementById('register-senha').value;
-      const errorDiv = document.getElementById('login-error');
 
       if (!nome || !email || !senha) {
         alert('Preencha todos os campos!');
@@ -2326,7 +2323,6 @@
       }
 
       try {
-        // CORREÇÃO: Verificar se o app Secondary já existe
         const secondaryApp = firebase.apps.find(app => app.name === 'Secondary')
           || firebase.initializeApp(firebaseConfig, 'Secondary');
 
@@ -2335,7 +2331,6 @@
         const userCredential = await secondaryAuth
           .createUserWithEmailAndPassword(email, senha);
 
-        // CORREÇÃO: Salvar com status 'aguardando' e aprovado false
         await db.collection('usuarios')
           .doc(userCredential.user.uid)
           .set({
@@ -2354,7 +2349,6 @@
 
         window.closeModal('modal-register-publico');
 
-        // Limpar campos
         document.getElementById('register-nome').value = '';
         document.getElementById('register-email').value = '';
         document.getElementById('register-senha').value = '';
@@ -2928,7 +2922,7 @@
     // DISPARO
     // ============================================
     function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
-    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</span><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</span><td>${p.numeroParcela}/${p.totalParcelas}</span><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
+    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `</tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</span><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</span><td>${p.numeroParcela}/${p.totalParcelas}</span><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
 
     // ============================================
     // ANIVERSARIANTES DA SEMANA
@@ -3050,10 +3044,10 @@
       await refreshCache(); await window.carregarFrequencia(); await carregarReposicoesAgendadas(); await verificarFaltasConsecutivas(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard();
     };
     window.buscarAlunoFrequencia = function () { clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => { const termo = document.getElementById('buscar-frequencia')?.value.toLowerCase().trim() || ''; document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => { const nome = card.getAttribute('data-nome') || ''; card.style.display = nome.includes(termo) ? 'block' : 'none'; }); }, 300); };
-    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"></table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span></td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
+    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span></td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
 
     // ============================================
-    // RELATORIO DE FREQUENCIA (CORRIGIDO)
+    // RELATORIO DE FREQUENCIA
     // ============================================
     window.carregarRelatorioFrequencia = async function () {
       const mes = document.getElementById('rel-frequencia-mes').value;
@@ -3080,7 +3074,6 @@
             <th>Aluno</th>
   `;
 
-      // Adiciona os cabeçalhos com dia da semana
       for (const d of diasDoMes) {
         const dataObj = new Date(d + 'T12:00:00');
         const diaSemanaNum = dataObj.getDay();
@@ -3248,7 +3241,6 @@
       updateClock();
       setInterval(updateClock, 1000);
 
-      // CORREÇÃO: Menu de gerenciar usuários aparece apenas para admin
       const menuUsuarios = document.getElementById('menu-gerenciar-usuarios');
       if (menuUsuarios) {
         if (currentUserRole === 'admin') {
@@ -3300,7 +3292,6 @@
     const loginBtn = document.getElementById('login-btn');
     const registerBtn = document.getElementById('register-btn');
 
-    // CORREÇÃO: Botão Criar Conta abre o modal de cadastro público
     if (loginBtn) loginBtn.onclick = window.doLogin;
     if (registerBtn) {
       registerBtn.onclick = () => {
