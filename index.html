@@ -1467,7 +1467,7 @@
               </div>
             </div>
             <div class="table-wrap">
-              <table>
+              <tr>
                 <thead>
                   <tr>
                     <th>Nome</th>
@@ -1512,7 +1512,7 @@
               <button class="btn btn-ghost btn-sm" onclick="window.limparFiltrosParcelas()">Limpar</button>
             </div>
             <div class="table-wrap">
-              <table>
+              </table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1561,7 +1561,7 @@
                   Mensagem</button></div>
             </div>
             <div class="table-wrap">
-              </table>
+              <table>
               <thead>
                 <tr>
                   <th>Aluno</th>
@@ -1702,7 +1702,7 @@
                 <option value="atrasado">Atrasado</option>
               </select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
             <div class="table-wrap">
-              </tr>
+              </table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1884,7 +1884,7 @@
       appId: "1:652867293678:web:364b3e1d5275ea680a3eff"
     };
 
-    // Inicializa app principal (apenas uma vez)
+    // Inicializa app principal (SOMENTE UMA VEZ)
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
@@ -1965,57 +1965,56 @@
     // REFRESH CACHE
     // ============================================
     async function refreshCache() {
-      if (!currentUser?.uid) return;
-      
-      const getCol = (name) => {
-        return db
-          .collection('usuarios')
-          .doc(currentUser.uid)
-          .collection(name);
-      };
+      if (!currentUser?.uid) {
+        console.warn('refreshCache: usuário não autenticado');
+        return;
+      }
 
-      const clientesSnap = await getCol('clientes').get();
-      clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      try {
+        const clientesSnap = await getUserCollection('clientes').get();
+        clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const dividasSnap = await getCol('dividas').get();
-      dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const dividasSnap = await getUserCollection('dividas').get();
+        dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const parcelasSnap = await getCol('parcelas').get();
-      parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const parcelasSnap = await getUserCollection('parcelas').get();
+        parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const frequenciasSnap = await getCol('frequencias').get();
-      frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const frequenciasSnap = await getUserCollection('frequencias').get();
+        frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const reposicoesSnap = await getCol('reposicoes').get();
-      reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const reposicoesSnap = await getUserCollection('reposicoes').get();
+        reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const historicoSnap = await getCol('historico').orderBy('dt', 'desc').get();
-      historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const historicoSnap = await getUserCollection('historico').orderBy('dt', 'desc').get();
+        historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const ultimosParabensSnap = await getCol('ultimosParabens').get();
-      ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const ultimosParabensSnap = await getUserCollection('ultimosParabens').get();
+        ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const alertasSnap = await getCol('alertasFaltas').get();
-      alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const alertasSnap = await getUserCollection('alertasFaltas').get();
+        alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      if (currentUserRole === 'admin') {
-        const usuariosSnap = await db.collection('usuarios').get();
-        usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      } else {
-        usuariosCache = [];
+        if (currentUserRole === 'admin') {
+          const usuariosSnap = await db.collection('usuarios').get();
+          usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } else {
+          usuariosCache = [];
+        }
+      } catch (error) {
+        console.error('Erro ao refreshCache:', error);
+        throw error;
       }
     }
 
     async function addHistory(acao, tipo) {
       if (!currentUser?.uid) return;
-      const getCol = () => {
-        return db
-          .collection('usuarios')
-          .doc(currentUser.uid)
-          .collection('historico');
-      };
-      await getCol().add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
-      await refreshCache();
+      try {
+        await getUserCollection('historico').add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
+        await refreshCache();
+      } catch (error) {
+        console.error('Erro ao adicionar histórico:', error);
+      }
     }
 
     // ============================================
@@ -2043,43 +2042,47 @@
     }
 
     async function verificarAcessoUsuario(user) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
-
-      if (!usuarioDoc.exists) {
-        // Cria o documento do usuário se não existir
-        await db.collection('usuarios').doc(user.uid).set({
-          nome: user.email?.split('@')[0] || 'Usuário',
-          email: user.email,
-          status: 'ativo',
-          role: 'user',
-          aprovado: true,
-          dadosMigrados: false,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        return { role: 'user', status: 'ativo' };
+      let tentativas = 0;
+      const maxTentativas = 5;
+      
+      while (tentativas < maxTentativas) {
+        const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
+        
+        if (usuarioDoc.exists) {
+          const usuarioData = usuarioDoc.data();
+          
+          if (usuarioData.status === 'bloqueado') {
+            throw new Error('Usuário bloqueado. Entre em contato com o administrador.');
+          }
+          
+          if (usuarioData.aprovado === false) {
+            throw new Error('Aguardando liberação pelo administrador.');
+          }
+          
+          currentUserRole = usuarioData.role;
+          
+          await db.collection('usuarios').doc(user.uid).update({
+            ultimoLogin: new Date().toISOString()
+          }).catch(err => console.log('Erro ao atualizar último login:', err));
+          
+          return usuarioData;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        tentativas++;
       }
-
-      const usuarioData = usuarioDoc.data();
-
-      if (usuarioData.status === 'bloqueado') {
-        throw new Error('Usuário bloqueado');
-      }
-
-      if (usuarioData.aprovado === false) {
-        throw new Error('Aguardando liberação pelo administrador');
-      }
-
-      currentUserRole = usuarioData.role;
-      return usuarioData;
+      
+      throw new Error('Documento do usuário não encontrado após várias tentativas. Tente novamente.');
     }
 
     // ============================================
     // GERENCIAR USUÁRIOS
     // ============================================
     window.aprovarUsuario = async function (userId) {
-      if (currentUserRole !== 'admin') return;
+      if (currentUserRole !== 'admin') {
+        alert('Acesso negado');
+        return;
+      }
       if (!confirm('Aprovar este usuário?')) return;
 
       await db.collection('usuarios').doc(userId).update({
@@ -2138,14 +2141,17 @@
         <td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR') : '—'}</td>
         <td>${u.ultimoLogin ? new Date(u.ultimoLogin).toLocaleDateString('pt-BR') : '—'}</td>
         <td>${roleBadge}</td>
-        <td class="td-actions">${actions}</td>
+        <td class="td-actions">${actions}</span></td>
       </tr>
     `;
       }).join('');
     };
 
     window.openUsuarioModal = function (id = null) {
-      if (currentUserRole !== 'admin') return;
+      if (currentUserRole !== 'admin') {
+        alert('Acesso negado');
+        return;
+      }
       document.getElementById('usuario-id').value = '';
       document.getElementById('usuario-nome').value = '';
       document.getElementById('usuario-email').value = '';
@@ -2170,7 +2176,10 @@
     window.editarUsuario = function (id) { window.openUsuarioModal(id); };
 
     window.saveUsuario = async function () {
-      if (currentUserRole !== 'admin') return;
+      if (currentUserRole !== 'admin') {
+        alert('Acesso negado');
+        return;
+      }
       const id = document.getElementById('usuario-id').value;
       const nome = document.getElementById('usuario-nome').value.trim();
       const email = document.getElementById('usuario-email').value.trim();
@@ -2189,8 +2198,14 @@
         } else {
           if (!senha) { alert('Preencha a senha!'); return; }
 
-          // Usa a mesma instância do Firebase para criar usuário
-          const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+          let secondaryApp = firebase.apps.find(app => app.name === 'Secondary');
+          if (!secondaryApp) {
+            secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+          }
+          const secondaryAuth = secondaryApp.auth();
+
+          const userCredential = await secondaryAuth
+            .createUserWithEmailAndPassword(email, senha);
 
           await db.collection('usuarios')
             .doc(userCredential.user.uid)
@@ -2218,6 +2233,8 @@
           await userBaseRef.collection('parcelas').doc('_init').delete();
           await userBaseRef.collection('frequencias').doc('_init').delete();
 
+          await secondaryAuth.signOut();
+
           await refreshCache();
 
           await addHistory(`Usuário ${nome} criado pelo administrador`, 'green');
@@ -2234,7 +2251,10 @@
     };
 
     window.bloquearUsuario = async function (id) {
-      if (currentUserRole !== 'admin') return;
+      if (currentUserRole !== 'admin') {
+        alert('Acesso negado');
+        return;
+      }
       if (!confirm('Deseja bloquear este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'bloqueado' });
       await refreshCache();
@@ -2243,7 +2263,10 @@
     };
 
     window.ativarUsuario = async function (id) {
-      if (currentUserRole !== 'admin') return;
+      if (currentUserRole !== 'admin') {
+        alert('Acesso negado');
+        return;
+      }
       if (!confirm('Deseja ativar este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'ativo', aprovado: true });
       await refreshCache();
@@ -2252,15 +2275,41 @@
     };
 
     window.excluirUsuario = async function (id, email) {
-      if (currentUserRole !== 'admin') return;
-      if (!confirm(`Deseja excluir o usuário ${email}? Esta ação não pode ser desfeita.`)) return;
-
+      if (currentUserRole !== 'admin') {
+        alert('Acesso negado');
+        return;
+      }
+      
+      if (!confirm(`⚠️ ATENÇÃO! Você está prestes a excluir PERMANENTEMENTE o usuário:\n\n📧 ${email}\n\nTODOS os dados deste usuário serão perdidos!\n\nEsta ação NÃO pode ser desfeita.\n\nDeseja continuar?`)) return;
+      
+      const excluirBtn = event?.target;
+      const originalText = excluirBtn ? excluirBtn.innerHTML : 'Excluir';
+      if (excluirBtn) {
+        excluirBtn.disabled = true;
+        excluirBtn.innerHTML = '⏳ Excluindo...';
+      }
+      
       try {
         const userRef = db.collection('usuarios').doc(id);
-
+        const userDoc = await userRef.get();
+        
+        if (!userDoc.exists) {
+          alert('Usuário não encontrado!');
+          return;
+        }
+        
+        const userData = userDoc.data();
+        
+        if (userData.email === currentUser.email) {
+          alert('❌ Você não pode excluir seu próprio usuário!');
+          return;
+        }
+        
+        console.log(`Excluindo dados do usuário ${email}...`);
+        
         const collections = [
           'clientes',
-          'dividas',
+          'dividas', 
           'parcelas',
           'frequencias',
           'reposicoes',
@@ -2268,25 +2317,60 @@
           'ultimosParabens',
           'alertasFaltas'
         ];
-
+        
         for (const col of collections) {
-          const snap = await userRef.collection(col).get();
-          for (const doc of snap.docs) {
-            await doc.ref.delete();
+          try {
+            const snap = await userRef.collection(col).get();
+            console.log(`  → Excluindo ${snap.size} documentos da coleção ${col}`);
+            
+            const batchSize = 500;
+            let batch = db.batch();
+            let count = 0;
+            
+            for (const doc of snap.docs) {
+              batch.delete(doc.ref);
+              count++;
+              
+              if (count >= batchSize) {
+                await batch.commit();
+                batch = db.batch();
+                count = 0;
+              }
+            }
+            
+            if (count > 0) {
+              await batch.commit();
+            }
+          } catch (colError) {
+            console.log(`  ⚠️ Erro ao excluir coleção ${col}:`, colError.message);
           }
         }
-
+        
+        console.log(`  → Excluindo documento principal do usuário`);
         await userRef.delete();
-
+        
+        await addHistory(`Usuário ${email} excluído permanentemente`, 'red');
+        
         await refreshCache();
-
-        await addHistory(`Usuário ${email} excluído`, 'red');
-
         window.renderUsuarios();
-
-        alert('Usuário removido com sucesso!');
+        
+        alert(`✅ Usuário ${email} excluído com sucesso!\n\nTodos os dados foram removidos permanentemente.`);
+        
       } catch (error) {
-        alert(error.message);
+        console.error('Erro detalhado ao excluir:', error);
+        
+        if (error.code === 'permission-denied') {
+          alert('❌ Erro de permissão!\n\nVocê precisa configurar as regras de segurança do Firestore.\n\nAcesse o Firebase Console → Firestore Database → Rules e configure corretamente.');
+        } else if (error.code === 'not-found') {
+          alert('❌ Usuário não encontrado no banco de dados.');
+        } else {
+          alert('❌ Erro ao excluir usuário: ' + error.message);
+        }
+      } finally {
+        if (excluirBtn) {
+          excluirBtn.disabled = false;
+          excluirBtn.innerHTML = originalText;
+        }
       }
     };
 
@@ -2311,14 +2395,18 @@
       
       try {
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        
         await db.collection('usuarios').doc(userCredential.user.uid).update({
           ultimoLogin: new Date().toISOString()
-        });
+        }).catch(err => console.log('Erro ao atualizar último login:', err));
+        
         errorDiv.style.display = 'none';
+        
       } catch (error) {
         errorDiv.textContent = '❌ ' + error.message;
         errorDiv.style.display = 'block';
-        setTimeout(() => errorDiv.style.display = 'none', 3000);
+        setTimeout(() => errorDiv.style.display = 'none', 5000);
+        await auth.signOut();
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerHTML = originalText;
@@ -2367,7 +2455,8 @@
         document.getElementById('login-pass').value = senha;
 
       } catch (error) {
-        alert('Erro: ' + error.message);
+        console.error(error);
+        alert('Erro no cadastro: ' + error.message);
       } finally {
         registerBtn.disabled = false;
         registerBtn.innerHTML = originalText;
@@ -2395,7 +2484,7 @@
     };
     window.navigate = function (page) {
       if (page === 'usuarios' && currentUserRole !== 'admin') {
-        alert('Acesso negado. Apenas administradores podem acessar esta página.');
+        alert('Acesso negado. Apenas administradores podem gerenciar usuários.');
         return;
       }
       
@@ -2848,8 +2937,8 @@
       const search = document.getElementById('search-clientes')?.value.toLowerCase().trim() || '';
       let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
       const tbody = document.getElementById('clientes-tbody');
-      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td><tr>'; return; }
-      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></span><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td></tr>`).join('');
+      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
+      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td></tr>`).join('');
     };
 
     // ============================================
@@ -2876,7 +2965,7 @@
       let html = '';
       for (const p of parcelas) {
         const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
-        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</span></td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span></td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></span></td></tr>`;
+        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</span><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></span></td></tr>`;
       }
       tbody.innerHTML = html;
     };
@@ -3312,19 +3401,21 @@
     }
 
     const loginBtn = document.getElementById('login-btn');
-    const registerBtn = document.getElementById('register-btn');
+    const registerBtn = document.getElementById('register-confirm-btn');
 
     if (loginBtn) loginBtn.onclick = window.doLogin;
     if (registerBtn) {
-      registerBtn.onclick = () => {
-        window.openModal('modal-register-publico');
-      };
+      registerBtn.onclick = window.doRegister;
     }
 
     // Criar admin antes do auth state change
-    setTimeout(() => {
-      criarUsuarioPadraoAdmin().catch(console.error);
-    }, 2000);
+    (async () => {
+      try {
+        await criarUsuarioPadraoAdmin();
+      } catch (e) {
+        console.log('Erro ao criar admin:', e);
+      }
+    })();
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
