@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -662,6 +663,11 @@
       color: var(--yellow);
     }
 
+    .badge-enviado {
+      background: rgba(16, 185, 129, .15);
+      color: var(--green);
+    }
+
     .search-row {
       display: flex;
       gap: .5rem;
@@ -1296,6 +1302,10 @@
       margin-left: 4px;
       font-size: 0.7rem;
     }
+
+    .admin-only {
+      display: none !important;
+    }
   </style>
 </head>
 
@@ -1309,9 +1319,9 @@
       </div>
       <div class="login-error" id="login-error"></div>
       <label>Email</label>
-      <input type="email" id="login-user" placeholder="seu@email.com">
+      <input type="email" id="login-user" placeholder="seu@email.com" value="mario.bergamini4375@gmail.com">
       <label>Senha</label>
-      <input type="password" id="login-pass" placeholder="******">
+      <input type="password" id="login-pass" placeholder="******" value="202606">
       <div style="display: flex; gap: 0.5rem; flex-direction: column;">
         <button class="btn btn-primary" style="width:100%" id="login-btn">Entrar</button>
         <button class="btn btn-ghost" style="width:100%" id="register-btn">Criar Conta</button>
@@ -1319,7 +1329,6 @@
     </div>
   </div>
 
-  <!-- MODAL DE CADASTRO PÚBLICO -->
   <div class="modal-overlay" id="modal-register-publico">
     <div class="modal">
       <div class="modal-header">
@@ -1347,6 +1356,24 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modal-novo-usuario-pendente">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📢 Novo Usuário Aguardando Aprovação</h3>
+        <button class="modal-close" onclick="window.closeModal('modal-novo-usuario-pendente')">×</button>
+      </div>
+      <div class="modal-body" id="modal-novo-usuario-pendente-body">
+        <p>Um novo usuário aguarda sua liberação!</p>
+        <div id="pendente-detalhes"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary"
+          onclick="window.closeModal('modal-novo-usuario-pendente'); window.navigate('usuarios')">Gerenciar
+          Usuários</button>
+      </div>
+    </div>
+  </div>
+
   <div id="app">
     <div class="layout">
       <div class="overlay-bg" id="overlay-bg" onclick="window.closeSidebar()"></div>
@@ -1365,8 +1392,7 @@
             Aniversariantes da Semana</div>
 
           <div class="nav-item" onclick="window.toggleSubmenuMensalidade()"><span class="icon">💰</span> Mensalidade
-            <span style="margin-left:auto">▼</span>
-          </div>
+            <span style="margin-left:auto">▼</span></div>
           <div id="submenu-mensalidade" style="display:none; padding-left: 1.5rem;">
             <div class="nav-subitem" onclick="window.navigate('parcelas'); event.stopPropagation()"><span
                 class="icon">📋</span> Mensalidades / Controle</div>
@@ -1452,6 +1478,11 @@
                 <div class="stat-value" id="dashboard-stat-faltas">0</div>
                 <div class="stat-cobrancas" id="dashboard-lista-faltas"></div>
               </div>
+              <div class="stat-card yellow" id="dashboard-usuarios-pendentes-card" style="display:none;">
+                <div class="stat-label">🔔 Novos Usuários</div>
+                <div class="stat-value" id="dashboard-stat-usuarios-pendentes">0</div>
+                <div class="stat-cobrancas" id="dashboard-lista-usuarios-pendentes"></div>
+              </div>
             </div>
           </div>
 
@@ -1467,7 +1498,7 @@
               </div>
             </div>
             <div class="table-wrap">
-              <tr>
+              <table>
                 <thead>
                   <tr>
                     <th>Nome</th>
@@ -1512,7 +1543,7 @@
               <button class="btn btn-ghost btn-sm" onclick="window.limparFiltrosParcelas()">Limpar</button>
             </div>
             <div class="table-wrap">
-              </table>
+              <table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1562,21 +1593,21 @@
             </div>
             <div class="table-wrap">
               <table>
-              <thead>
-                <tr>
-                  <th>Aluno</th>
-                  <th>Telefone</th>
-                  <th>Mensalidade</th>
-                  <th>Parcela</th>
-                  <th>Valor</th>
-                  <th>Vencimento</th>
-                  <th>Status</th>
-                  <th>Último Envio</th>
-                  <th>Enviar</th>
-                </tr>
-              </thead>
-              <tbody id="disparo-tbody"></tbody>
-            </table>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Telefone</th>
+                    <th>Mensalidade</th>
+                    <th>Parcela</th>
+                    <th>Valor</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Último Envio</th>
+                    <th>Enviar</th>
+                  </tr>
+                </thead>
+                <tbody id="disparo-tbody"></tbody>
+              </table>
             </div>
           </div>
 
@@ -1702,7 +1733,7 @@
                 <option value="atrasado">Atrasado</option>
               </select><button class="btn btn-primary" onclick="window.renderRelatorio()">Filtrar</button></div>
             <div class="table-wrap">
-              </table>
+              <table>
                 <thead>
                   <tr>
                     <th>Aluno</th>
@@ -1720,8 +1751,11 @@
 
           <div class="page" id="page-usuarios">
             <div class="section-header">
-              <h2>👥 Gerenciar Usuários</h2><button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo
-                Usuário</button>
+              <h2>👥 Gerenciar Usuários</h2>
+              <div id="alert-novos-usuarios"
+                style="display:none; background: var(--orange); color: white; padding: 0.3rem 0.8rem; border-radius: 20px;">
+                🔔 Novos usuários aguardando aprovação!</div>
+              <button class="btn btn-primary" onclick="window.openUsuarioModal()">+ Novo Usuário</button>
             </div>
             <div class="search-row">
               <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="search-usuarios"
@@ -1749,7 +1783,6 @@
     </div>
   </div>
 
-  <!-- MODALS -->
   <div class="modal-overlay" id="modal-cliente">
     <div class="modal">
       <div class="modal-header">
@@ -1823,6 +1856,7 @@
         <div class="form-group"><label>Status</label><select id="usuario-status" class="filter-select">
             <option value="ativo">Ativo</option>
             <option value="bloqueado">Bloqueado</option>
+            <option value="aguardando">Aguardando</option>
           </select></div>
       </div>
       <div class="modal-footer"><button class="btn btn-ghost"
@@ -1874,7 +1908,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDDDJ8YkybzUdN-bnSiFc3P5IQft5yT3GU",
       authDomain: "gestaomais-b3872.firebaseapp.com",
@@ -1884,16 +1917,12 @@
       appId: "1:652867293678:web:364b3e1d5275ea680a3eff"
     };
 
-    // Inicializa app principal (SOMENTE UMA VEZ)
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ============================================
-    // VARIÁVEIS GLOBAIS
-    // ============================================
     let clientesCache = [];
     let dividasCache = [];
     let parcelasCache = [];
@@ -1909,7 +1938,6 @@
     let currentUser = null;
     let currentUserRole = null;
 
-    // Lista de Feriados
     const feriadosList = [
       "2024-01-01", "2025-01-01", "2026-01-01",
       "2024-04-21", "2025-04-21", "2026-04-21",
@@ -1931,73 +1959,95 @@
       return feriadosList.includes(dataStr);
     }
 
-    // ============================================
-    // FUNÇÃO MULTITENANT
-    // ============================================
     function getUserCollection(collectionName) {
       if (!currentUser?.uid) {
         throw new Error('Usuário não autenticado');
       }
-      return db
-        .collection('usuarios')
-        .doc(currentUser.uid)
-        .collection(collectionName);
+      return db.collection('usuarios').doc(currentUser.uid).collection(collectionName);
     }
 
-    // ============================================
-    // FUNÇÕES AUXILIARES
-    // ============================================
     function uid() { return '_' + Math.random().toString(36).substr(2, 9); }
     function fmtBRL(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
     function fmtDate(d) { if (!d) return '—'; return d.split('-').reverse().join('/'); }
     function today() { return new Date().toISOString().split('T')[0]; }
-    function getDiaSemana(dataStr) {
-      const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-      const data = new Date(dataStr + 'T12:00:00');
-      return dias[data.getDay()];
-    }
-    function horarioParaMinutos(horario) {
-      const [h, m] = horario.split(':').map(Number);
-      return (h * 60) + m;
+
+    function atualizarMenuAdmin() {
+      const menuAdmin = document.getElementById('menu-gerenciar-usuarios');
+      if (!menuAdmin) return;
+      if (currentUserRole === 'admin') {
+        menuAdmin.style.display = 'block';
+      } else {
+        menuAdmin.style.display = 'none';
+      }
     }
 
-    // ============================================
-    // REFRESH CACHE
-    // ============================================
+    async function verificarNovosUsuariosPendentes() {
+      if (currentUserRole !== 'admin') return;
+      try {
+        const usuariosSnapshot = await db.collection('usuarios')
+          .where('aprovado', '==', false)
+          .where('status', '==', 'aguardando')
+          .get();
+        const novosPendentes = usuariosSnapshot.docs.length;
+        const alertDiv = document.getElementById('alert-novos-usuarios');
+        const dashboardCard = document.getElementById('dashboard-usuarios-pendentes-card');
+        const dashboardStat = document.getElementById('dashboard-stat-usuarios-pendentes');
+        const dashboardLista = document.getElementById('dashboard-lista-usuarios-pendentes');
+
+        if (alertDiv) {
+          if (novosPendentes > 0) {
+            alertDiv.style.display = 'block';
+            alertDiv.innerHTML = `🔔 ${novosPendentes} novo(s) usuário(s) aguardando aprovação!`;
+          } else {
+            alertDiv.style.display = 'none';
+          }
+        }
+
+        if (dashboardCard && dashboardStat && dashboardLista) {
+          if (novosPendentes > 0) {
+            dashboardCard.style.display = 'block';
+            dashboardStat.textContent = novosPendentes;
+            dashboardLista.innerHTML = usuariosSnapshot.docs.map(doc => {
+              const usuario = doc.data();
+              return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${usuario.nome || 'Sem nome'}</div><div class="cobranca-vencimento">${usuario.email || 'Sem e-mail'}</div></div><button class="btn btn-primary btn-sm" onclick="window.navigate('usuarios')">Gerenciar</button></div>`;
+            }).join('');
+          } else {
+            dashboardCard.style.display = 'none';
+            dashboardStat.textContent = '0';
+            dashboardLista.innerHTML = '';
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao verificar novos usuários:', error);
+      }
+    }
+
     async function refreshCache() {
       if (!currentUser?.uid) {
         console.warn('refreshCache: usuário não autenticado');
         return;
       }
-
       try {
         const clientesSnap = await getUserCollection('clientes').get();
         clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const dividasSnap = await getUserCollection('dividas').get();
         dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const parcelasSnap = await getUserCollection('parcelas').get();
         parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const frequenciasSnap = await getUserCollection('frequencias').get();
         frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const reposicoesSnap = await getUserCollection('reposicoes').get();
         reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const historicoSnap = await getUserCollection('historico').orderBy('dt', 'desc').get();
         historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const ultimosParabensSnap = await getUserCollection('ultimosParabens').get();
         ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         const alertasSnap = await getUserCollection('alertasFaltas').get();
         alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         if (currentUserRole === 'admin') {
           const usuariosSnap = await db.collection('usuarios').get();
           usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          await verificarNovosUsuariosPendentes();
         } else {
           usuariosCache = [];
         }
@@ -2017,9 +2067,6 @@
       }
     }
 
-    // ============================================
-    // FUNÇÕES DE USUÁRIO
-    // ============================================
     async function criarUsuarioPadraoAdmin() {
       try {
         const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini4375@gmail.com').get();
@@ -2041,117 +2088,170 @@
       }
     }
 
+
+    async function processarFaltasPeriodoInativo(ultimoLoginISO) {
+      if (!currentUser?.uid || !ultimoLoginISO) return;
+
+      try {
+        const ultimoLogin = new Date(ultimoLoginISO);
+        const agora = new Date();
+
+        if (isNaN(ultimoLogin.getTime()) || agora <= ultimoLogin) return;
+
+        const mapaDias = {
+          0: 'Domingo',
+          1: 'Segunda-feira',
+          2: 'Terça-feira',
+          3: 'Quarta-feira',
+          4: 'Quinta-feira',
+          5: 'Sexta-feira',
+          6: 'Sábado'
+        };
+
+        const frequenciasExistentes = new Set(
+          frequenciasCache.map(f => `${f.clienteId}_${f.data}`)
+        );
+
+        const batch = db.batch();
+        let totalFaltas = 0;
+
+        for (const aluno of clientesCache) {
+          if (!Array.isArray(aluno.diasHorarios) || !aluno.diasHorarios.length) continue;
+
+          for (const aula of aluno.diasHorarios) {
+            let dataVerificacao = new Date(ultimoLogin);
+
+            while (dataVerificacao <= agora) {
+              const diaSemanaAtual = mapaDias[dataVerificacao.getDay()];
+              const dataISO = dataVerificacao.toISOString().split('T')[0];
+
+              if (
+                diaSemanaAtual === aula.dia &&
+                !ehFeriado(dataISO)
+              ) {
+                const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
+
+                const dataHoraAula = new Date(dataVerificacao);
+                dataHoraAula.setHours(horaAula, minutoAula + 79, 0, 0);
+
+                if (
+                  dataHoraAula > ultimoLogin &&
+                  dataHoraAula < agora
+                ) {
+                  const chaveFrequencia = `${aluno.id}_${dataISO}`;
+
+                  if (!frequenciasExistentes.has(chaveFrequencia)) {
+                    const novaFreqRef = getUserCollection('frequencias').doc();
+
+                    batch.set(novaFreqRef, {
+                      clienteId: aluno.id,
+                      data: dataISO,
+                      status: 'falta',
+                      marcadoAutomaticamente: true,
+                      motivo: 'Sistema fechado / usuário inativo',
+                      horarioAula: aula.horario,
+                      marcadoEm: new Date().toISOString()
+                    });
+
+                    frequenciasExistentes.add(chaveFrequencia);
+                    totalFaltas++;
+                  }
+                }
+              }
+
+              dataVerificacao.setDate(dataVerificacao.getDate() + 1);
+              dataVerificacao.setHours(0, 0, 0, 0);
+            }
+          }
+        }
+
+        if (totalFaltas > 0) {
+          await batch.commit();
+          await refreshCache();
+          console.log(`Faltas automáticas registradas: ${totalFaltas}`);
+        }
+      } catch (error) {
+        console.error('Erro ao processar faltas por inatividade:', error);
+      }
+    }
+
     async function verificarAcessoUsuario(user) {
       let tentativas = 0;
       const maxTentativas = 5;
-      
       while (tentativas < maxTentativas) {
         const usuarioDoc = await db.collection('usuarios').doc(user.uid).get();
-        
         if (usuarioDoc.exists) {
           const usuarioData = usuarioDoc.data();
-          
           if (usuarioData.status === 'bloqueado') {
             throw new Error('Usuário bloqueado. Entre em contato com o administrador.');
           }
-          
           if (usuarioData.aprovado === false) {
             throw new Error('Aguardando liberação pelo administrador.');
           }
-          
           currentUserRole = usuarioData.role;
-          
+          atualizarMenuAdmin();
+
+          await refreshCache();
+          await processarFaltasPeriodoInativo(usuarioData.ultimoLogin || null);
+
           await db.collection('usuarios').doc(user.uid).update({
             ultimoLogin: new Date().toISOString()
           }).catch(err => console.log('Erro ao atualizar último login:', err));
-          
+
           return usuarioData;
         }
-        
         await new Promise(resolve => setTimeout(resolve, 1000));
         tentativas++;
       }
-      
       throw new Error('Documento do usuário não encontrado após várias tentativas. Tente novamente.');
     }
 
-    // ============================================
-    // GERENCIAR USUÁRIOS
-    // ============================================
     window.aprovarUsuario = async function (userId) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
       if (!confirm('Aprovar este usuário?')) return;
-
-      await db.collection('usuarios').doc(userId).update({
-        status: 'ativo',
-        aprovado: true,
-        aprovadoEm: new Date().toISOString(),
-        aprovadoPor: currentUser.email
-      });
-
+      await db.collection('usuarios').doc(userId).update({ status: 'ativo', aprovado: true, aprovadoEm: new Date().toISOString(), aprovadoPor: currentUser.email });
       await refreshCache();
       await addHistory(`Usuário aprovado`, 'green');
       window.renderUsuarios();
+      await verificarNovosUsuariosPendentes();
     };
 
     window.renderUsuarios = async function () {
-      if (currentUserRole !== 'admin') return;
-
-      const search = document.getElementById('search-usuarios')?.value.toLowerCase().trim() || '';
-      let usuarios = usuariosCache.filter(u =>
-        !search || u.nome.toLowerCase().includes(search) || u.email.toLowerCase().includes(search)
-      );
-
-      const tbody = document.getElementById('usuarios-tbody');
-      if (!usuarios.length) {
-        tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
+      if (currentUserRole !== 'admin') {
+        const usuariosPage = document.getElementById('page-usuarios');
+        if (usuariosPage) {
+          usuariosPage.classList.remove('active');
+          usuariosPage.style.display = 'none';
+        }
+        window.navigate('dashboard');
         return;
       }
 
+      const usuariosPage = document.getElementById('page-usuarios');
+      if (usuariosPage) {
+        usuariosPage.style.display = 'block';
+      }
+      const search = document.getElementById('search-usuarios')?.value.toLowerCase().trim() || '';
+      let usuarios = usuariosCache.filter(u => !search || u.nome?.toLowerCase().includes(search) || u.email?.toLowerCase().includes(search));
+      const tbody = document.getElementById('usuarios-tbody');
+      if (!usuarios.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></tr>'; return; }
       tbody.innerHTML = usuarios.map(u => {
         let statusBadge = '';
-        if (u.status === 'ativo') statusBadge = '<span class="badge badge-ativo">✅ Ativo</span>';
+        if (u.status === 'ativo' && u.aprovado === true) statusBadge = '<span class="badge badge-ativo">✅ Ativo</span>';
         else if (u.status === 'bloqueado') statusBadge = '<span class="badge badge-bloqueado">🔒 Bloqueado</span>';
-        else statusBadge = '<span class="badge badge-aguardando">⏳ Aguardando</span>';
-
+        else statusBadge = '<span class="badge badge-aguardando">⏳ Aguardando aprovação</span>';
         let roleBadge = u.role === 'admin' ? '<span class="badge badge-pendente">👑 Admin</span>' : '<span class="badge badge-pago">👤 Usuário</span>';
-
         let actions = '';
-        if (u.status === 'aguardando') {
-          actions += `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Aprovar</button>`;
-        }
-        if (u.status === 'bloqueado') {
-          actions += `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`;
-        }
-        if (u.status === 'ativo') {
-          actions += `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>`;
-        }
-        if (u.role !== 'admin') {
-          actions += `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>`;
-        }
-
-        return `
-      <tr>
-        <td><strong>${u.nome || '—'}</strong></td>
-        <td>${u.email}</td>
-        <td>${statusBadge}</td>
-        <td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR') : '—'}</td>
-        <td>${u.ultimoLogin ? new Date(u.ultimoLogin).toLocaleDateString('pt-BR') : '—'}</td>
-        <td>${roleBadge}</td>
-        <td class="td-actions">${actions}</span></td>
-      </tr>
-    `;
+        if (u.aprovado === false || u.status === 'aguardando') { actions += `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Liberar</button>`; }
+        if (u.status === 'bloqueado') { actions += `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`; }
+        if (u.status === 'ativo' && u.aprovado === true && u.role !== 'admin') { actions += `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>`; }
+        if (u.role !== 'admin') { actions += `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>`; }
+        return `<tr><td><strong>${u.nome || '—'}</strong></td><td>${u.email}</td><td>${statusBadge}</td><td>${u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('pt-BR') : '—'}</td><td>${u.ultimoLogin ? new Date(u.ultimoLogin).toLocaleDateString('pt-BR') : '—'}</td><td>${roleBadge}</td><td class="td-actions">${actions}</td></tr>`;
       }).join('');
     };
 
     window.openUsuarioModal = function (id = null) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
       document.getElementById('usuario-id').value = '';
       document.getElementById('usuario-nome').value = '';
       document.getElementById('usuario-email').value = '';
@@ -2173,13 +2273,8 @@
       window.openModal('modal-usuario');
     };
 
-    window.editarUsuario = function (id) { window.openUsuarioModal(id); };
-
     window.saveUsuario = async function () {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
       const id = document.getElementById('usuario-id').value;
       const nome = document.getElementById('usuario-nome').value.trim();
       const email = document.getElementById('usuario-email').value.trim();
@@ -2197,52 +2292,31 @@
           alert('Usuário atualizado com sucesso!');
         } else {
           if (!senha) { alert('Preencha a senha!'); return; }
-
           let secondaryApp = firebase.apps.find(app => app.name === 'Secondary');
-          if (!secondaryApp) {
-            secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
-          }
+          if (!secondaryApp) { secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary'); }
           const secondaryAuth = secondaryApp.auth();
-
-          const userCredential = await secondaryAuth
-            .createUserWithEmailAndPassword(email, senha);
-
-          await db.collection('usuarios')
-            .doc(userCredential.user.uid)
-            .set({
-              nome,
-              email,
-              status,
-              role: 'user',
-              aprovado: true,
-              dadosMigrados: false,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-          const userBaseRef = db
-            .collection('usuarios')
-            .doc(userCredential.user.uid);
-
+          const userCredential = await secondaryAuth.createUserWithEmailAndPassword(email, senha);
+          await db.collection('usuarios').doc(userCredential.user.uid).set({
+            nome, email, status: 'ativo', role: 'user', aprovado: true, dadosMigrados: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          const userBaseRef = db.collection('usuarios').doc(userCredential.user.uid);
           await userBaseRef.collection('clientes').doc('_init').set({ created: true });
           await userBaseRef.collection('dividas').doc('_init').set({ created: true });
           await userBaseRef.collection('parcelas').doc('_init').set({ created: true });
           await userBaseRef.collection('frequencias').doc('_init').set({ created: true });
-
           await userBaseRef.collection('clientes').doc('_init').delete();
           await userBaseRef.collection('dividas').doc('_init').delete();
           await userBaseRef.collection('parcelas').doc('_init').delete();
           await userBaseRef.collection('frequencias').doc('_init').delete();
-
           await secondaryAuth.signOut();
-
           await refreshCache();
-
           await addHistory(`Usuário ${nome} criado pelo administrador`, 'green');
-
           alert('Usuário criado com sucesso!');
         }
         window.closeModal('modal-usuario');
         window.renderUsuarios();
+        await verificarNovosUsuariosPendentes();
       } catch (error) {
         alert('Erro: ' + error.message);
       } finally {
@@ -2251,10 +2325,7 @@
     };
 
     window.bloquearUsuario = async function (id) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
       if (!confirm('Deseja bloquear este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'bloqueado' });
       await refreshCache();
@@ -2263,10 +2334,7 @@
     };
 
     window.ativarUsuario = async function (id) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
+      if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
       if (!confirm('Deseja ativar este usuário?')) return;
       await db.collection('usuarios').doc(id).update({ status: 'ativo', aprovado: true });
       await refreshCache();
@@ -2275,90 +2343,44 @@
     };
 
     window.excluirUsuario = async function (id, email) {
-      if (currentUserRole !== 'admin') {
-        alert('Acesso negado');
-        return;
-      }
-      
+      if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
       if (!confirm(`⚠️ ATENÇÃO! Você está prestes a excluir PERMANENTEMENTE o usuário:\n\n📧 ${email}\n\nTODOS os dados deste usuário serão perdidos!\n\nEsta ação NÃO pode ser desfeita.\n\nDeseja continuar?`)) return;
-      
       const excluirBtn = event?.target;
       const originalText = excluirBtn ? excluirBtn.innerHTML : 'Excluir';
-      if (excluirBtn) {
-        excluirBtn.disabled = true;
-        excluirBtn.innerHTML = '⏳ Excluindo...';
-      }
-      
+      if (excluirBtn) { excluirBtn.disabled = true; excluirBtn.innerHTML = '⏳ Excluindo...'; }
       try {
         const userRef = db.collection('usuarios').doc(id);
         const userDoc = await userRef.get();
-        
-        if (!userDoc.exists) {
-          alert('Usuário não encontrado!');
-          return;
-        }
-        
+        if (!userDoc.exists) { alert('Usuário não encontrado!'); return; }
         const userData = userDoc.data();
-        
-        if (userData.email === currentUser.email) {
-          alert('❌ Você não pode excluir seu próprio usuário!');
-          return;
-        }
-        
-        console.log(`Excluindo dados do usuário ${email}...`);
-        
-        const collections = [
-          'clientes',
-          'dividas', 
-          'parcelas',
-          'frequencias',
-          'reposicoes',
-          'historico',
-          'ultimosParabens',
-          'alertasFaltas'
-        ];
-        
+        if (userData.email === currentUser.email) { alert('❌ Você não pode excluir seu próprio usuário!'); return; }
+        const collections = ['clientes', 'dividas', 'parcelas', 'frequencias', 'reposicoes', 'historico', 'ultimosParabens', 'alertasFaltas'];
         for (const col of collections) {
           try {
             const snap = await userRef.collection(col).get();
-            console.log(`  → Excluindo ${snap.size} documentos da coleção ${col}`);
-            
             const batchSize = 500;
             let batch = db.batch();
             let count = 0;
-            
             for (const doc of snap.docs) {
               batch.delete(doc.ref);
               count++;
-              
               if (count >= batchSize) {
                 await batch.commit();
                 batch = db.batch();
                 count = 0;
               }
             }
-            
-            if (count > 0) {
-              await batch.commit();
-            }
-          } catch (colError) {
-            console.log(`  ⚠️ Erro ao excluir coleção ${col}:`, colError.message);
-          }
+            if (count > 0) { await batch.commit(); }
+          } catch (colError) { console.log(`  ⚠️ Erro ao excluir coleção ${col}:`, colError.message); }
         }
-        
-        console.log(`  → Excluindo documento principal do usuário`);
         await userRef.delete();
-        
         await addHistory(`Usuário ${email} excluído permanentemente`, 'red');
-        
         await refreshCache();
         window.renderUsuarios();
-        
+        await verificarNovosUsuariosPendentes();
         alert(`✅ Usuário ${email} excluído com sucesso!\n\nTodos os dados foram removidos permanentemente.`);
-        
       } catch (error) {
         console.error('Erro detalhado ao excluir:', error);
-        
         if (error.code === 'permission-denied') {
           alert('❌ Erro de permissão!\n\nVocê precisa configurar as regras de segurança do Firestore.\n\nAcesse o Firebase Console → Firestore Database → Rules e configure corretamente.');
         } else if (error.code === 'not-found') {
@@ -2367,16 +2389,10 @@
           alert('❌ Erro ao excluir usuário: ' + error.message);
         }
       } finally {
-        if (excluirBtn) {
-          excluirBtn.disabled = false;
-          excluirBtn.innerHTML = originalText;
-        }
+        if (excluirBtn) { excluirBtn.disabled = false; excluirBtn.innerHTML = originalText; }
       }
     };
 
-    // ============================================
-    // LOGIN E REGISTER
-    // ============================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
       const password = document.getElementById('login-pass').value;
@@ -2387,26 +2403,42 @@
         setTimeout(() => errorDiv.style.display = 'none', 3000);
         return;
       }
-      
       const loginBtn = document.getElementById('login-btn');
       const originalText = loginBtn.innerHTML;
       loginBtn.disabled = true;
       loginBtn.innerHTML = '⏳ Entrando...';
-      
       try {
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        
-        await db.collection('usuarios').doc(userCredential.user.uid).update({
-          ultimoLogin: new Date().toISOString()
-        }).catch(err => console.log('Erro ao atualizar último login:', err));
-        
-        errorDiv.style.display = 'none';
-        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+          await verificarAcessoUsuario(userCredential.user);
+          errorDiv.style.display = 'none';
+        } catch (accessError) {
+          await auth.signOut();
+          throw accessError;
+        }
       } catch (error) {
-        errorDiv.textContent = '❌ ' + error.message;
+        console.error('Erro no login:', error);
+        let mensagemErro = '';
+        switch (error.code) {
+          case 'auth/invalid-credential':
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+            mensagemErro = '❌ Email ou senha incorretos!';
+            break;
+          case 'auth/too-many-requests':
+            mensagemErro = '❌ Muitas tentativas. Tente novamente mais tarde.';
+            break;
+          case 'auth/network-request-failed':
+            mensagemErro = '❌ Erro de conexão. Verifique sua internet.';
+            break;
+          default:
+            mensagemErro = '❌ ' + (error.message || 'Erro ao fazer login');
+        }
+        errorDiv.textContent = mensagemErro;
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 5000);
-        await auth.signOut();
+        try { await auth.signOut(); } catch (e) { }
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerHTML = originalText;
@@ -2417,46 +2449,58 @@
       const nome = document.getElementById('register-nome').value.trim();
       const email = document.getElementById('register-email').value.trim();
       const senha = document.getElementById('register-senha').value;
-
-      if (!nome || !email || !senha) {
-        alert('Preencha todos os campos!');
-        return;
-      }
-
+      if (!nome || !email || !senha) { alert('Preencha todos os campos!'); return; }
+      if (senha.length < 6) { alert('A senha deve ter pelo menos 6 caracteres!'); return; }
       const registerBtn = document.getElementById('register-confirm-btn');
       const originalText = registerBtn.innerHTML;
       registerBtn.disabled = true;
       registerBtn.innerHTML = '⏳ Cadastrando...';
-
       try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
-
-        await db.collection('usuarios')
-          .doc(userCredential.user.uid)
-          .set({
-            nome,
-            email,
-            status: 'ativo',
-            role: 'user',
-            aprovado: true,
-            dadosMigrados: false,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-        alert('Cadastro realizado com sucesso! Faça login para continuar.');
-
+        let secondaryApp = firebase.apps.find(app => app.name === 'Secondary');
+        if (!secondaryApp) { secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary'); }
+        const secondaryAuth = secondaryApp.auth();
+        const secondaryDb = secondaryApp.firestore();
+        const userCredential = await secondaryAuth.createUserWithEmailAndPassword(email, senha);
+        await secondaryDb.collection('usuarios').doc(userCredential.user.uid).set({
+          nome, email, status: 'aguardando', role: 'user', aprovado: false, dadosMigrados: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(), solicitadoEm: new Date().toISOString()
+        });
+        const userBaseRef = secondaryDb.collection('usuarios').doc(userCredential.user.uid);
+        await userBaseRef.collection('clientes').doc('_init').set({ created: true });
+        await userBaseRef.collection('dividas').doc('_init').set({ created: true });
+        await userBaseRef.collection('parcelas').doc('_init').set({ created: true });
+        await userBaseRef.collection('frequencias').doc('_init').set({ created: true });
+        await userBaseRef.collection('clientes').doc('_init').delete();
+        await userBaseRef.collection('dividas').doc('_init').delete();
+        await userBaseRef.collection('parcelas').doc('_init').delete();
+        await userBaseRef.collection('frequencias').doc('_init').delete();
+        await secondaryAuth.signOut();
+        alert('✅ Cadastro realizado com sucesso!\n\nAguardando autorização do Administrador.\nVocê receberá acesso em breve.');
         window.closeModal('modal-register-publico');
-
         document.getElementById('register-nome').value = '';
         document.getElementById('register-email').value = '';
         document.getElementById('register-senha').value = '';
-        
-        document.getElementById('login-user').value = email;
-        document.getElementById('login-pass').value = senha;
-
+        if (currentUserRole === 'admin') {
+          await verificarNovosUsuariosPendentes();
+          const modalBody = document.getElementById('modal-novo-usuario-pendente-body');
+          if (modalBody) {
+            const detalhesDiv = document.getElementById('pendente-detalhes');
+            if (detalhesDiv) {
+              detalhesDiv.innerHTML = `<div class="cobranca-item" style="margin-top: 1rem;"><div class="cobranca-info"><div class="cobranca-nome">${nome}</div><div class="cobranca-valor">📧 ${email}</div><div class="cobranca-vencimento">Solicitado em: ${new Date().toLocaleString('pt-BR')}</div></div></div>`;
+            }
+          }
+          window.openModal('modal-novo-usuario-pendente');
+        }
       } catch (error) {
-        console.error(error);
-        alert('Erro no cadastro: ' + error.message);
+        console.error('Erro no cadastro:', error);
+        let mensagemErro = '';
+        switch (error.code) {
+          case 'auth/email-already-in-use': mensagemErro = '❌ Este email já está cadastrado!'; break;
+          case 'auth/invalid-email': mensagemErro = '❌ Email inválido!'; break;
+          case 'auth/weak-password': mensagemErro = '❌ Senha muito fraca. Use pelo menos 6 caracteres.'; break;
+          default: mensagemErro = '❌ Erro no cadastro: ' + error.message;
+        }
+        alert(mensagemErro);
       } finally {
         registerBtn.disabled = false;
         registerBtn.innerHTML = originalText;
@@ -2464,16 +2508,17 @@
     };
 
     window.doLogout = async function () {
-      await auth.signOut();
-      currentUser = null;
-      currentUserRole = null;
-      document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('app').style.display = 'none';
+      try {
+        await auth.signOut();
+        currentUser = null;
+        currentUserRole = null;
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+      } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+      }
     };
 
-    // ============================================
-    // NAVEGAÇÃO
-    // ============================================
     window.toggleSubmenuMensalidade = function () {
       const submenu = document.getElementById('submenu-mensalidade');
       submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
@@ -2483,14 +2528,37 @@
       submenu.style.display = submenu.style.display === 'none' ? 'block' : 'none';
     };
     window.navigate = function (page) {
-      if (page === 'usuarios' && currentUserRole !== 'admin') {
+      const paginasRestritas = ['usuarios'];
+
+      if (paginasRestritas.includes(page) && currentUserRole !== 'admin') {
+        const paginaUsuarios = document.getElementById('page-usuarios');
+        if (paginaUsuarios) {
+          paginaUsuarios.classList.remove('active');
+          paginaUsuarios.style.display = 'none';
+        }
         alert('Acesso negado. Apenas administradores podem gerenciar usuários.');
-        return;
+        page = 'dashboard';
       }
-      
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+      localStorage.setItem('ultimaTelaGestaoMais', page);
+
+      document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.style.display = 'none';
+      });
+
+      const paginaUsuarios = document.getElementById('page-usuarios');
+      if (paginaUsuarios && page !== 'usuarios') {
+        paginaUsuarios.classList.remove('active');
+        paginaUsuarios.style.display = 'none';
+      }
+
       const pageElement = document.getElementById(`page-${page}`);
-      if (pageElement) pageElement.classList.add('active');
+
+      if (pageElement) {
+        pageElement.classList.add('active');
+        pageElement.style.display = 'block';
+      }
       let title = '';
       if (page === 'dashboard') title = 'Dashboard';
       else if (page === 'alunos') title = 'Cadastro de Alunos';
@@ -2525,6 +2593,14 @@
       if (page === 'relatorios') window.renderRelatorio();
       if (page === 'usuarios') window.renderUsuarios();
     };
+
+    function restaurarUltimaTela() {
+      const ultimaTela = localStorage.getItem('ultimaTelaGestaoMais');
+      if (ultimaTela && document.getElementById(`page-${ultimaTela}`)) {
+        setTimeout(() => window.navigate(ultimaTela), 100);
+      }
+    }
+
     window.toggleSidebar = function () {
       document.getElementById('sidebar').classList.toggle('open');
       document.getElementById('overlay-bg').classList.toggle('open');
@@ -2536,9 +2612,6 @@
     window.openModal = function (id) { document.getElementById(id).classList.add('open'); };
     window.closeModal = function (id) { document.getElementById(id).classList.remove('open'); };
 
-    // ============================================
-    // RELÓGIO
-    // ============================================
     function updateClock() {
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
@@ -2557,9 +2630,6 @@
       if (clockDate) clockDate.textContent = dateString;
     }
 
-    // ============================================
-    // DARK/LIGHT MODE
-    // ============================================
     window.toggleTheme = function () {
       const body = document.body;
       const themeBtn = document.getElementById('theme-toggle');
@@ -2586,9 +2656,6 @@
       }
     }
 
-    // ============================================
-    // MENSAGENS
-    // ============================================
     const MSG_DEFAULT = "Olá {nome}, a parcela {parcela}/{total_parcelas} da mensalidade \"{tipo}\" com vencimento em {vencimento} no valor de {valor}. Aguardamos seu contato.";
     const MSG_FALTAS_CONSECUTIVAS = "Olá {nome}!\n\nIdentificamos 2 faltas consecutivas nas aulas.\n\nEntre em contato conosco para agendar sua aula de reposição.\n\nEstamos à disposição 🙂";
     function getMsgTemplate() { return localStorage.getItem('msg_template') || MSG_DEFAULT; }
@@ -2602,9 +2669,6 @@
     window.resetMsgTemplate = function () { document.getElementById('msg-template').value = MSG_DEFAULT; };
     window.salvarMsgTemplate = function () { const val = document.getElementById('msg-template').value; if (val) localStorage.setItem('msg_template', val); else localStorage.removeItem('msg_template'); window.closeModal('modal-msg'); alert('Mensagem salva!'); };
 
-    // ============================================
-    // DASHBOARD
-    // ============================================
     let hiddenItems = { hoje: [], atrasadas: [], aniversariantes: [] };
     function loadHiddenItems() {
       const saved = localStorage.getItem('hiddenDashboardItems');
@@ -2632,40 +2696,29 @@
       if (alterado) { saveHiddenItems(); window.renderDashboard(); }
     }
     setInterval(verificarRestauracaoAtrasadas, 60 * 60 * 1000);
+    setInterval(() => { if (currentUserRole === 'admin') { verificarNovosUsuariosPendentes(); } }, 30000);
 
-    // ============================================
-    // VERIFICAR FALTAS CONSECUTIVAS
-    // ============================================
     async function verificarFaltasConsecutivas() {
+      if (!currentUser?.uid) return;
       for (const aluno of clientesCache) {
-        const faltasAluno = frequenciasCache
-          .filter(f => f.clienteId === aluno.id && f.status === 'falta')
-          .sort((a, b) => a.data.localeCompare(b.data));
-
+        const faltasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id && f.status === 'falta').sort((a, b) => a.data.localeCompare(b.data));
         let faltasConsecutivas = [];
         let dataAnterior = null;
-
         for (const falta of faltasAluno) {
           if (dataAnterior) {
             const dataFalta = new Date(falta.data + 'T12:00:00');
             const dataAnteriorDate = new Date(dataAnterior + 'T12:00:00');
             const diffDias = Math.ceil((dataFalta - dataAnteriorDate) / (1000 * 60 * 60 * 24));
-            if (diffDias <= 7) {
-              faltasConsecutivas.push(falta.data);
-            } else {
-              faltasConsecutivas = [falta.data];
-            }
-          } else {
-            faltasConsecutivas = [falta.data];
-          }
+            if (diffDias <= 7) { faltasConsecutivas.push(falta.data); } else { faltasConsecutivas = [falta.data]; }
+          } else { faltasConsecutivas = [falta.data]; }
           dataAnterior = falta.data;
           if (faltasConsecutivas.length >= 2) {
-            const alertaExistente = alertasFaltasCache.find(a => a.alunoId === aluno.id && !a.resolvido && a.faltas && a.faltas[0] === faltasConsecutivas[0]);
+            const alertaExistente = alertasFaltasCache.find(a => a.alunoId === aluno.id && !a.resolvido && Array.isArray(a.faltas) && a.faltas[0] === faltasConsecutivas[0]);
             if (!alertaExistente) {
               await getUserCollection('alertasFaltas').add({
-                alunoId: aluno.id, nome: aluno.nome, telefone: aluno.telefone,
+                alunoId: aluno.id, nome: aluno.nome, telefone: aluno.telefone || '',
                 faltas: [...faltasConsecutivas], ultimaFalta: faltasConsecutivas[faltasConsecutivas.length - 1],
-                resolvido: false, reposicaoAgendada: false, criadoEm: new Date().toISOString()
+                resolvido: false, reposicaoAgendada: false, criadoEm: new Date().toISOString(), userId: currentUser.uid
               });
               await refreshCache();
             }
@@ -2675,84 +2728,146 @@
       }
     }
 
-    // ============================================
-    // RENDER FALTAS CONSECUTIVAS
-    // ============================================
     window.renderFaltasConsecutivas = function () {
       const container = document.getElementById('faltas-consecutivas-lista');
       if (!container) return;
       const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-      if (alertas.length === 0) {
-        container.innerHTML = '<div class="empty">✅ Nenhum aluno com 2 faltas consecutivas</div>';
-        return;
-      }
-      container.innerHTML = alertas.map(alerta => `
-    <div class="cobranca-item" style="border-left: 3px solid var(--orange);">
-      <div class="cobranca-info">
-        <div class="cobranca-nome">${alerta.nome}</div>
-        <div class="cobranca-valor">⚠️ 2 faltas consecutivas</div>
-        <div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div>
-      </div>
-      <div class="td-actions">
-        <button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">📲 WhatsApp</button>
-        <button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button>
-      </div>
-    </div>
-  `).join('');
+      if (alertas.length === 0) { container.innerHTML = '<div class="empty">✅ Nenhum aluno com 2 faltas consecutivas</div>'; return; }
+      container.innerHTML = alertas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join('');
     };
 
-    // ============================================
-    // RENDER WHATSAPP FALTAS
-    // ============================================
+    // CORREÇÃO: Função renderWhatsAppFaltas modificada para mostrar apenas 1 registro por aluno (o último)
     window.renderWhatsAppFaltas = function () {
       const container = document.getElementById('whatsapp-faltas-content');
-      const countSpan = document.getElementById('whatsapp-faltas-count');
+      const badge = document.getElementById('whatsapp-faltas-count');
       if (!container) return;
-      const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-      if (!countSpan) return;
-      countSpan.textContent = `${alertas.length} alerta(s)`;
-      countSpan.className = alertas.length > 0 ? 'badge badge-pendente' : 'badge badge-pago';
-      if (alertas.length === 0) {
-        container.innerHTML = '<div class="empty">✅ Nenhum alerta de faltas consecutivas pendente</div>';
+
+      // Agrupar alertas por aluno e manter apenas o mais recente
+      const ultimosAlertasPorAluno = new Map();
+
+      alertasFaltasCache.forEach(alerta => {
+        // Ignorar alertas que já receberam baixa
+        if (alerta.baixaWhatsApp === true) return;
+
+        const alunoId = alerta.alunoId;
+        const alertaExistente = ultimosAlertasPorAluno.get(alunoId);
+
+        if (!alertaExistente) {
+          ultimosAlertasPorAluno.set(alunoId, alerta);
+        } else {
+          const timestampExistente = alertaExistente.criadoEm ? new Date(alertaExistente.criadoEm).getTime() : 0;
+          const timestampAtual = alerta.criadoEm ? new Date(alerta.criadoEm).getTime() : 0;
+          if (timestampAtual > timestampExistente) {
+            ultimosAlertasPorAluno.set(alunoId, alerta);
+          }
+        }
+      });
+
+      const faltas = Array.from(ultimosAlertasPorAluno.values());
+
+      if (badge) {
+        badge.textContent = `${faltas.length} aluno(s)`;
+        badge.className = faltas.length > 0 ? 'badge badge-pendente' : 'badge badge-pago';
+      }
+      if (!faltas.length) {
+        container.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div>Nenhum aluno com faltas pendentes.</div></div>`;
         return;
       }
-      container.innerHTML = `<div class="frequencia-grid">${alertas.map(alerta => {
-        const aluno = clientesCache.find(c => c.id === alerta.alunoId) || { nome: alerta.nome, telefone: alerta.telefone };
-        return `<div class="frequencia-card" style="border-left: 3px solid var(--orange);"><div class="frequencia-aluno-nome">${aluno.nome || alerta.nome}</div><div class="frequencia-dias"><strong>Telefone:</strong> ${aluno.telefone || alerta.telefone}<br><strong>Faltas consecutivas:</strong> ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div><div class="td-actions" style="margin-top: 10px;"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${aluno.telefone || alerta.telefone}', '${aluno.nome || alerta.nome}')">✏️ Enviar Mensagem WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">Ocultar Alerta</button></div></div>`;
-      }).join('')}</div>`;
+      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Faltas</th><th>Última Mensagem</th><th>Status</th><th>Ações</th></tr></thead><tbody>${faltas.map(alerta => {
+        const ultimaMensagem = alerta.ultimaMensagemData ? `${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviada';
+        const status = alerta.statusWhatsApp === 'enviado' ? '<span class="badge badge-pago">Enviado</span>' : '<span class="badge badge-atrasado">Pendente</span>';
+        return `<tr><td><strong>${alerta.nome}</strong></td><td>${alerta.faltas?.length || 2}</td><td>${ultimaMensagem}</td><td>${status}</td><td class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarMensagemWhatsAppFalta('${alerta.id}')">📲 Enviar</button><button class="btn btn-ghost btn-sm" onclick="window.darBaixaWhatsApp('${alerta.id}')">✅ Dar Baixa</button></td></tr>`;
+      }).join('')}</tbody></table></div>`;
     };
 
-    window.enviarWhatsappFalta = async function (alertaId, telefone, nome) {
-      const mensagem = MSG_FALTAS_CONSECUTIVAS.replace(/{nome}/g, nome);
-      const numero = telefone?.replace(/\D/g, '') || '';
-      if (!numero) { alert('Número de telefone não cadastrado para este aluno!'); return; }
+    window.enviarMensagemWhatsAppFalta = async function (id) {
       try {
-        await db.collection('logsWhatsApp').add({ tipo: 'alerta_falta', alertaId, alunoNome: nome, telefone, mensagem, dataHora: new Date().toISOString(), status: 'enviado' });
-        await addHistory(`Mensagem de falta consecutiva enviada para ${nome}`, 'whatsapp');
-      } catch (error) { console.error("Erro ao registrar envio de WhatsApp:", error); }
-      window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(mensagem)}`, '_blank');
+        const alerta = alertasFaltasCache.find(a => a.id === id);
+        if (!alerta) return;
+        const cliente = clientesCache.find(c => c.id === alerta.alunoId);
+        if (!cliente?.telefone) { alert('Aluno sem telefone cadastrado.'); return; }
+        const telefone = cliente.telefone.replace(/\D/g, '');
+        const mensagem = MSG_FALTAS_CONSECUTIVAS.replace(/{nome}/g, cliente.nome);
+        const link = `https://wa.me/55${telefone}?text=${encodeURIComponent(mensagem)}`;
+        window.open(link, '_blank');
+        const agora = new Date();
+        const updateData = {
+          ultimaMensagemData: agora.toLocaleDateString('pt-BR'),
+          ultimaMensagemHora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          ultimaMensagemTimestamp: Date.now(),
+          statusWhatsApp: 'enviado'
+        };
+        await getUserCollection('alertasFaltas').doc(alerta.id).set(updateData, { merge: true });
+        Object.assign(alerta, updateData);
+        window.renderWhatsAppFaltas();
+        window.renderFaltasConsecutivas();
+        window.renderDashboard();
+        await addHistory(`WhatsApp de falta enviado para ${cliente.nome} (tela WhatsApp Faltas)`, 'whatsapp');
+      } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+        alert('Erro ao enviar mensagem!');
+      }
+    };
+
+    window.darBaixaWhatsApp = async function (id) {
+      try {
+        await getUserCollection('alertasFaltas').doc(id).set({ baixaWhatsApp: true, baixaWhatsAppData: Date.now() }, { merge: true });
+        const alerta = alertasFaltasCache.find(a => a.id === id);
+        if (alerta) alerta.baixaWhatsApp = true;
+        window.renderWhatsAppFaltas();
+        window.renderFaltasConsecutivas();
+        window.renderDashboard();
+        await addHistory(`Alerta de falta recebeu baixa (tela WhatsApp Faltas)`, 'green');
+      } catch (error) {
+        console.error('Erro ao dar baixa:', error);
+        alert('Erro ao dar baixa!');
+      }
+    };
+
+    window.enviarWhatsappFaltaDashboard = async function (id) {
+      try {
+        const alerta = alertasFaltasCache.find(a => a.id === id);
+        if (!alerta) return;
+        const cliente = clientesCache.find(c => c.id === alerta.alunoId);
+        if (!cliente?.telefone) { alert('Aluno sem telefone cadastrado.'); return; }
+        const telefone = cliente.telefone.replace(/\D/g, '');
+        const mensagem = MSG_FALTAS_CONSECUTIVAS.replace(/{nome}/g, cliente.nome);
+        const link = `https://wa.me/55${telefone}?text=${encodeURIComponent(mensagem)}`;
+        window.open(link, '_blank');
+        const agora = new Date();
+        const updateData = {
+          ultimaMensagemData: agora.toLocaleDateString('pt-BR'),
+          ultimaMensagemHora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          ultimaMensagemTimestamp: Date.now(),
+          statusWhatsApp: 'enviado'
+        };
+        await getUserCollection('alertasFaltas').doc(alerta.id).set(updateData, { merge: true });
+        Object.assign(alerta, updateData);
+        window.renderWhatsAppFaltas();
+        window.renderFaltasConsecutivas();
+        window.renderDashboard();
+        await addHistory(`WhatsApp de falta enviado para ${cliente.nome} (Dashboard)`, 'whatsapp');
+      } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+        alert('Erro ao enviar mensagem!');
+      }
     };
 
     window.ocultarAlertaFalta = async function (id) {
-      if (!confirm('Dar baixa neste alerta? Ele será removido da lista.')) return;
-      await getUserCollection('alertasFaltas').doc(id).update({ resolvido: true });
+      if (!confirm('Dar baixa neste alerta? Ele será removido da lista do Dashboard.')) return;
+      await getUserCollection('alertasFaltas').doc(id).update({ resolvido: true, resolvidoEm: new Date().toISOString(), resolvidoVia: 'dashboard' });
       await refreshCache();
       window.renderFaltasConsecutivas();
       window.renderWhatsAppFaltas();
       window.renderDashboard();
     };
 
-    // ============================================
-    // REGISTRO DE ENVIO WHATSAPP
-    // ============================================
     async function registrarEnvioWhatsApp(parcelaId, clienteId, telaOrigem) {
       const agora = new Date();
       const dataHora = agora.toLocaleString('pt-BR');
       const apenasData = agora.toISOString().split('T')[0];
       const parcela = parcelasCache.find(p => p.id === parcelaId);
-      if (parcela) {
-        await getUserCollection('parcelas').doc(parcelaId).update({ ultimoEnvio: dataHora, ultimoEnvioLembrete: apenasData, ultimoEnvioTela: telaOrigem });
-      }
+      if (parcela) { await getUserCollection('parcelas').doc(parcelaId).update({ ultimoEnvio: dataHora, ultimoEnvioLembrete: apenasData, ultimoEnvioTela: telaOrigem }); }
       const cliente = clientesCache.find(c => c.id === clienteId);
       await addHistory(`WhatsApp enviado para ${cliente?.nome} - Tela: ${telaOrigem}`, 'whatsapp');
       await refreshCache();
@@ -2780,9 +2895,6 @@
       window.open(`https://wa.me/55${telefone}?text=${mensagem}`, '_blank');
     };
 
-    // ============================================
-    // CLIENTES
-    // ============================================
     function gerarOpcoesHorarios() {
       const horarios = [];
       for (let hora = 6; hora <= 22; hora++) {
@@ -2938,12 +3050,9 @@
       let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
       const tbody = document.getElementById('clientes-tbody');
       if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
-      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</td><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></span></td></tr>`).join('');
+      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</span></td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</span><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></td></tr>`).join('');
     };
 
-    // ============================================
-    // PARCELAS
-    // ============================================
     window.limparFiltrosParcelas = function () { document.getElementById('search-parcelas').value = ''; document.getElementById('filter-data-de').value = ''; document.getElementById('filter-data-ate').value = ''; document.getElementById('filter-parcela-status').value = ''; window.renderParcelas(); };
     window.renderParcelas = async function () {
       const search = document.getElementById('search-parcelas')?.value.toLowerCase().trim() || '';
@@ -2965,7 +3074,7 @@
       let html = '';
       for (const p of parcelas) {
         const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
-        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</span><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></span></td></tr>`;
+        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></td></tr>`;
       }
       tbody.innerHTML = html;
     };
@@ -2986,9 +3095,6 @@
       await refreshCache(); window.closeModal('modal-status'); window.renderParcelas(); window.renderDashboard(); window.renderHoje();
     };
 
-    // ============================================
-    // DASHBOARD RENDER
-    // ============================================
     window.renderDashboard = async function () {
       const hoje = today();
       let parcelas = parcelasCache;
@@ -3012,13 +3118,10 @@
       if (dashboardFaltasContainer) {
         dashboardFaltasStat.textContent = alertasFaltas.length;
         if (alertasFaltas.length === 0) { dashboardFaltasContainer.innerHTML = '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>'; }
-        else { dashboardFaltasContainer.innerHTML = alertasFaltas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFalta('${alerta.id}', '${alerta.telefone}', '${alerta.nome}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join(''); }
+        else { dashboardFaltasContainer.innerHTML = alertasFaltas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join(''); }
       }
     };
 
-    // ============================================
-    // VENCENDO HOJE
-    // ============================================
     window.renderHoje = async function () {
       const hoje = today();
       const parcelas = parcelasCache.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
@@ -3028,15 +3131,9 @@
     };
     window.marcarPago = async function (parcelaId) { await getUserCollection('parcelas').doc(parcelaId).update({ status: 'pago' }); await refreshCache(); await addHistory(`Parcela marcada como paga`, 'green'); window.renderHoje(); window.renderDashboard(); };
 
-    // ============================================
-    // DISPARO
-    // ============================================
     function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
-    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</span><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</span><td>${p.numeroParcela}/${p.totalParcelas}</span><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</span><td><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
+    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
 
-    // ============================================
-    // ANIVERSARIANTES DA SEMANA
-    // ============================================
     window.carregarAniversariantesSemana = async function () {
       const agora = new Date();
       const inicioSemana = new Date(agora);
@@ -3053,10 +3150,7 @@
         const dataAniversarioEsteAno = new Date(agora.getFullYear(), parseInt(mes) - 1, parseInt(dia));
         if (dataAniversarioEsteAno < inicioSemana) dataAniversarioEsteAno.setFullYear(agora.getFullYear() + 1);
         return dataAniversarioEsteAno >= inicioSemana && dataAniversarioEsteAno <= fimSemana;
-      }).sort((a, b) => {
-        const aData = a.nascimento.slice(5); const bData = b.nascimento.slice(5);
-        return aData.localeCompare(bData);
-      });
+      }).sort((a, b) => { const aData = a.nascimento.slice(5); const bData = b.nascimento.slice(5); return aData.localeCompare(bData); });
       const infoElement = document.getElementById('aniversariantes-semana-info');
       const periodoStr = `${fmtDate(inicioSemana.toISOString().split('T')[0])} a ${fmtDate(fimSemana.toISOString().split('T')[0])}`;
       infoElement.textContent = `${aniversariantes.length} aniversariante(s) - ${periodoStr}`;
@@ -3065,9 +3159,6 @@
       else { content.innerHTML = `<div class="aniversariantes-grid">${aniversariantes.map(a => `<div class="aniversariante-card"><div class="aniversariante-icon">🎂</div><div class="aniversariante-info"><div class="aniversariante-nome">${a.nome}</div><div class="aniversariante-data">${fmtDate(a.nascimento)}</div><div class="aniversariante-dia-semana">${new Date(agora.getFullYear(), parseInt(a.nascimento.split('-')[1]) - 1, parseInt(a.nascimento.split('-')[2])).toLocaleDateString('pt-BR', { weekday: 'long' })}</div></div></div>`).join('')}</div>`; }
     };
 
-    // ============================================
-    // ALUNOS POR HORA
-    // ============================================
     window.carregarAlunosPorHora = function () {
       const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
       const horarios = gerarOpcoesHorarios();
@@ -3080,9 +3171,6 @@
     window.exportarAlunosHoraExcel = function () { const tabela = document.querySelector('.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Alunos por Hora'); XLSX.writeFile(wb, 'alunos-por-hora.xlsx'); };
     window.exportarAlunosHoraPDF = function () { const { jsPDF } = window.jspdf; const tabela = document.querySelector('.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const doc = new jsPDF('landscape'); doc.text('Relatório - Alunos por Hora', 14, 15); doc.autoTable({ html: '.alunos-por-hora-table', startY: 20, styles: { fontSize: 7 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save('alunos-por-hora.pdf'); };
 
-    // ============================================
-    // REPOSICAO DE AULA
-    // ============================================
     window.carregarReposicao = async function () {
       document.getElementById('reposicao-aluno').innerHTML = '<option value="">-- Selecione --</option>' + clientesCache.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
       faltaSelecionada = null;
@@ -3103,6 +3191,12 @@
       if (!alunoId) { alert('Selecione um aluno!'); return; } if (!faltaSelecionada) { alert('Selecione uma falta!'); return; } if (!dataReposicao) { alert('Selecione a data da reposição!'); return; }
       const saveBtn = event?.target; const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar'; if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
       try {
+        const agoraDashboard = new Date();
+        const dataHoraReposicao = new Date(`${dataReposicao}T${horarioReposicao}:00`);
+        if (dataHoraReposicao.getTime() <= agoraDashboard.getTime()) {
+          alert('Não é permitido agendar reposição em horário que já passou. Utilize sempre um horário futuro baseado no relógio do dashboard.');
+          return;
+        }
         const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r.foiCumprida); if (reposicaoExistente) { alert('Esta falta já possui uma reposição agendada!'); return; }
         await getUserCollection('reposicoes').add({ alunoId, faltaOriginalId: faltaSelecionada, dataReposicao, horarioReposicao, foiCumprida: false });
         await refreshCache(); await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green'); alert('Reposição agendada com sucesso!');
@@ -3122,9 +3216,8 @@
     window.cancelarReposicao = async function (id) { if (!confirm('Cancelar esta reposição? A falta voltará a ficar disponível para novo agendamento.')) return; await getUserCollection('reposicoes').doc(id).delete(); await refreshCache(); await carregarReposicoesAgendadas(); await carregarFaltasAluno(); await addHistory(`Reposição cancelada`, 'red'); };
     document.addEventListener('DOMContentLoaded', function () { const reposicaoAlunoSelect = document.getElementById('reposicao-aluno'); if (reposicaoAlunoSelect) { reposicaoAlunoSelect.addEventListener('change', function () { faltaSelecionada = null; carregarFaltasAluno(); }); } });
 
-    // ============================================
-    // FREQUENCIA - Marcar Presença Manual
-    // ============================================
+    function horarioParaMinutos(horario) { const [h, m] = horario.split(':').map(Number); return (h * 60) + m; }
+
     window.carregarFrequencia = async function () {
       const data = document.getElementById('frequencia-data').value || today();
       const dataObj = new Date(data + 'T12:00:00');
@@ -3154,36 +3247,16 @@
       await refreshCache(); await window.carregarFrequencia(); await carregarReposicoesAgendadas(); await verificarFaltasConsecutivas(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard();
     };
     window.buscarAlunoFrequencia = function () { clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => { const termo = document.getElementById('buscar-frequencia')?.value.toLowerCase().trim() || ''; document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => { const nome = card.getAttribute('data-nome') || ''; card.style.display = nome.includes(termo) ? 'block' : 'none'; }); }, 300); };
-    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Dia da Semana</th><th>Status</th></tr></thead><tbody>`; for (const p of pendentes) { html += `<tr><td>${fmtDate(p.data)}</span></td><td>${p.dia}</td>}<button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></td></tr>`; } html += `</tbody></table></div>`; container.innerHTML = html; };
+    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"> <div class="frequencia-grid">`; for (const p of pendentes) { html += `<div class="frequencia-card"><div class="frequencia-aluno-nome">${fmtDate(p.data)} - ${p.dia}</div><div class="frequencia-status"><button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></div></div>`; } html += `</div></div>`; container.innerHTML = html; };
 
-    // ============================================
-    // RELATORIO DE FREQUENCIA
-    // ============================================
     window.carregarRelatorioFrequencia = async function () {
       const mes = document.getElementById('rel-frequencia-mes').value;
-      if (!mes) {
-        alert('Selecione um mês');
-        return;
-      }
-
+      if (!mes) { alert('Selecione um mês'); return; }
       const [ano, mesNum] = mes.split('-');
       const diasNoMes = new Date(parseInt(ano), parseInt(mesNum), 0).getDate();
       const diasDoMes = Array.from({ length: diasNoMes }, (_, i) => `${ano}-${mesNum}-${String(i + 1).padStart(2, '0')}`);
-
       const container = document.getElementById('relatorio-frequencia-content');
-
-      let html = `
-    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-      <button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button>
-      <button class="btn btn-red" onclick="window.exportarRelatorioDireto('pdf')">📕 PDF</button>
-    </div>
-    <div class="table-wrap">
-      <table id="tabela-relatorio-frequencia">
-        <thead>
-          <tr>
-            <th>Aluno</th>
-  `;
-
+      let html = `<div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;"><button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button><button class="btn btn-red" onclick="window.exportarRelatorioDireto('pdf')">📕 PDF</button></div><div class="table-wrap"><table id="tabela-relatorio-frequencia"><thead><tr><th>Aluno</th>`;
       for (const d of diasDoMes) {
         const dataObj = new Date(d + 'T12:00:00');
         const diaSemanaNum = dataObj.getDay();
@@ -3192,86 +3265,41 @@
         const diaNum = d.slice(8);
         html += `<th>${diaSemana}<br>${diaNum}/${mesNum}</th>`;
       }
-
-      html += `
-            <th>% Presença</th>
-            <th>Faltas</th>
-            <th>Reposições</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
-
+      html += `<th>Total Aulas</th><th>% Presença</th><th>Faltas</th><th>Reposições</th></tr></thead><tbody>`;
       const alunosComAula = clientesCache.filter(c => c.diasHorarios && c.diasHorarios.length > 0);
-
       for (const aluno of alunosComAula) {
-        let totalDias = 0;
-        let presentes = 0;
-        let faltas = 0;
-        let reposicoes = 0;
-
-        html += `<tr><td><strong>${aluno.nome}</strong></td>`;
-
+        let totalDias = 0, presentes = 0, faltas = 0, reposicoes = 0;
+        html += `<tr><th><strong>${aluno.nome}</strong></th>`;
         for (const data of diasDoMes) {
           const dataObj = new Date(data + 'T12:00:00');
           const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'long' });
           const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
           const temAula = aluno.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized);
-
-          if (!temAula) {
-            html += '<td class="empty-cell">-</td>';
-            continue;
-          }
-
-          if (ehFeriado(data)) {
-            html += `<td class="feriado-cell" title="Feriado">🚫</span></td>`;
-            continue;
-          }
-
+          if (!temAula) { html += '<td class="empty-cell">-</td>'; continue; }
+          if (ehFeriado(data)) { html += `<td class="feriado-cell" title="Feriado">🚫</td>`; continue; }
           totalDias++;
           const freq = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === data);
-
           if (freq?.status === 'presente') {
             presentes++;
             if (freq.isReposicao) reposicoes++;
-            html += `<td style="background:var(--green);color:white;" title="Presente">✅</span></td>`;
-          }
-          else if (freq?.status === 'falta') {
+            html += `<td style="background:var(--green);color:white;" title="Presente">✅</td>`;
+          } else if (freq?.status === 'falta') {
             faltas++;
             const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === freq.id && r.foiCumprida);
-            if (temReposicao) {
-              html += `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</span></td>`;
-            } else {
-              html += `<td style="background:var(--red);color:white;" title="Falta">❌</span></td>`;
-            }
-          }
-          else {
-            html += `<td class="empty-cell">-</span></td>`;
+            if (temReposicao) { html += `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</td>`; }
+            else { html += `<td style="background:var(--red);color:white;" title="Falta">❌</td>`; }
+          } else {
+            html += `<td class="empty-cell" title="Aguardando marcação de presença">🧭</td>`;
           }
         }
-
         const percentual = totalDias ? ((presentes / totalDias) * 100).toFixed(1) : 0;
-        html += `
-      <td>${percentual}%</span></td>
-      <td>${faltas}</span></td>
-      <td>${reposicoes}</span></td>
-    </tr>`;
+        html += `<td>${totalDias}</td><td>${percentual}%</td><td>${faltas}</td><td>${reposicoes}</td></tr>`;
       }
-
-      html += `
-        </tbody>
-      </table>
-    </div>
-  `;
-
+      html += `</tbody></table></div>`;
       container.innerHTML = html;
     };
-
     window.exportarRelatorioDireto = function (tipo) { const tabela = document.getElementById('tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo === 'excel') { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência'); XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`); } else if (tipo === 'pdf') { const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape'); doc.text('Relatório de Frequência', 14, 15); doc.autoTable({ html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 }, theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`); } };
 
-    // ============================================
-    // PRESENÇA AUTOMÁTICA
-    // ============================================
     function calcularFimAula(horarioInicio) { const [hora, minuto] = horarioInicio.split(':').map(Number); let horaFim = hora, minutoFim = minuto + 59; if (minutoFim >= 60) { horaFim += Math.floor(minutoFim / 60); minutoFim = minutoFim % 60; } return [horaFim, minutoFim]; }
     window.carregarPresencaAutomatica = async function () {
       const agora = new Date(); const dataAtual = today();
@@ -3298,30 +3326,15 @@
       await refreshCache(); const card = document.querySelector(`.frequencia-card[data-aluno="${clienteId}"]`); if (card) { card.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => card.remove(), 300); } document.getElementById('presenca-auto-count').textContent = `${document.querySelectorAll('#presenca-automatica-content .frequencia-card').length} alunos`; await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome}${isReposicao ? ' (Reposição)' : ''}`, status === 'presente' ? 'green' : 'red'); await carregarReposicoesAgendadas(); await verificarFaltasConsecutivas(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard();
     };
 
-    // ============================================
-    // HISTORICO
-    // ============================================
     window.renderHistorico = async function () { document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join(''); };
-
-    // ============================================
-    // RELATORIOS
-    // ============================================
     window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
 
-    // ============================================
-    // UTILITARIOS
-    // ============================================
     window.maskPhone = function (input) { let v = input.value.replace(/\D/g, ''); if (v.length > 11) v = v.slice(0, 11); if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`; else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`; else if (v.length > 0) v = `(${v}`; input.value = v; };
     window.salvarBackupManual = async function () { try { const dados = { clientes: clientesCache, dividas: dividasCache, parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache, historico: historicoCache, dataBackup: new Date().toISOString() }; const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`; a.click(); URL.revokeObjectURL(url); alert('Backup salvo com sucesso!'); } catch (error) { alert('Erro ao salvar backup'); } };
     async function criarDadosIniciais() { console.log('Sistema pronto para uso. Nenhum dado de exemplo foi criado.'); }
-
-    // ============================================
-    // MIGRAÇÃO DE DADOS
-    // ============================================
     async function migrarDadosParaMultitenant() {
       if (!currentUser) return;
       if (currentUserRole !== 'admin') return;
-      
       const uid = currentUser.uid;
       const userDoc = await db.collection('usuarios').doc(uid).get();
       const userData = userDoc.data();
@@ -3343,25 +3356,17 @@
       await refreshCache();
     }
 
-    // ============================================
-    // INIT
-    // ============================================
     async function initApp() {
       document.getElementById('msg-template').value = getMsgTemplate();
       document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
       loadTheme();
       updateClock();
       setInterval(updateClock, 1000);
-
       const menuUsuarios = document.getElementById('menu-gerenciar-usuarios');
       if (menuUsuarios) {
-        if (currentUserRole === 'admin') {
-          menuUsuarios.style.display = 'block';
-        } else {
-          menuUsuarios.style.display = 'none';
-        }
+        if (currentUserRole === 'admin') { menuUsuarios.style.display = 'block'; }
+        else { menuUsuarios.style.display = 'none'; }
       }
-
       const frequenciaHeader = document.querySelector('#page-frequencia .section-header');
       if (frequenciaHeader && !document.getElementById('buscar-frequencia')) {
         const buscaDiv = document.createElement('div');
@@ -3370,52 +3375,40 @@
         const buscaInput = document.getElementById('buscar-frequencia');
         if (buscaInput) { buscaInput.addEventListener('input', function () { if (buscaFrequenciaTimeout) clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => window.carregarFrequencia(), 300); }); }
       }
-
       const sidebarFooter = document.querySelector('.sidebar-footer');
       if (sidebarFooter && !document.getElementById('backup-btn')) {
         const backupBtn = document.createElement('button');
         backupBtn.id = 'backup-btn'; backupBtn.className = 'logout-btn'; backupBtn.style.marginBottom = '0.5rem'; backupBtn.innerHTML = '💾 Backup Manual'; backupBtn.onclick = window.salvarBackupManual;
         sidebarFooter.insertBefore(backupBtn, sidebarFooter.firstChild);
       }
-
       const frequenciaDataInput = document.getElementById('frequencia-data');
       if (frequenciaDataInput && !frequenciaDataInput.value) frequenciaDataInput.value = today();
       const relFrequenciaMes = document.getElementById('rel-frequencia-mes');
       if (relFrequenciaMes && !relFrequenciaMes.value) relFrequenciaMes.value = new Date().toISOString().slice(0, 7);
-
       await refreshCache();
       await migrarDadosParaMultitenant();
       await criarDadosIniciais();
       loadHiddenItems();
       popularSelectHorarios();
       await verificarFaltasConsecutivas();
-
-      window.renderDashboard(); window.renderHoje(); window.renderClientes(); window.carregarAniversariantesSemana(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas();
-
+      window.renderDashboard(); window.renderHoje(); window.renderClientes(); window.carregarAniversariantesSemana(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); restaurarUltimaTela();
       const alunosPorHoraHeader = document.querySelector('#page-alunos-por-hora .section-header');
       if (alunosPorHoraHeader && !document.getElementById('btn-export-alunos-hora')) {
         const btnDiv = document.createElement('div');
         btnDiv.innerHTML = `<button class="btn btn-green btn-sm" onclick="window.exportarAlunosHoraExcel()">📗 Exportar Excel</button><button class="btn btn-red btn-sm" onclick="window.exportarAlunosHoraPDF()">📕 Salvar PDF</button>`;
         alunosPorHoraHeader.appendChild(btnDiv);
       }
+      if (currentUserRole === 'admin') { await verificarNovosUsuariosPendentes(); }
     }
 
     const loginBtn = document.getElementById('login-btn');
     const registerBtn = document.getElementById('register-confirm-btn');
-
+    const registerPublicBtn = document.getElementById('register-btn');
     if (loginBtn) loginBtn.onclick = window.doLogin;
-    if (registerBtn) {
-      registerBtn.onclick = window.doRegister;
-    }
+    if (registerBtn) { registerBtn.onclick = window.doRegister; }
+    if (registerPublicBtn) { registerPublicBtn.onclick = () => window.openModal('modal-register-publico'); }
 
-    // Criar admin antes do auth state change
-    (async () => {
-      try {
-        await criarUsuarioPadraoAdmin();
-      } catch (e) {
-        console.log('Erro ao criar admin:', e);
-      }
-    })();
+    (async () => { try { await criarUsuarioPadraoAdmin(); } catch (e) { console.log('Erro ao criar admin:', e); } })();
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
