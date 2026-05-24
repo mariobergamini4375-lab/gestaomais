@@ -1503,10 +1503,10 @@
                   <tr>
                     <th>Nome</th>
                     <th>Telefone</th>
-                    <th>Endereço</th>
-                    <th>Aniversário</th>
-                    <th>Data Matrícula</th>
-                    <th>Dias/Horários Aula</th>
+                    <th>Responsável</th>
+                    <th>Modalidade</th>
+                    <th>Plano</th>
+                    <th>Status</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
@@ -1659,6 +1659,7 @@
           <div class="page" id="page-reposicao">
             <div class="section-header">
               <h2>🔄 Reposição de Aula</h2>
+              <button class="btn btn-ghost btn-sm" onclick="window.atualizarPaginaReposicao()">🔄 Atualizar</button>
             </div>
             <div class="reposicao-card">
               <div class="reposicao-form-group"><label>Selecione o Aluno</label><select id="reposicao-aluno"
@@ -1666,7 +1667,7 @@
                   <option value="">-- Selecione --</option>
                 </select></div>
               <div class="reposicao-form-group"><label>Faltas do Aluno</label>
-                <div id="reposicao-faltas-list" style="max-height:200px;overflow-y:auto;">
+                <div id="reposicao-faltas-container" style="max-height:200px;overflow-y:auto;">
                   <div class="empty">Selecione um aluno</div>
                 </div>
               </div>
@@ -1792,6 +1793,14 @@
         <div class="form-group"><label>Nome *</label><input type="text" id="cliente-nome"></div>
         <div class="form-group"><label>Telefone *</label><input type="text" id="cliente-telefone"
             placeholder="(11) 99999-9999" oninput="window.maskPhone(this)"></div>
+        <div class="form-group"><label>Responsável</label><input type="text" id="cliente-responsavel"></div>
+        <div class="form-group"><label>Modalidade</label><input type="text" id="cliente-modalidade"></div>
+        <div class="form-group"><label>Plano</label><input type="text" id="cliente-plano"></div>
+        <div class="form-group"><label>Status</label><select id="cliente-status" class="filter-select">
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
+            <option value="Suspenso">Suspenso</option>
+          </select></div>
         <div class="form-group"><label>Endereço</label><input type="text" id="cliente-endereco"></div>
         <div class="form-group"><label>Data de Nascimento</label><input type="date" id="cliente-nascimento"></div>
         <div class="form-group"><label>Data da Matrícula</label><input type="date" id="cliente-matricula"></div>
@@ -1973,11 +1982,30 @@
 
     function atualizarMenuAdmin() {
       const menuAdmin = document.getElementById('menu-gerenciar-usuarios');
-      if (!menuAdmin) return;
+      const usuariosPage = document.getElementById('page-usuarios');
+      const dashboardUsuariosCard = document.getElementById('dashboard-usuarios-pendentes-card');
+
       if (currentUserRole === 'admin') {
-        menuAdmin.style.display = 'block';
+        if (menuAdmin) {
+          menuAdmin.style.display = 'block';
+        }
+
+        if (usuariosPage) {
+          usuariosPage.style.display = 'block';
+        }
       } else {
-        menuAdmin.style.display = 'none';
+        if (menuAdmin) {
+          menuAdmin.style.display = 'none';
+        }
+
+        if (usuariosPage) {
+          usuariosPage.classList.remove('active');
+          usuariosPage.style.display = 'none';
+        }
+
+        if (dashboardUsuariosCard) {
+          dashboardUsuariosCard.style.display = 'none';
+        }
       }
     }
 
@@ -2030,20 +2058,28 @@
       try {
         const clientesSnap = await getUserCollection('clientes').get();
         clientesCache = clientesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const dividasSnap = await getUserCollection('dividas').get();
         dividasCache = dividasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const parcelasSnap = await getUserCollection('parcelas').get();
         parcelasCache = parcelasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const frequenciasSnap = await getUserCollection('frequencias').get();
         frequenciasCache = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const reposicoesSnap = await getUserCollection('reposicoes').get();
         reposicoesCache = reposicoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const historicoSnap = await getUserCollection('historico').orderBy('dt', 'desc').get();
         historicoCache = historicoSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const ultimosParabensSnap = await getUserCollection('ultimosParabens').get();
         ultimosParabensCache = ultimosParabensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         const alertasSnap = await getUserCollection('alertasFaltas').get();
         alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         if (currentUserRole === 'admin') {
           const usuariosSnap = await db.collection('usuarios').get();
           usuariosCache = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -2219,22 +2255,51 @@
     window.renderUsuarios = async function () {
       if (currentUserRole !== 'admin') {
         const usuariosPage = document.getElementById('page-usuarios');
+
         if (usuariosPage) {
           usuariosPage.classList.remove('active');
           usuariosPage.style.display = 'none';
+          usuariosPage.innerHTML = '';
         }
-        window.navigate('dashboard');
+
+        localStorage.setItem('ultimaTelaGestaoMais', 'dashboard');
+
+        if (document.getElementById('page-dashboard')) {
+          document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+          });
+
+          document.getElementById('page-dashboard').classList.add('active');
+          document.getElementById('page-dashboard').style.display = 'block';
+        }
+
+        document.getElementById('topbar-title').innerText = 'Dashboard';
+
         return;
       }
 
       const usuariosPage = document.getElementById('page-usuarios');
+
       if (usuariosPage) {
         usuariosPage.style.display = 'block';
       }
+
       const search = document.getElementById('search-usuarios')?.value.toLowerCase().trim() || '';
-      let usuarios = usuariosCache.filter(u => !search || u.nome?.toLowerCase().includes(search) || u.email?.toLowerCase().includes(search));
+
+      let usuarios = usuariosCache.filter(u => {
+        return !search ||
+          u.nome?.toLowerCase().includes(search) ||
+          u.email?.toLowerCase().includes(search);
+      });
+
       const tbody = document.getElementById('usuarios-tbody');
-      if (!usuarios.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></tr>'; return; }
+
+      if (!usuarios.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum usuário encontrado</div></td></tr>';
+        return;
+      }
+
       tbody.innerHTML = usuarios.map(u => {
         let statusBadge = '';
         if (u.status === 'ativo' && u.aprovado === true) statusBadge = '<span class="badge badge-ativo">✅ Ativo</span>';
@@ -2736,17 +2801,14 @@
       container.innerHTML = alertas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join('');
     };
 
-    // CORREÇÃO: Função renderWhatsAppFaltas modificada para mostrar apenas 1 registro por aluno (o último)
     window.renderWhatsAppFaltas = function () {
       const container = document.getElementById('whatsapp-faltas-content');
       const badge = document.getElementById('whatsapp-faltas-count');
       if (!container) return;
 
-      // Agrupar alertas por aluno e manter apenas o mais recente
       const ultimosAlertasPorAluno = new Map();
 
       alertasFaltasCache.forEach(alerta => {
-        // Ignorar alertas que já receberam baixa
         if (alerta.baixaWhatsApp === true) return;
 
         const alunoId = alerta.alunoId;
@@ -2933,6 +2995,10 @@
       document.getElementById('cliente-id').value = '';
       document.getElementById('cliente-nome').value = '';
       document.getElementById('cliente-telefone').value = '';
+      document.getElementById('cliente-responsavel').value = '';
+      document.getElementById('cliente-modalidade').value = '';
+      document.getElementById('cliente-plano').value = '';
+      document.getElementById('cliente-status').value = 'Ativo';
       document.getElementById('cliente-endereco').value = '';
       document.getElementById('cliente-nascimento').value = '';
       document.getElementById('cliente-matricula').value = today();
@@ -2946,8 +3012,12 @@
         const c = clientesCache.find(x => x.id === id);
         if (c) {
           document.getElementById('cliente-id').value = c.id;
-          document.getElementById('cliente-nome').value = c.nome;
-          document.getElementById('cliente-telefone').value = c.telefone;
+          document.getElementById('cliente-nome').value = c.nome || '';
+          document.getElementById('cliente-telefone').value = c.telefone || '';
+          document.getElementById('cliente-responsavel').value = c.responsavel || '';
+          document.getElementById('cliente-modalidade').value = c.modalidade || '';
+          document.getElementById('cliente-plano').value = c.plano || '';
+          document.getElementById('cliente-status').value = c.status || 'Ativo';
           document.getElementById('cliente-endereco').value = c.endereco || '';
           document.getElementById('cliente-nascimento').value = c.nascimento || '';
           document.getElementById('cliente-matricula').value = c.dataMatricula || today();
@@ -2977,6 +3047,10 @@
         const id = document.getElementById('cliente-id').value;
         const nome = document.getElementById('cliente-nome').value.trim();
         const telefone = document.getElementById('cliente-telefone').value.trim();
+        const responsavel = document.getElementById('cliente-responsavel').value;
+        const modalidade = document.getElementById('cliente-modalidade').value;
+        const plano = document.getElementById('cliente-plano').value;
+        const status = document.getElementById('cliente-status').value;
         const endereco = document.getElementById('cliente-endereco').value;
         const nascimento = document.getElementById('cliente-nascimento').value;
         const dataMatricula = document.getElementById('cliente-matricula').value;
@@ -2989,12 +3063,18 @@
         if (!nome || !telefone) { alert('Preencha nome e telefone!'); return; }
         const mensalidadeInfo = { valor: valorMensalidade, vencimento: vencimentoMensalidade, descricao: descricaoMensalidade, parcelado, numParcelas, intervalo };
         if (id) {
-          await getUserCollection('clientes').doc(id).update({ nome, telefone, endereco, nascimento, dataMatricula, diasHorarios: currentDiasHorarios, mensalidadeInfo });
+          await getUserCollection('clientes').doc(id).update({
+            nome, telefone, responsavel, modalidade, plano, status, endereco, nascimento, dataMatricula,
+            diasHorarios: currentDiasHorarios, mensalidadeInfo
+          });
           await refreshCache();
           await addHistory(`Aluno ${nome} atualizado`, 'green');
         } else {
           if (!valorMensalidade || !vencimentoMensalidade) { alert('Preencha valor e vencimento!'); return; }
-          const docRef = await getUserCollection('clientes').add({ nome, telefone, endereco, nascimento, dataMatricula, diasHorarios: currentDiasHorarios, mensalidadeInfo });
+          const docRef = await getUserCollection('clientes').add({
+            nome, telefone, responsavel, modalidade, plano, status, endereco, nascimento, dataMatricula,
+            diasHorarios: currentDiasHorarios, mensalidadeInfo
+          });
           await refreshCache();
           await addHistory(`Aluno ${nome} cadastrado`, 'green');
           await criarMensalidadeParaCliente(docRef.id, nome, valorMensalidade, vencimentoMensalidade, descricaoMensalidade, parcelado, numParcelas, intervalo);
@@ -3007,6 +3087,7 @@
         saveBtn.innerHTML = originalText;
       }
     };
+
     async function criarMensalidadeParaCliente(clienteId, nomeCliente, valor, vencimento, descricao, parcelado, numParcelas, intervalo) {
       const dividaRef = await getUserCollection('dividas').add({ clienteId, tipo: descricao, descricao, valor, vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1 });
       await refreshCache();
@@ -3032,7 +3113,12 @@
       window.renderParcelas();
       window.renderDashboard();
     }
-    window.deleteClienteHandler = async function (id) {
+
+    window.editarCliente = function (id) {
+      window.openClienteModal(id);
+    };
+
+    window.excluirCliente = async function (id) {
       if (!confirm('⚠️ Excluir aluno e TODAS as mensalidades?')) return;
       const c = clientesCache.find(x => x.id === id);
       const parcelasDoCliente = parcelasCache.filter(p => p.clienteId === id);
@@ -3045,12 +3131,85 @@
       window.renderClientes();
       window.renderDashboard();
     };
+
+    // Botão atualizar na tela de reposição
+    window.atualizarPaginaReposicao = function () {
+      window.navigate('reposicao');
+    };
+
     window.renderClientes = async function () {
-      const search = document.getElementById('search-clientes')?.value.toLowerCase().trim() || '';
-      let clientes = clientesCache.filter(c => !search || c.nome.toLowerCase().includes(search) || c.telefone.includes(search));
-      const tbody = document.getElementById('clientes-tbody');
-      if (!clientes.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhum aluno</div></td></tr>'; return; }
-      tbody.innerHTML = clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.telefone}</td><td>${c.endereco || '—'}</span></td><td>${c.nascimento ? fmtDate(c.nascimento) : '—'}</td><td>${c.dataMatricula ? fmtDate(c.dataMatricula) : '—'}</span><td>${c.diasHorarios?.map(dh => `${dh.dia} ${dh.horario}`).join(', ') || '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openClienteModal('${c.id}')">✏️</button><button class="btn btn-red btn-sm" onclick="window.deleteClienteHandler('${c.id}')">🗑</button></td></tr>`).join('');
+      try {
+        await refreshCache();
+
+        const tbody = document.getElementById('clientes-tbody');
+        if (!tbody) return;
+
+        const search = document.getElementById('search-clientes')?.value?.toLowerCase()?.trim() || '';
+
+        const clientes = Array.isArray(clientesCache) ? clientesCache : [];
+
+        const clientesValidos = clientes.filter(cliente => {
+          if (!cliente) return false;
+          if (!cliente.id) return false;
+          if (!cliente.nome) return false;
+          return true;
+        });
+
+        const clientesFiltrados = clientesValidos.filter(cliente => {
+          if (!search) return true;
+          return (
+            cliente.nome?.toLowerCase().includes(search) ||
+            cliente.telefone?.toLowerCase().includes(search) ||
+            cliente.responsavel?.toLowerCase().includes(search)
+          );
+        });
+
+        clientesFiltrados.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+        if (!clientesFiltrados.length) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7">
+                <div class="empty">
+                  Nenhum aluno encontrado
+                </div>
+               </span>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = clientesFiltrados.map(cliente => {
+          return `
+            <tr>
+              <td><strong>${cliente.nome || '-'}</strong></td>
+              <td>${cliente.telefone || '-'}</span></td>
+              <td>${cliente.responsavel || '-'}</span></td>
+              <td>${cliente.modalidade || '-'}</span></td>
+              <td>${cliente.plano || '-'}</span></td>
+              <td><span class="badge badge-${cliente.status === 'Ativo' ? 'pago' : 'atrasado'}">${cliente.status || 'Ativo'}</span></td>
+              <td class="td-actions">
+                <button class="btn btn-primary btn-sm" onclick="window.editarCliente('${cliente.id}')">✏ Editar</button>
+                <button class="btn btn-red btn-sm" onclick="window.excluirCliente('${cliente.id}')">🗑 Excluir</button>
+               </span>
+            </tr>
+          `;
+        }).join('');
+      } catch (error) {
+        console.error('Erro ao renderizar alunos:', error);
+        const tbody = document.getElementById('clientes-tbody');
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7">
+                <div class="empty">
+                  Erro ao carregar alunos
+                </div>
+               </span>
+            </tr>
+          `;
+        }
+      }
     };
 
     window.limparFiltrosParcelas = function () { document.getElementById('search-parcelas').value = ''; document.getElementById('filter-data-de').value = ''; document.getElementById('filter-data-ate').value = ''; document.getElementById('filter-parcela-status').value = ''; window.renderParcelas(); };
@@ -3074,7 +3233,7 @@
       let html = '';
       for (const p of parcelas) {
         const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
-        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></td></tr>`;
+        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></td></tr>`;
       }
       tbody.innerHTML = html;
     };
@@ -3132,7 +3291,7 @@
     window.marcarPago = async function (parcelaId) { await getUserCollection('parcelas').doc(parcelaId).update({ status: 'pago' }); await refreshCache(); await addHistory(`Parcela marcada como paga`, 'green'); window.renderHoje(); window.renderDashboard(); };
 
     function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
-    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></tr>`; }).join(''); };
+    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></span></td></td>`; }).join(''); };
 
     window.carregarAniversariantesSemana = async function () {
       const agora = new Date();
@@ -3176,20 +3335,139 @@
       faltaSelecionada = null;
       popularSelectHorarios();
       await carregarReposicoesAgendadas();
+
+      const alunoSelect = document.getElementById('reposicao-aluno');
+      if (alunoSelect) {
+        alunoSelect.addEventListener('change', async function () {
+          const alunoId = this.value;
+          await window.carregarFaltasAluno(alunoId);
+        });
+      }
     };
-    async function carregarFaltasAluno() {
-      const alunoId = document.getElementById('reposicao-aluno').value;
-      if (!alunoId) { document.getElementById('reposicao-faltas-list').innerHTML = '<div class="empty">Selecione um aluno</div>'; return; }
-      const faltas = frequenciasCache.filter(f => f.clienteId === alunoId && f.status === 'falta' && !reposicoesCache.some(r => r.faltaOriginalId === f.id && !r.foiCumprida));
-      const container = document.getElementById('reposicao-faltas-list');
-      if (!faltas.length) { container.innerHTML = '<div class="empty">Sem faltas pendentes para este aluno</div>'; }
-      else { container.innerHTML = faltas.map(f => { const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === f.id && !r.foiCumprida); const classeExtra = temReposicao ? 'has-reposicao' : ''; return `<div class="reposicao-falta-item ${classeExtra}" onclick="window.selecionarFalta('${f.id}', this)" data-falta-id="${f.id}"><strong>Data:</strong> ${fmtDate(f.data)}${temReposicao ? '<br><small style="color:var(--yellow)">⚠️ Já possui reposição agendada</small>' : ''}</div>`; }).join(''); }
-    }
-    window.selecionarFalta = function (faltaId, element) { const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === faltaId && !r.foiCumprida); if (temReposicao) { alert('Esta falta já possui uma reposição agendada!'); return; } document.querySelectorAll('.reposicao-falta-item').forEach(el => el.classList.remove('selected')); element.classList.add('selected'); faltaSelecionada = faltaId; };
+
+    // Função carregarFaltasAluno com informação da reposição já agendada
+    window.carregarFaltasAluno = async function (alunoId) {
+      const faltasContainer = document.getElementById('reposicao-faltas-container');
+
+      if (!faltasContainer) return;
+
+      if (!alunoId) {
+        faltasContainer.innerHTML = '<div class="empty">Selecione um aluno</div>';
+        return;
+      }
+
+      try {
+        await refreshCache();
+
+        const frequenciasAluno = frequenciasCache.filter(freq => {
+          if (!freq) return false;
+          const mesmoAluno = String(freq.clienteId || '') === String(alunoId);
+          const ehFalta = freq.presenca === false ||
+            freq.presenca === 'false' ||
+            freq.presente === false ||
+            freq.status === 'falta' ||
+            freq.falta === true;
+          return mesmoAluno && ehFalta;
+        });
+
+        const faltasUnicas = [];
+        const mapaDatas = new Set();
+
+        frequenciasAluno.forEach(item => {
+          const data = item.data || item.dataAula || item.date || '';
+          const chave = `${item.clienteId}_${data}`;
+
+          if (!mapaDatas.has(chave)) {
+            mapaDatas.add(chave);
+            faltasUnicas.push(item);
+          }
+        });
+
+        faltasUnicas.sort((a, b) => {
+          const da = new Date(a.data || a.dataAula || 0);
+          const db = new Date(b.data || b.dataAula || 0);
+          return db - da;
+        });
+
+        if (!faltasUnicas.length) {
+          faltasContainer.innerHTML = `
+            <div class="empty">
+              Nenhuma falta encontrada no Relatório de Frequência
+            </div>
+          `;
+          return;
+        }
+
+        faltasContainer.innerHTML = faltasUnicas.map(falta => {
+          const dataFalta = falta.data || falta.dataAula || '';
+          const disciplina = falta.disciplina || falta.modalidade || '-';
+          const professor = falta.professor || '-';
+
+          const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === falta.id && !r.foiCumprida);
+          const temReposicao = !!reposicaoExistente;
+          const classeExtra = temReposicao ? 'has-reposicao' : '';
+
+          let infoReposicao = '';
+          if (temReposicao && reposicaoExistente) {
+            infoReposicao = `
+              <div class="reposicao-info" style="margin-top: 5px; font-size: 0.7rem; color: var(--yellow);">
+                📅 Reposição agendada: ${fmtDate(reposicaoExistente.dataReposicao)} às ${reposicaoExistente.horarioReposicao}
+              </div>
+            `;
+          }
+
+          return `
+            <div class="reposicao-falta-item ${classeExtra}" onclick="window.selecionarFalta('${falta.id}', this)" data-falta-id="${falta.id}">
+              <div class="checkbox-content">
+                <div class="checkbox-title">
+                  ${fmtDate(dataFalta)}
+                </div>
+                <div class="checkbox-subtitle">
+                  ${disciplina}
+                </div>
+                <div class="checkbox-description">
+                  Professor: ${professor}
+                </div>
+                ${infoReposicao}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Erro ao carregar faltas do aluno:', error);
+        faltasContainer.innerHTML = `
+          <div class="empty">
+            Erro ao carregar faltas
+          </div>
+        `;
+      }
+    };
+
+    window.selecionarFalta = function (faltaId, element) {
+      const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === faltaId && !r.foiCumprida);
+      if (temReposicao) {
+        alert('Esta falta já possui uma reposição agendada!');
+        return;
+      }
+      document.querySelectorAll('.reposicao-falta-item').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      faltaSelecionada = faltaId;
+    };
+
     window.salvarReposicao = async function () {
-      const alunoId = document.getElementById('reposicao-aluno').value; const dataReposicao = document.getElementById('reposicao-data').value; const horarioReposicao = document.getElementById('reposicao-horario').value;
-      if (!alunoId) { alert('Selecione um aluno!'); return; } if (!faltaSelecionada) { alert('Selecione uma falta!'); return; } if (!dataReposicao) { alert('Selecione a data da reposição!'); return; }
-      const saveBtn = event?.target; const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar'; if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
+      const alunoId = document.getElementById('reposicao-aluno').value;
+      const dataReposicao = document.getElementById('reposicao-data').value;
+      const horarioReposicao = document.getElementById('reposicao-horario').value;
+
+      if (!alunoId) { alert('Selecione um aluno!'); return; }
+      if (!faltaSelecionada) { alert('Selecione uma falta!'); return; }
+      if (!dataReposicao) { alert('Selecione a data da reposição!'); return; }
+
+      const saveBtn = event?.target;
+      const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar';
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
+
       try {
         const agoraDashboard = new Date();
         const dataHoraReposicao = new Date(`${dataReposicao}T${horarioReposicao}:00`);
@@ -3197,24 +3475,88 @@
           alert('Não é permitido agendar reposição em horário que já passou. Utilize sempre um horário futuro baseado no relógio do dashboard.');
           return;
         }
-        const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r.foiCumprida); if (reposicaoExistente) { alert('Esta falta já possui uma reposição agendada!'); return; }
-        await getUserCollection('reposicoes').add({ alunoId, faltaOriginalId: faltaSelecionada, dataReposicao, horarioReposicao, foiCumprida: false });
-        await refreshCache(); await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green'); alert('Reposição agendada com sucesso!');
+
+        const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r.foiCumprida);
+        if (reposicaoExistente) { alert('Esta falta já possui uma reposição agendada!'); return; }
+
+        await getUserCollection('reposicoes').add({
+          alunoId,
+          faltaOriginalId: faltaSelecionada,
+          dataReposicao,
+          horarioReposicao,
+          foiCumprida: false
+        });
+
+        await refreshCache();
+        await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green');
+        alert('Reposição agendada com sucesso!');
+
         const alerta = alertasFaltasCache.find(a => a.alunoId === alunoId && !a.resolvido);
-        if (alerta) { await getUserCollection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true }); await refreshCache(); window.renderFaltasConsecutivas(); window.renderWhatsAppFaltas(); window.renderDashboard(); }
-        faltaSelecionada = null; document.getElementById('reposicao-data').value = ''; await carregarFaltasAluno(); await carregarReposicoesAgendadas();
-      } finally { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalText; } }
+        if (alerta) {
+          await getUserCollection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true });
+          await refreshCache();
+          window.renderFaltasConsecutivas();
+          window.renderWhatsAppFaltas();
+          window.renderDashboard();
+        }
+
+        faltaSelecionada = null;
+        document.getElementById('reposicao-data').value = '';
+
+        await window.carregarFaltasAluno(alunoId);
+        await carregarReposicoesAgendadas();
+
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalText; }
+      }
     };
+
     async function carregarReposicoesAgendadas() {
-      const hoje = today(); const agora = new Date(); const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
-      const reposFuturas = reposicoesCache.filter(r => { if (r.foiCumprida) return false; if (r.dataReposicao === hoje) { const horario = horarioParaMinutos(r.horarioReposicao); return minutosAtuais < horario; } return r.dataReposicao > hoje; });
+      const hoje = today();
+      const agora = new Date();
+      const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
+
+      const reposFuturas = reposicoesCache.filter(r => {
+        if (r.foiCumprida) return false;
+        if (r.dataReposicao === hoje) {
+          const horario = horarioParaMinutos(r.horarioReposicao);
+          return minutosAtuais < horario;
+        }
+        return r.dataReposicao > hoje;
+      });
+
       reposFuturas.sort((a, b) => a.dataReposicao.localeCompare(b.dataReposicao));
+
       const container = document.getElementById('reposicoes-agendadas-list');
-      if (!reposFuturas.length) { container.innerHTML = '<div class="empty">Nenhuma reposição agendada</div>'; return; }
-      container.innerHTML = `<div class="frequencia-grid">${reposFuturas.map(r => { const aluno = clientesCache.find(c => c.id === r.alunoId); const faltaOriginal = frequenciasCache.find(f => f.id === r.faltaOriginalId); return `<div class="frequencia-card" data-reposicao-id="${r.id}"><div class="frequencia-aluno-nome">${aluno?.nome || 'Aluno não encontrado'}</div><div class="frequencia-dias"><strong>Falta original:</strong> ${fmtDate(faltaOriginal?.data || 'Data não disponível')}<br><strong>Reposição:</strong> ${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}</div><div class="frequencia-status"><span class="badge badge-pendente">⏳ Agendada</span></div><button class="btn btn-red btn-sm" onclick="window.cancelarReposicao('${r.id}')">Cancelar</button></div>`; }).join('')}</div>`;
+      if (!reposFuturas.length) {
+        container.innerHTML = '<div class="empty">Nenhuma reposição agendada</div>';
+        return;
+      }
+
+      container.innerHTML = `<div class="frequencia-grid">${reposFuturas.map(r => {
+        const aluno = clientesCache.find(c => c.id === r.alunoId);
+        const faltaOriginal = frequenciasCache.find(f => f.id === r.faltaOriginalId);
+        return `<div class="frequencia-card" data-reposicao-id="${r.id}">
+          <div class="frequencia-aluno-nome">${aluno?.nome || 'Aluno não encontrado'}</div>
+          <div class="frequencia-dias">
+            <strong>Falta original:</strong> ${fmtDate(faltaOriginal?.data || 'Data não disponível')}<br>
+            <strong>Reposição:</strong> ${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}
+          </div>
+          <div class="frequencia-status"><span class="badge badge-pendente">⏳ Agendada</span></div>
+          <button class="btn btn-red btn-sm" onclick="window.cancelarReposicao('${r.id}')">Cancelar</button>
+        </div>`;
+      }).join('')}</div>`;
     }
-    window.cancelarReposicao = async function (id) { if (!confirm('Cancelar esta reposição? A falta voltará a ficar disponível para novo agendamento.')) return; await getUserCollection('reposicoes').doc(id).delete(); await refreshCache(); await carregarReposicoesAgendadas(); await carregarFaltasAluno(); await addHistory(`Reposição cancelada`, 'red'); };
-    document.addEventListener('DOMContentLoaded', function () { const reposicaoAlunoSelect = document.getElementById('reposicao-aluno'); if (reposicaoAlunoSelect) { reposicaoAlunoSelect.addEventListener('change', function () { faltaSelecionada = null; carregarFaltasAluno(); }); } });
+
+    window.cancelarReposicao = async function (id) {
+      if (!confirm('Cancelar esta reposição? A falta voltará a ficar disponível para novo agendamento.')) return;
+      await getUserCollection('reposicoes').doc(id).delete();
+      await refreshCache();
+      await carregarReposicoesAgendadas();
+      const alunoId = document.getElementById('reposicao-aluno')?.value;
+      if (alunoId) await window.carregarFaltasAluno(alunoId);
+      await addHistory(`Reposição cancelada`, 'red');
+    };
 
     function horarioParaMinutos(horario) { const [h, m] = horario.split(':').map(Number); return (h * 60) + m; }
 
@@ -3293,7 +3635,7 @@
           }
         }
         const percentual = totalDias ? ((presentes / totalDias) * 100).toFixed(1) : 0;
-        html += `<td>${totalDias}</td><td>${percentual}%</td><td>${faltas}</td><td>${reposicoes}</td></tr>`;
+        html += `<td>${totalDias}</td><td>${percentual}%</span></td><td>${faltas}</td><td>${reposicoes}</td></tr>`;
       }
       html += `</tbody></table></div>`;
       container.innerHTML = html;
@@ -3327,7 +3669,7 @@
     };
 
     window.renderHistorico = async function () { document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join(''); };
-    window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
+    window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</span></td><td>${fmtDate(p.dataVencimento)}</span></td><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
 
     window.maskPhone = function (input) { let v = input.value.replace(/\D/g, ''); if (v.length > 11) v = v.slice(0, 11); if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`; else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`; else if (v.length > 0) v = `(${v}`; input.value = v; };
     window.salvarBackupManual = async function () { try { const dados = { clientes: clientesCache, dividas: dividasCache, parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache, historico: historicoCache, dataBackup: new Date().toISOString() }; const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`; a.click(); URL.revokeObjectURL(url); alert('Backup salvo com sucesso!'); } catch (error) { alert('Erro ao salvar backup'); } };
