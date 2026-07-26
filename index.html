@@ -2381,6 +2381,7 @@
     };
 
     window.renderUsuarios = async function () {
+      // Verifica se o usuário é admin, se não for, não renderiza a página
       if (currentUserRole !== 'admin') {
         const usuariosPage = document.getElementById('page-usuarios');
 
@@ -2389,20 +2390,7 @@
           usuariosPage.style.display = 'none';
         }
 
-        localStorage.setItem('ultimaTelaGestaoMais', 'dashboard');
-
-        if (document.getElementById('page-dashboard')) {
-          document.querySelectorAll('.page').forEach(p => {
-            p.classList.remove('active');
-            p.style.display = 'none';
-          });
-
-          document.getElementById('page-dashboard').classList.add('active');
-          document.getElementById('page-dashboard').style.display = 'block';
-        }
-
-        document.getElementById('topbar-title').innerText = 'Dashboard';
-
+        // Não mostrar alerta de acesso negado, apenas esconde a página
         return;
       }
 
@@ -2869,13 +2857,14 @@
     window.navigate = function (page) {
       const paginasRestritas = ['usuarios'];
 
+      // Se tentar acessar usuários e não for admin, redireciona sem mostrar alerta
       if (paginasRestritas.includes(page) && currentUserRole !== 'admin') {
         const paginaUsuarios = document.getElementById('page-usuarios');
         if (paginaUsuarios) {
           paginaUsuarios.classList.remove('active');
           paginaUsuarios.style.display = 'none';
         }
-        alert('Acesso negado. Apenas administradores podem gerenciar usuários.');
+        // Redireciona para dashboard sem alerta
         page = 'dashboard';
       }
 
