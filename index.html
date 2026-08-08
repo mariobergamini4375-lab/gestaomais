@@ -687,7 +687,6 @@
       color: var(--accent2);
     }
 
-    /* Badges para o sistema de mensagens */
     .badge-ativa {
       background: rgba(16, 185, 129, .15);
       color: var(--green);
@@ -701,11 +700,6 @@
     .badge-expirada {
       background: rgba(239, 68, 68, .15);
       color: var(--red);
-    }
-
-    .badge-aguardando {
-      background: rgba(245, 158, 11, .15);
-      color: var(--yellow);
     }
 
     .search-row {
@@ -1353,7 +1347,6 @@
       display: none !important;
     }
 
-    /* Modal de aviso de expiração */
     .aviso-expiracao-modal .modal {
       max-width: 450px;
     }
@@ -1392,7 +1385,6 @@
       justify-content: center;
     }
 
-    /* ===== NOVOS ESTILOS PARA ÁREA DO ALUNO ===== */
     .aluno-area-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1535,7 +1527,6 @@
       color: var(--green);
     }
 
-    /* Estilos para o relatório do aluno */
     .aluno-relatorio-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -1580,7 +1571,6 @@
       font-weight: 600;
     }
 
-    /* Botão de check-in flutuante para mobile */
     .checkin-floating-btn {
       position: fixed;
       bottom: 80px;
@@ -1609,7 +1599,6 @@
       justify-content: center;
     }
 
-    /* Acesso do Aluno - seção no modal */
     .acesso-aluno-section {
       background: var(--surface2);
       border-radius: 10px;
@@ -1627,7 +1616,6 @@
       margin-bottom: 0.5rem;
     }
 
-    /* OBSERVAÇÃO DESTAQUE PARA O ALUNO */
     .aluno-acesso-obs {
       background: rgba(59, 130, 246, 0.10);
       border-left: 4px solid var(--accent);
@@ -1652,7 +1640,6 @@
       margin-right: 0.5rem;
     }
 
-    /* ===== ESTILOS PARA O SISTEMA DE MENSAGENS ===== */
     .mensagem-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1721,7 +1708,6 @@
       border-bottom: none;
     }
 
-    /* Modal de exibição para o aluno */
     .modal-mensagem-aluno .modal {
       max-width: 550px;
     }
@@ -1759,7 +1745,6 @@
       justify-content: center;
     }
 
-    /* Filtro mês para relatório do aluno */
     .aluno-relatorio-filtro {
       display: flex;
       align-items: center;
@@ -1969,7 +1954,6 @@
                   class="icon">💬</span> WhatsApp Faltas</div>
             </div>
 
-            <!-- NOVO ITEM: Mensagem Alunos -->
             <div class="nav-item" onclick="window.navigate('mensagens')"><span class="icon">📨</span> Mensagem Alunos
             </div>
 
@@ -2358,14 +2342,12 @@
             </div>
           </div>
 
-          <!-- ===== NOVA PÁGINA: MENSAGENS ===== -->
           <div class="page" id="page-mensagens">
             <div class="section-header">
               <h2>📨 Mensagem Alunos</h2>
               <button class="btn btn-primary" onclick="window.abrirFormularioMensagem()">+ Nova Mensagem</button>
             </div>
 
-            <!-- Formulário de Nova Mensagem -->
             <div id="form-mensagem-container" style="display:none;" class="mensagem-card">
               <div class="section-header">
                 <h3 id="form-mensagem-titulo">Nova Mensagem</h3>
@@ -2435,7 +2417,6 @@
               </div>
             </div>
 
-            <!-- Tabela de Mensagens -->
             <div id="lista-mensagens-container">
               <div class="section-header">
                 <h3>📋 Mensagens Cadastradas</h3>
@@ -2475,7 +2456,6 @@
     </div>
   </div>
 
-  <!-- ===== NOVO MODAL PARA EXIBIÇÃO PARA O ALUNO ===== -->
   <div class="modal-overlay modal-mensagem-aluno" id="modal-mensagem-aluno">
     <div class="modal">
       <div class="modal-header">
@@ -2545,11 +2525,9 @@
           </div>
         </div>
 
-        <!-- NOVA SEÇÃO: ACESSO DO ALUNO -->
         <div class="acesso-aluno-section">
           <div class="section-label">🔐 ACESSO DO ALUNO</div>
 
-          <!-- OBSERVAÇÃO ADICIONADA CONFORME SOLICITADO -->
           <div class="aluno-acesso-obs">
             <strong><span class="obs-icon">📌</span> ATENÇÃO:</strong>
             Orientar a obrigatoriedade do aluno fazer o Check-in nos dias de aula para registrar presença.
@@ -2707,11 +2685,9 @@
     let currentUserEmail = null;
     let pendingUsersCheckInterval = null;
     let alunoLogado = null;
-
-    // ===== NOVAS VARIÁVEIS PARA O SISTEMA DE MENSAGENS =====
     let mensagensCache = [];
     let mensagemEditandoId = null;
-    let mensagemAlunoAtual = null; // Para controle de exibição
+    let mensagemAlunoAtual = null;
 
     // ============================================================
     // FERIADOS
@@ -2746,10 +2722,9 @@
       }
 
       // Para alunos, usamos o adminUid para acessar as coleções do admin que o criou
-      if (currentUserRole === 'aluno' && alunoLogado) {
-        const adminUid = alunoLogado.adminUid || currentUser.adminUid;
+      if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
+        const adminUid = alunoLogado.adminUid;
         if (adminUid) {
-          // Usa o adminUid para acessar as coleções corretas
           return db.collection('usuarios').doc(adminUid).collection(collectionName);
         }
         // Fallback: tenta usar o próprio UID do aluno
@@ -2964,7 +2939,6 @@
             p.style.display = '';
           }
         });
-        // Garante que a página de mensagens fique visível
         const pageMensagens = document.getElementById('page-mensagens');
         if (pageMensagens) pageMensagens.style.display = 'block';
       } else if (currentUserRole === 'aluno') {
@@ -4107,32 +4081,25 @@
     // FUNÇÃO DE MARCAR PRESENÇA MANUAL (CORRIGIDA)
     // ============================================================
     window.marcarPresencaManual = async function (clienteId, data, status, faltaOriginalId = null) {
-      // Verifica se o usuário logado é um aluno (deve bloquear)
       if (currentUserRole === 'aluno') {
         alert('⚠️ Apenas o administrador pode alterar presenças manualmente.');
         return;
       }
 
-      // Obtém o aluno que está sendo alterado
       const alunoAlvo = clientesCache.find(c => c.id === clienteId);
       if (!alunoAlvo) {
         alert('Aluno não encontrado.');
         return;
       }
 
-      // Verifica se o usuário atual é o administrador principal
       const isAdminPrincipal = currentUserRole === 'admin';
-
-      // Verifica se o usuário atual é o responsável pelo cadastro do aluno (adminUid)
       const isResponsavel = alunoAlvo.adminUid === currentUser.uid;
 
-      // Se não for admin principal nem responsável, bloqueia
       if (!isAdminPrincipal && !isResponsavel) {
         alert('⚠️ Você não tem permissão para alterar a presença deste aluno. Apenas o administrador principal ou o responsável pelo cadastro podem fazer esta alteração.');
         return;
       }
 
-      // Se chegou aqui, tem permissão para alterar
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
 
       if (status === null && existing) {
@@ -4243,7 +4210,7 @@
     window.exportarRelatorioDireto = function (tipo) { const tabela = document.getElementById('tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo === 'excel') { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência'); XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`); } else if (tipo === 'pdf') { const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape'); doc.text('Relatório de Frequência', 14, 15); doc.autoTable({ html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 }, theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`); } };
 
     // ============================================================
-    // FUNÇÕES DE PRESENÇA AUTOMÁTICA
+    // FUNÇÕES DE PRESENÇA AUTOMÁTICA - SEM CRIAÇÃO DE FALTAS
     // ============================================================
     function calcularFimAula(horarioInicio) {
       const [hora, minuto] = horarioInicio.split(':').map(Number);
@@ -4302,11 +4269,8 @@
         }
       });
 
-      // ============================================================
-      // ALTERAÇÃO IMPORTANTE: REMOVIDA A CRIAÇÃO DE FALTAS AUTOMÁTICAS DO FRONTEND
-      // A criação de faltas agora é feita exclusivamente pelo backend (Cloud Function)
-      // Isso evita duplicidade e garante que as faltas sejam registradas mesmo com o site fechado
-      // ============================================================
+      // Importante: NÃO criar faltas aqui. A Cloud Function é responsável por isso.
+      // Esta função apenas verifica e exibe os check-ins disponíveis.
 
       await refreshCache();
 
@@ -4442,8 +4406,6 @@
     // MANTIDA COMO FALLBACK PARA GARANTIR QUE NENHUMA FALTA SEJA PERDIDA
     // ============================================================
     async function processarFaltasPeriodoInativo(ultimoLoginISO) {
-      // Esta função serve como FALLBACK para garantir que faltas sejam criadas
-      // mesmo se a Cloud Function falhar. Ela NÃO CRIA faltas se já existirem registros.
       if (!currentUser?.uid || !ultimoLoginISO) return;
       try {
         const ultimoLogin = new Date(ultimoLoginISO);
@@ -4458,7 +4420,6 @@
           5: 'Sexta-feira',
           6: 'Sábado'
         };
-        // IMPORTANTE: Verifica registros existentes para evitar duplicidade
         const frequenciasExistentes = new Set(
           frequenciasCache.map(f => `${f.clienteId}_${f.data}`)
         );
@@ -4483,7 +4444,6 @@
                   dataHoraAula < agora
                 ) {
                   const chaveFrequencia = `${aluno.id}_${dataISO}`;
-                  // SÓ CRIA SE NÃO EXISTIR REGISTRO
                   if (!frequenciasExistentes.has(chaveFrequencia)) {
                     const novaFreqRef = getUserCollection('frequencias').doc();
                     batch.set(novaFreqRef, {
@@ -5198,7 +5158,6 @@
         const alertasSnap = await userRef.collection('alertasFaltas').get();
         alertasFaltasCache = alertasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        // Carrega mensagens
         const mensagensSnap = await userRef.collection('mensagens').get();
         mensagensCache = mensagensSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -5481,7 +5440,6 @@
         }, 30000);
       }
 
-      // Inicializa a página de mensagens se estiver visível
       if (document.getElementById('page-mensagens').classList.contains('active')) {
         window.renderMensagens();
       }
@@ -5491,7 +5449,6 @@
     // ÁREA DO ALUNO - FUNÇÕES (CORRIGIDAS COM FILTRO MENSAL)
     // ============================================================
 
-    // Função auxiliar para filtrar frequências por mês e ano
     function filtrarFrequenciasPorMes(frequencias, ano, mes) {
       return frequencias.filter(f => {
         if (!f || !f.data) return false;
@@ -5503,7 +5460,6 @@
       });
     }
 
-    // Função auxiliar para obter o mês e ano atual
     function getMesAnoAtual() {
       const agora = new Date();
       return {
@@ -5540,9 +5496,6 @@
       const parcelasAluno = parcelasCache.filter(p => p.clienteId === aluno.id && p.status === 'atrasado');
       const mensalidadeAtrasada = parcelasAluno.length > 0;
 
-      // ============================================================
-      // CORREÇÃO: Filtrar frequências apenas do mês atual
-      // ============================================================
       const { ano, mes } = getMesAnoAtual();
       const frequenciasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id);
       const frequenciasMesAtual = filtrarFrequenciasPorMes(frequenciasAluno, ano, mes);
@@ -5580,7 +5533,6 @@
         }
       }
 
-      // Nome do mês atual para exibição
       const nomeMes = agora.toLocaleDateString('pt-BR', { month: 'long' });
       const anoAtual = agora.getFullYear();
 
@@ -5725,12 +5677,10 @@
         if (dentroJanela && !jaConfirmado) {
           encontrouAulaAtiva = true;
 
-          // Cálculo do tempo restante em segundos e formatação
           const segundosRestantes = Math.max(0, fimJanela * 60 - (minutosAtuais * 60 + agora.getSeconds()));
           const minutosRestantes = Math.floor(segundosRestantes / 60);
           const segundosRestantesDisplay = segundosRestantes % 60;
 
-          // Formata o contador como MM:SS
           const contadorDisplay = `${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantesDisplay).padStart(2, '0')}`;
 
           html += `
@@ -5780,8 +5730,6 @@
 
       container.innerHTML = html;
 
-      // Inicia os contadores para cada aula ativa
-      // Limpa timers anteriores
       if (window.checkinTimers) {
         window.checkinTimers.forEach(timer => clearInterval(timer));
         window.checkinTimers = [];
@@ -5817,10 +5765,8 @@
 
               if (segundosRestantesAgora <= 0) {
                 clearInterval(timer);
-                // Remove o timer da lista
                 window.checkinTimers = window.checkinTimers.filter(t => t !== timer);
 
-                // Atualiza a UI para janela encerrada
                 if (containerElement) {
                   containerElement.innerHTML = `
                     <div style="background:var(--surface2);border:2px solid var(--red);border-radius:12px;padding:1.5rem;text-align:center;">
@@ -5840,7 +5786,6 @@
               countdownElement.textContent =
                 `${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantesDisplay).padStart(2, '0')}`;
 
-              // Desabilita o botão se não houver mais tempo
               if (btnElement && segundosRestantesAgora <= 0) {
                 btnElement.disabled = true;
                 btnElement.textContent = '⏰ Encerrado';
@@ -5857,7 +5802,6 @@
       const dataAtual = today();
       const agora = new Date();
 
-      // Verifica se ainda está dentro da janela de check-in
       const aluno = alunoLogado;
       if (!aluno) {
         alert('Dados do aluno não encontrados.');
@@ -6126,9 +6070,6 @@
       container.innerHTML = html;
     };
 
-    // ============================================================
-    // FUNÇÃO CORRIGIDA: RELATÓRIO DO ALUNO COM FILTRO MENSAL
-    // ============================================================
     window.carregarAlunoRelatorio = async function () {
       const container = document.getElementById('aluno-relatorio-content');
       if (!container) return;
@@ -6141,11 +6082,9 @@
 
       const aluno = alunoLogado;
 
-      // Define o mês padrão como o mês atual
       const agora = new Date();
       const mesPadrao = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`;
 
-      // Verifica se o filtro já existe, se não cria
       let filtroHTML = `
         <div class="aluno-relatorio-filtro">
           <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
@@ -6155,20 +6094,16 @@
         </div>
       `;
 
-      // Verifica se o filtro já existe no container
       const filtroExistente = container.querySelector('.aluno-relatorio-filtro');
       if (filtroExistente) {
-        // Atualiza o valor do input se necessário
         const inputMes = document.getElementById('aluno-relatorio-mes');
         if (inputMes && !inputMes.value) {
           inputMes.value = mesPadrao;
         }
       } else {
-        // Insere o filtro no início do container
         container.innerHTML = filtroHTML;
       }
 
-      // Função interna para carregar os dados com o filtro aplicado
       window.carregarAlunoRelatorioComFiltro = async function () {
         const inputMes = document.getElementById('aluno-relatorio-mes');
         if (!inputMes) {
@@ -6184,7 +6119,6 @@
 
         const [ano, mes] = mesSelecionado.split('-').map(Number);
 
-        // Filtra as frequências do aluno pelo mês selecionado
         const frequenciasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id);
         const frequenciasFiltradas = filtrarFrequenciasPorMes(frequenciasAluno, ano, mes);
 
@@ -6288,13 +6222,11 @@
 
         html += `</div>`;
 
-        // Remove o conteúdo antigo mantendo o filtro
         const filtroElement = container.querySelector('.aluno-relatorio-filtro');
         container.innerHTML = '';
         if (filtroElement) {
           container.appendChild(filtroElement);
         } else {
-          // Reinsere o filtro se não existir
           const newFiltro = document.createElement('div');
           newFiltro.className = 'aluno-relatorio-filtro';
           newFiltro.innerHTML = `
@@ -6306,13 +6238,11 @@
           container.appendChild(newFiltro);
         }
 
-        // Adiciona o conteúdo
         const contentDiv = document.createElement('div');
         contentDiv.innerHTML = html;
         container.appendChild(contentDiv);
       };
 
-      // Executa a carga inicial com o mês padrão
       setTimeout(() => {
         window.carregarAlunoRelatorioComFiltro();
       }, 100);
@@ -6322,7 +6252,6 @@
     // FUNÇÕES DO SISTEMA DE MENSAGENS
     // ============================================================
 
-    // Abre o formulário para criar uma nova mensagem
     window.abrirFormularioMensagem = function (id = null) {
       const container = document.getElementById('form-mensagem-container');
       const titulo = document.getElementById('form-mensagem-titulo');
@@ -6331,11 +6260,9 @@
       const btnExcluir = document.getElementById('btn-excluir-mensagem');
       const statusDisplay = document.getElementById('mensagem-status-display');
 
-      // Remove qualquer container de confirmações antigo
       const oldConfirmacoes = document.getElementById('confirmacoes-container');
       if (oldConfirmacoes) oldConfirmacoes.remove();
 
-      // Reseta o formulário
       document.getElementById('mensagem-id-edit').value = '';
       document.getElementById('mensagem-titulo').value = '';
       document.getElementById('mensagem-conteudo').value = '';
@@ -6347,28 +6274,23 @@
       document.getElementById('selecao-alunos-container').style.display = 'none';
       document.getElementById('mensagem-alunos').innerHTML = '';
 
-      // Habilita todos os campos do formulário
       document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
         el.disabled = false;
       });
 
-      // Preenche o select de alunos
       const selectAlunos = document.getElementById('mensagem-alunos');
       selectAlunos.innerHTML = clientesCache.map(c =>
         `<option value="${c.id}">${c.nome}</option>`
       ).join('');
 
-      // Define status como Aguardando (novo)
       statusDisplay.textContent = 'Aguardando';
       statusDisplay.className = 'badge badge-aguardando';
 
-      // Mostra todos os botões padrão
       document.querySelectorAll('#form-mensagem-container .btn').forEach(el => {
         el.style.display = '';
       });
 
       if (id) {
-        // Modo edição
         const msg = mensagensCache.find(m => m.id === id);
         if (msg) {
           titulo.textContent = 'Editar Mensagem';
@@ -6380,16 +6302,13 @@
           document.getElementById('mensagem-data-fim').value = msg.dataFim || '';
           document.getElementById('mensagem-hora-fim').value = msg.horaFim || '';
 
-          // Define o status atual
           const statusAtual = window.calcularStatusMensagem(msg);
           statusDisplay.textContent = statusAtual;
           statusDisplay.className = `badge badge-${statusAtual === 'Aguardando' ? 'aguardando' : statusAtual === 'Ativa' ? 'ativa' : statusAtual === 'Encerrada' ? 'encerrada' : 'expirada'}`;
 
-          // Destinatários
           if (msg.alunos && msg.alunos.length > 0) {
             document.querySelector('input[name="destinatario-tipo"][value="especificos"]').checked = true;
             document.getElementById('selecao-alunos-container').style.display = 'block';
-            // Seleciona os alunos
             Array.from(selectAlunos.options).forEach(opt => {
               opt.selected = msg.alunos.includes(opt.value);
             });
@@ -6397,7 +6316,6 @@
             document.querySelector('input[name="destinatario-tipo"][value="todos"]').checked = true;
           }
 
-          // Mostra botões conforme status
           if (statusAtual === 'Aguardando') {
             document.getElementById('btn-confirmar-mensagem').style.display = 'inline-flex';
             document.getElementById('btn-editar-mensagem').style.display = 'none';
@@ -6413,7 +6331,6 @@
           }
         }
       } else {
-        // Modo nova mensagem
         titulo.textContent = 'Nova Mensagem';
         document.getElementById('btn-confirmar-mensagem').style.display = 'none';
         document.getElementById('btn-editar-mensagem').style.display = 'none';
@@ -6422,16 +6339,13 @@
         document.getElementById('mensagem-status-display').className = 'badge badge-aguardando';
       }
 
-      // FORÇA a exibição do container
       container.style.display = 'block';
 
-      // Scroll suave para o formulário
       setTimeout(() => {
         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     };
 
-    // Fecha o formulário
     window.fecharFormularioMensagem = function () {
       const container = document.getElementById('form-mensagem-container');
       container.style.display = 'none';
@@ -6440,16 +6354,13 @@
       document.getElementById('btn-editar-mensagem').style.display = 'none';
       document.getElementById('btn-excluir-mensagem').style.display = 'none';
 
-      // Remove container de confirmações
       const oldConfirmacoes = document.getElementById('confirmacoes-container');
       if (oldConfirmacoes) oldConfirmacoes.remove();
 
-      // Habilita todos os campos
       document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
         el.disabled = false;
       });
 
-      // Mostra todos os botões novamente
       document.querySelectorAll('#form-mensagem-container .btn').forEach(el => {
         el.style.display = '';
       });
@@ -6457,7 +6368,6 @@
       window.renderMensagens();
     };
 
-    // Visualiza a mensagem (abre modal com detalhes)
     window.visualizarMensagem = function (id) {
       const msg = mensagensCache.find(m => m.id === id);
       if (!msg) {
@@ -6465,11 +6375,9 @@
         return;
       }
 
-      // Remove container de confirmações antigo se existir
       const oldConfirmacoes = document.getElementById('confirmacoes-container');
       if (oldConfirmacoes) oldConfirmacoes.remove();
 
-      // Abre o formulário em modo de visualização
       const container = document.getElementById('form-mensagem-container');
       document.getElementById('form-mensagem-titulo').textContent = `📄 ${msg.titulo || 'Mensagem'}`;
       document.getElementById('mensagem-id-edit').value = msg.id;
@@ -6485,12 +6393,10 @@
       statusDisplay.textContent = status;
       statusDisplay.className = `badge badge-${status === 'Aguardando' ? 'aguardando' : status === 'Ativa' ? 'ativa' : status === 'Encerrada' ? 'encerrada' : 'expirada'}`;
 
-      // Desabilita os campos para visualização
       document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
         el.disabled = true;
       });
 
-      // Esconde botões de ação exceto Editar e Excluir
       document.querySelectorAll('#form-mensagem-container .btn').forEach(el => {
         if (el.id !== 'btn-editar-mensagem' && el.id !== 'btn-excluir-mensagem') {
           el.style.display = 'none';
@@ -6499,7 +6405,6 @@
       document.getElementById('btn-editar-mensagem').style.display = 'inline-flex';
       document.getElementById('btn-excluir-mensagem').style.display = 'inline-flex';
 
-      // Mostra as confirmações
       let confirmacoesHtml = '';
       const totalAlunos = msg.alunos && msg.alunos.length > 0 ? msg.alunos.length : clientesCache.length;
       const totalConf = msg.confirmacoes ? msg.confirmacoes.length : 0;
@@ -6523,20 +6428,17 @@
         </div>`;
       }
 
-      // Adiciona resumo de confirmações
       confirmacoesHtml += `<div style="margin-top:0.8rem;display:flex;gap:1rem;flex-wrap:wrap;font-size:0.8rem;background:var(--surface2);padding:0.6rem 1rem;border-radius:8px;">
         <span>👥 Total de alunos: <strong>${totalAlunos}</strong></span>
         <span style="color:var(--green);">✅ Confirmaram: <strong>${totalConf}</strong></span>
         <span style="color:var(--yellow);">⏳ Pendentes: <strong>${totalAlunos - totalConf}</strong></span>
       </div>`;
 
-      // Insere as confirmações no formulário
       const formBody = document.querySelector('#form-mensagem-container');
       const div = document.createElement('div');
       div.id = 'confirmacoes-container';
       div.innerHTML = confirmacoesHtml;
 
-      // Insere antes dos botões (modal-footer)
       const footer = document.querySelector('#form-mensagem-container .modal-footer');
       if (footer) {
         formBody.insertBefore(div, footer);
@@ -6550,7 +6452,6 @@
       }, 100);
     };
 
-    // Calcula o status da mensagem com base nas datas e horas
     window.calcularStatusMensagem = function (msg) {
       const agora = new Date();
       const inicio = new Date(`${msg.dataInicio}T${msg.horaInicio || '00:00'}`);
@@ -6565,7 +6466,6 @@
       }
     };
 
-    // Salva a mensagem (criação ou atualização)
     window.salvarMensagem = async function () {
       const id = document.getElementById('mensagem-id-edit').value;
       const titulo = document.getElementById('mensagem-titulo').value.trim();
@@ -6617,7 +6517,6 @@
 
       try {
         if (id) {
-          // Atualiza a mensagem existente, preservando confirmacoes e status
           const msgExistente = mensagensCache.find(m => m.id === id);
           if (msgExistente) {
             dados.confirmacoes = msgExistente.confirmacoes || [];
@@ -6645,7 +6544,6 @@
       }
     };
 
-    // Confirma a mensagem (torna ativa)
     window.confirmarMensagem = async function () {
       const id = document.getElementById('mensagem-id-edit').value;
       if (!id) {
@@ -6668,7 +6566,6 @@
           return;
         }
 
-        // Apenas confirma, o status será calculado automaticamente
         await getUserCollection('mensagens').doc(id).update({
           confirmadaEm: new Date().toISOString(),
           confirmadaPor: currentUser.email || 'admin'
@@ -6685,7 +6582,6 @@
       }
     };
 
-    // Edita a mensagem (abre o formulário para edição)
     window.editarMensagem = function () {
       const id = document.getElementById('mensagem-id-edit').value;
       if (id) {
@@ -6695,7 +6591,6 @@
       }
     };
 
-    // Exclui a mensagem
     window.excluirMensagem = async function () {
       const id = document.getElementById('mensagem-id-edit').value;
       if (!id) {
@@ -6718,7 +6613,6 @@
       }
     };
 
-    // Exclui mensagem diretamente da lista
     window.excluirMensagemDireto = async function (id) {
       if (!confirm('Tem certeza que deseja excluir esta mensagem permanentemente?')) return;
       try {
@@ -6733,7 +6627,6 @@
       }
     };
 
-    // Duplica uma mensagem existente
     window.duplicarMensagem = async function (id) {
       const msg = mensagensCache.find(m => m.id === id);
       if (!msg) {
@@ -6769,14 +6662,11 @@
       }
     };
 
-    // Renderiza a lista de mensagens
     window.renderMensagens = function () {
       const container = document.getElementById('mensagens-tabela-container');
       const search = document.getElementById('search-mensagens')?.value?.toLowerCase()?.trim() || '';
 
-      // Atualiza os status antes de renderizar
       let mensagens = mensagensCache.filter(m => {
-        // Atualiza o status no cache para manter sincronizado
         m.statusCalculado = window.calcularStatusMensagem(m);
         return !search || m.titulo?.toLowerCase().includes(search) || m.conteudo?.toLowerCase().includes(search);
       });
@@ -6807,7 +6697,6 @@
         const totalAlunos = msg.alunos && msg.alunos.length > 0 ? msg.alunos.length : clientesCache.length;
         const confirmacoes = msg.confirmacoes ? msg.confirmacoes.length : 0;
 
-        // Resumo da mensagem (primeiros 50 caracteres)
         const resumo = msg.conteudo ? msg.conteudo.substring(0, 50) + (msg.conteudo.length > 50 ? '...' : '') : '';
 
         html += `<tr>
@@ -6835,60 +6724,49 @@
     // FUNÇÕES DE EXIBIÇÃO PARA O ALUNO
     // ============================================================
 
-    // Verifica se existem mensagens ativas para o aluno logado
     window.verificarMensagensAtivas = async function () {
       if (currentUserRole !== 'aluno' || !alunoLogado) return;
 
       const alunoId = alunoLogado.id;
       const agora = new Date();
 
-      // Filtra mensagens ativas
       const mensagensAtivas = mensagensCache.filter(msg => {
         const status = window.calcularStatusMensagem(msg);
         if (status !== 'Ativa') return false;
 
-        // Verifica se o aluno está na lista de destinatários
         if (msg.alunos && msg.alunos.length > 0) {
           return msg.alunos.includes(alunoId);
         }
-        return true; // Todos os alunos
+        return true;
       });
 
       if (mensagensAtivas.length === 0) return;
 
-      // Verifica se o aluno já confirmou alguma dessas mensagens
       for (const msg of mensagensAtivas) {
         const jaConfirmou = msg.confirmacoes?.some(c => c.alunoId === alunoId);
         if (!jaConfirmou) {
-          // Exibe a primeira mensagem não confirmada
           window.exibirMensagemParaAluno(msg);
           return;
         }
       }
     };
 
-    // Exibe o modal com a mensagem para o aluno
     window.exibirMensagemParaAluno = function (msg) {
       const modal = document.getElementById('modal-mensagem-aluno');
       document.getElementById('modal-mensagem-titulo').textContent = msg.titulo || 'Comunicado';
       document.getElementById('modal-mensagem-conteudo').textContent = msg.conteudo || '';
 
-      // Reseta o checkbox
       document.getElementById('mensagem-aluno-ciente').checked = false;
 
-      // Guarda o ID da mensagem para usar no aceite
       modal.dataset.mensagemId = msg.id;
 
-      // Abre o modal
       window.openModal('modal-mensagem-aluno');
     };
 
-    // Fecha o modal de mensagem do aluno
     window.fecharModalMensagemAluno = function () {
       window.closeModal('modal-mensagem-aluno');
     };
 
-    // Aceita a mensagem (registra confirmação)
     window.aceitarMensagemAluno = async function () {
       const modal = document.getElementById('modal-mensagem-aluno');
       const msgId = modal.dataset.mensagemId;
@@ -6911,7 +6789,6 @@
           return;
         }
 
-        // Verifica se já confirmou
         if (msg.confirmacoes?.some(c => c.alunoId === alunoLogado.id)) {
           alert('Você já confirmou esta mensagem.');
           window.closeModal('modal-mensagem-aluno');
@@ -6927,22 +6804,17 @@
           timestamp: agora.toISOString()
         };
 
-        // Atualiza a mensagem no Firestore
         const msgRef = getUserCollection('mensagens').doc(msgId);
         await msgRef.update({
           confirmacoes: firebase.firestore.FieldValue.arrayUnion(confirmacao)
         });
 
-        // Atualiza o cache
         await refreshCache();
 
-        // Fecha o modal
         window.closeModal('modal-mensagem-aluno');
 
-        // Verifica se há outras mensagens para exibir
         await window.verificarMensagensAtivas();
 
-        // Adiciona ao histórico
         await addHistory(`Aluno ${alunoLogado.nome} confirmou leitura da mensagem "${msg.titulo}"`, 'green');
 
       } catch (error) {
@@ -6974,7 +6846,6 @@
           document.getElementById('app').style.display = 'block';
           await initApp();
 
-          // Verifica mensagens ativas após o login
           setTimeout(() => {
             window.verificarMensagensAtivas();
           }, 1500);
