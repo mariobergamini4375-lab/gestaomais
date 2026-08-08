@@ -1800,7 +1800,7 @@
     </div>
   </div>
 
-  <!-- Modal de Expiração (bloqueio) -->
+  <!-- Modal de Expiração (bloqueio) - ATUALIZADO -->
   <div class="modal-overlay aviso-expiracao-modal" id="modal-expiracao-bloqueio">
     <div class="modal">
       <div class="modal-header">
@@ -1810,12 +1810,22 @@
       <div class="modal-body">
         <div class="aviso-icon">🔒</div>
         <div class="aviso-titulo">Seu acesso expirou</div>
-        <div class="aviso-mensagem" style="margin-top: 0.5rem;">
-          Para obter maiores informações, entre em contato pelo WhatsApp
-          <br><br>
+        <div class="aviso-mensagem"
+          style="margin-top: 0.5rem; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+          <p style="margin-bottom: 1rem;">Para obter novamente o acesso ao site, siga os passos abaixo:</p>
+          <ol style="text-align: left; padding-left: 1.5rem; line-height: 1.8;">
+            <li>Entre em contato pelo WhatsApp:<br>
+              <strong style="color: var(--green);">📱 (14) 99658-5412</strong>
+            </li>
+            <li>Solicite a chave <strong>PIX</strong> para pagamento da mensalidade.</li>
+            <li>O valor da mensalidade é: <strong style="color: var(--yellow);">R$ 49,90</strong></li>
+            <li>Após realizar o pagamento, envie o <strong>comprovante</strong> pelo WhatsApp.</li>
+            <li>O administrador verificará e liberará seu acesso.</li>
+          </ol>
+          <br>
           <a href="https://wa.me/5514996585412" target="_blank" class="btn btn-whatsapp"
-            style="display:inline-flex;margin-top:0.5rem;">
-            📱 (14) 99658-5412
+            style="display:inline-flex;margin-top:0.5rem; width: 100%; justify-content: center;">
+            📱 Falar com Administrador no WhatsApp
           </a>
         </div>
       </div>
@@ -4176,7 +4186,7 @@
     window.exportarRelatorioDireto = function (tipo) { const tabela = document.getElementById('tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo === 'excel') { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência'); XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`); } else if (tipo === 'pdf') { const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape'); doc.text('Relatório de Frequência', 14, 15); doc.autoTable({ html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 }, theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`); } };
 
     // ============================================================
-    // FUNÇÕES DE PRESENÇA AUTOMÁTICA (INALTERADAS)
+    // FUNÇÕES DE PRESENÇA AUTOMÁTICA (INALTERADAS - FRONTEND)
     // ============================================================
     function calcularFimAula(horarioInicio) {
       const [hora, minuto] = horarioInicio.split(':').map(Number);
@@ -4235,31 +4245,9 @@
         }
       });
 
-      const TEMPO_FALTA_AUTOMATICA = 30;
-      for (const aluno of alunosComAula) {
-        const horarioAula = aluno.diasHorarios?.find(dh => dh.dia === diaSemanaCapitalized)?.horario;
-        if (!horarioAula) continue;
-
-        const horarioInicio = horarioParaMinutos(horarioAula);
-        const tempoFalta = horarioInicio + TEMPO_FALTA_AUTOMATICA;
-
-        if (minutosAtuais >= tempoFalta) {
-          const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataAtual);
-          if (!freqExistente) {
-            await getUserCollection('frequencias').add({
-              clienteId: aluno.id,
-              data: dataAtual,
-              status: 'falta',
-              marcadoAutomaticamente: true,
-              horarioAula: horarioAula,
-              motivo: 'Falta automática - 30min sem check-in',
-              marcadoEm: new Date().toISOString()
-            });
-            await addHistory(`Falta automática registrada para ${aluno.nome} em ${fmtDate(dataAtual)} às ${horarioAula}`, 'red');
-            await refreshCache();
-          }
-        }
-      }
+      // OBSERVAÇÃO: A VERIFICAÇÃO DE FALTAS AUTOMÁTICAS FOI REMOVIDA DO FRONTEND
+      // POIS AGORA É PROCESSADA PELO BACKEND (CLOUD FUNCTIONS)
+      // Isso evita duplicidade e garante que as faltas sejam registradas mesmo com o site fechado.
 
       await refreshCache();
 
@@ -4315,7 +4303,7 @@
     };
 
     // ============================================================
-    // FUNÇÃO DE MARCAR PRESENÇA AUTO (INALTERADA)
+    // FUNÇÃO DE MARCAR PRESENÇA AUTO (INALTERADA - FRONTEND)
     // ============================================================
     window.marcarPresencaAuto = async function (clienteId, data, status, horarioAula, isReposicao, faltaOriginalId) {
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
@@ -5108,7 +5096,7 @@
     }
 
     // ============================================================
-    // PROCESSAR FALTAS PERÍODO INATIVO (INALTERADO)
+    // PROCESSAR FALTAS PERÍODO INATIVO (NÃO REMOVIDO - MANTIDO COMO FALLBACK)
     // ============================================================
     async function processarFaltasPeriodoInativo(ultimoLoginISO) {
       if (!currentUser?.uid || !ultimoLoginISO) return;
@@ -5156,9 +5144,10 @@
                       data: dataISO,
                       status: 'falta',
                       marcadoAutomaticamente: true,
-                      motivo: 'Sistema fechado / usuário inativo',
+                      motivo: 'Reconciliação - sistema inativo',
                       horarioAula: aula.horario,
-                      marcadoEm: new Date().toISOString()
+                      marcadoEm: new Date().toISOString(),
+                      criadoPor: 'system_reconciliacao_frontend'
                     });
                     frequenciasExistentes.add(chaveFrequencia);
                     totalFaltas++;
@@ -5173,10 +5162,10 @@
         if (totalFaltas > 0) {
           await batch.commit();
           await refreshCache();
-          console.log(`Faltas automáticas registradas: ${totalFaltas}`);
+          console.log(`Faltas automáticas registradas (reconciliação frontend): ${totalFaltas}`);
         }
       } catch (error) {
-        console.error('Erro ao processar faltas por inatividade:', error);
+        console.error('Erro ao processar faltas por inatividade (frontend):', error);
       }
     }
 
