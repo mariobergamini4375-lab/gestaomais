@@ -1758,6 +1758,42 @@
     .modal-mensagem-aluno .modal-footer {
       justify-content: center;
     }
+
+    /* Filtro mês para relatório do aluno */
+    .aluno-relatorio-filtro {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      background: var(--surface2);
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .aluno-relatorio-filtro label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+    }
+
+    .aluno-relatorio-filtro input[type="month"] {
+      padding: 0.5rem 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .aluno-relatorio-filtro input[type="month"]:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
   </style>
 </head>
 
@@ -5452,8 +5488,29 @@
     }
 
     // ============================================================
-    // ÁREA DO ALUNO - FUNÇÕES
+    // ÁREA DO ALUNO - FUNÇÕES (CORRIGIDAS COM FILTRO MENSAL)
     // ============================================================
+
+    // Função auxiliar para filtrar frequências por mês e ano
+    function filtrarFrequenciasPorMes(frequencias, ano, mes) {
+      return frequencias.filter(f => {
+        if (!f || !f.data) return false;
+        const partes = f.data.split('-');
+        if (partes.length < 3) return false;
+        const anoFreq = parseInt(partes[0]);
+        const mesFreq = parseInt(partes[1]);
+        return anoFreq === ano && mesFreq === mes;
+      });
+    }
+
+    // Função auxiliar para obter o mês e ano atual
+    function getMesAnoAtual() {
+      const agora = new Date();
+      return {
+        ano: agora.getFullYear(),
+        mes: agora.getMonth() + 1
+      };
+    }
 
     window.carregarAlunoDashboard = async function () {
       const container = document.getElementById('aluno-dashboard-content');
@@ -5483,10 +5540,16 @@
       const parcelasAluno = parcelasCache.filter(p => p.clienteId === aluno.id && p.status === 'atrasado');
       const mensalidadeAtrasada = parcelasAluno.length > 0;
 
+      // ============================================================
+      // CORREÇÃO: Filtrar frequências apenas do mês atual
+      // ============================================================
+      const { ano, mes } = getMesAnoAtual();
       const frequenciasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id);
-      const totalAulas = frequenciasAluno.length;
-      const presencas = frequenciasAluno.filter(f => f.status === 'presente').length;
-      const faltas = frequenciasAluno.filter(f => f.status === 'falta').length;
+      const frequenciasMesAtual = filtrarFrequenciasPorMes(frequenciasAluno, ano, mes);
+
+      const totalAulas = frequenciasMesAtual.length;
+      const presencas = frequenciasMesAtual.filter(f => f.status === 'presente').length;
+      const faltas = frequenciasMesAtual.filter(f => f.status === 'falta').length;
       const percentual = totalAulas > 0 ? ((presencas / totalAulas) * 100).toFixed(1) : 0;
 
       const diasHorarios = aluno.diasHorarios || [];
@@ -5517,6 +5580,10 @@
         }
       }
 
+      // Nome do mês atual para exibição
+      const nomeMes = agora.toLocaleDateString('pt-BR', { month: 'long' });
+      const anoAtual = agora.getFullYear();
+
       let html = `
         <div class="aluno-area-card">
           <div class="aluno-welcome">👋 Olá, <span>${aluno.nome}</span>!</div>
@@ -5533,6 +5600,11 @@
       }
 
       html += `
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+            <span style="font-size:0.8rem;color:var(--text2);background:var(--surface2);padding:0.2rem 0.8rem;border-radius:20px;border:1px solid var(--border);">
+              📅 ${nomeMes} ${anoAtual}
+            </span>
+          </div>
           <div class="aluno-info-grid">
             <div class="aluno-info-item">
               <div class="label">📅 Plano</div>
@@ -5543,19 +5615,19 @@
               <div class="value">${aluno.modalidade || '—'}</div>
             </div>
             <div class="aluno-info-item">
-              <div class="label">📊 Frequência</div>
+              <div class="label">📊 Frequência (${nomeMes})</div>
               <div class="value">${percentual}%</div>
             </div>
             <div class="aluno-info-item">
-              <div class="label">✅ Presenças</div>
+              <div class="label">✅ Presenças (${nomeMes})</div>
               <div class="value">${presencas}</div>
             </div>
             <div class="aluno-info-item">
-              <div class="label">❌ Faltas</div>
+              <div class="label">❌ Faltas (${nomeMes})</div>
               <div class="value">${faltas}</div>
             </div>
             <div class="aluno-info-item">
-              <div class="label">📚 Total de Aulas</div>
+              <div class="label">📚 Total de Aulas (${nomeMes})</div>
               <div class="value">${totalAulas}</div>
             </div>
           </div>
@@ -6054,6 +6126,9 @@
       container.innerHTML = html;
     };
 
+    // ============================================================
+    // FUNÇÃO CORRIGIDA: RELATÓRIO DO ALUNO COM FILTRO MENSAL
+    // ============================================================
     window.carregarAlunoRelatorio = async function () {
       const container = document.getElementById('aluno-relatorio-content');
       if (!container) return;
@@ -6065,107 +6140,182 @@
       }
 
       const aluno = alunoLogado;
-      const frequenciasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id);
 
-      frequenciasAluno.sort((a, b) => b.data.localeCompare(a.data));
+      // Define o mês padrão como o mês atual
+      const agora = new Date();
+      const mesPadrao = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`;
 
-      const totalAulas = frequenciasAluno.length;
-      const presencas = frequenciasAluno.filter(f => f.status === 'presente').length;
-      const faltas = frequenciasAluno.filter(f => f.status === 'falta').length;
-      const percentual = totalAulas > 0 ? ((presencas / totalAulas) * 100).toFixed(1) : 0;
-
-      const faltasConsecutivas = alertasFaltasCache.filter(a => a.alunoId === aluno.id && !a.resolvido);
-
-      let html = `
-        <div class="aluno-area-card">
-          <h3>📊 Relatório de Frequência</h3>
-          <div style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem;">
-            ${aluno.nome} - ${aluno.modalidade || 'Modalidade não informada'}
-          </div>
-      `;
-
-      html += `
-        <div class="aluno-relatorio-grid">
-          <div class="aluno-relatorio-item">
-            <div class="number green">${presencas}</div>
-            <div class="label">✅ Presenças</div>
-          </div>
-          <div class="aluno-relatorio-item">
-            <div class="number red">${faltas}</div>
-            <div class="label">❌ Faltas</div>
-          </div>
-          <div class="aluno-relatorio-item">
-            <div class="number accent">${totalAulas}</div>
-            <div class="label">📚 Total de Aulas</div>
-          </div>
-          <div class="aluno-relatorio-item">
-            <div class="number ${percentual >= 70 ? 'green' : percentual >= 50 ? 'yellow' : 'red'}">${percentual}%</div>
-            <div class="label">📊 Percentual</div>
-          </div>
+      // Verifica se o filtro já existe, se não cria
+      let filtroHTML = `
+        <div class="aluno-relatorio-filtro">
+          <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
+          <input type="month" id="aluno-relatorio-mes" value="${mesPadrao}">
+          <button class="btn btn-primary btn-sm" onclick="window.carregarAlunoRelatorioComFiltro()">🔍 Filtrar</button>
+          <span style="font-size:0.75rem;color:var(--text3);margin-left:auto;">Os dados são filtrados pelo mês selecionado</span>
         </div>
       `;
 
-      if (faltasConsecutivas.length > 0) {
-        html += `
-          <div class="aluno-mensalidade-alerta" style="border-color:var(--orange);background:rgba(245,158,11,0.15);">
-            <span class="alert-icon">⚠️</span>
-            <span class="alert-text">Você possui ${faltasConsecutivas.length} alerta(s) de faltas consecutivas. Procure o responsável para agendar reposição.</span>
-          </div>
-        `;
+      // Verifica se o filtro já existe no container
+      const filtroExistente = container.querySelector('.aluno-relatorio-filtro');
+      if (filtroExistente) {
+        // Atualiza o valor do input se necessário
+        const inputMes = document.getElementById('aluno-relatorio-mes');
+        if (inputMes && !inputMes.value) {
+          inputMes.value = mesPadrao;
+        }
+      } else {
+        // Insere o filtro no início do container
+        container.innerHTML = filtroHTML;
       }
 
-      if (frequenciasAluno.length === 0) {
-        html += `
-          <div class="empty" style="margin-top:1rem;">
-            <div class="empty-icon">📅</div>
-            <div>Nenhum registro de frequência encontrado.</div>
-          </div>
-        `;
-      } else {
-        html += `
-          <div style="margin-top:1rem;">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Horário</th>
-                    <th>Status</th>
-                    <th>Observação</th>
-                  </tr>
-                </thead>
-                <tbody>
-        `;
-
-        for (const f of frequenciasAluno) {
-          const statusBadge = f.status === 'presente' ? 'badge-pago' : 'badge-atrasado';
-          const statusText = f.status === 'presente' ? '✅ Presente' : '❌ Falta';
-          const observacao = f.marcadoPor === 'aluno' ? 'Check-in Aluno' :
-            f.marcadoAutomaticamente ? 'Automático' :
-              f.isReposicao ? 'Reposição' :
-                f.marcadoEm ? 'Marcado manualmente' : '—';
-
-          html += `
-            <tr>
-              <td>${fmtDate(f.data)}</td>
-              <td>${f.horarioAula || '—'}</td>
-              <td><span class="badge ${statusBadge}">${statusText}</span></td>
-              <td style="font-size:0.75rem;color:var(--text2);">${observacao}</td>
-            </tr>
-          `;
+      // Função interna para carregar os dados com o filtro aplicado
+      window.carregarAlunoRelatorioComFiltro = async function () {
+        const inputMes = document.getElementById('aluno-relatorio-mes');
+        if (!inputMes) {
+          window.carregarAlunoRelatorio();
+          return;
         }
 
+        const mesSelecionado = inputMes.value;
+        if (!mesSelecionado) {
+          alert('Selecione um mês para filtrar.');
+          return;
+        }
+
+        const [ano, mes] = mesSelecionado.split('-').map(Number);
+
+        // Filtra as frequências do aluno pelo mês selecionado
+        const frequenciasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id);
+        const frequenciasFiltradas = filtrarFrequenciasPorMes(frequenciasAluno, ano, mes);
+
+        frequenciasFiltradas.sort((a, b) => b.data.localeCompare(a.data));
+
+        const totalAulas = frequenciasFiltradas.length;
+        const presencas = frequenciasFiltradas.filter(f => f.status === 'presente').length;
+        const faltas = frequenciasFiltradas.filter(f => f.status === 'falta').length;
+        const percentual = totalAulas > 0 ? ((presencas / totalAulas) * 100).toFixed(1) : 0;
+
+        const faltasConsecutivas = alertasFaltasCache.filter(a => a.alunoId === aluno.id && !a.resolvido);
+
+        const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long' });
+
+        let html = `
+          <div class="aluno-area-card">
+            <h3>📊 Relatório de Frequência - ${nomeMes}/${ano}</h3>
+            <div style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem;">
+              ${aluno.nome} - ${aluno.modalidade || 'Modalidade não informada'}
+            </div>
+        `;
+
         html += `
-                </tbody>
-              </table>
+          <div class="aluno-relatorio-grid">
+            <div class="aluno-relatorio-item">
+              <div class="number green">${presencas}</div>
+              <div class="label">✅ Presenças</div>
+            </div>
+            <div class="aluno-relatorio-item">
+              <div class="number red">${faltas}</div>
+              <div class="label">❌ Faltas</div>
+            </div>
+            <div class="aluno-relatorio-item">
+              <div class="number accent">${totalAulas}</div>
+              <div class="label">📚 Total de Aulas</div>
+            </div>
+            <div class="aluno-relatorio-item">
+              <div class="number ${percentual >= 70 ? 'green' : percentual >= 50 ? 'yellow' : 'red'}">${percentual}%</div>
+              <div class="label">📊 Percentual</div>
             </div>
           </div>
         `;
-      }
 
-      html += `</div>`;
+        if (faltasConsecutivas.length > 0) {
+          html += `
+            <div class="aluno-mensalidade-alerta" style="border-color:var(--orange);background:rgba(245,158,11,0.15);">
+              <span class="alert-icon">⚠️</span>
+              <span class="alert-text">Você possui ${faltasConsecutivas.length} alerta(s) de faltas consecutivas. Procure o responsável para agendar reposição.</span>
+            </div>
+          `;
+        }
 
-      container.innerHTML = html;
+        if (frequenciasFiltradas.length === 0) {
+          html += `
+            <div class="empty" style="margin-top:1rem;">
+              <div class="empty-icon">📅</div>
+              <div>Nenhum registro de frequência encontrado para ${nomeMes}/${ano}.</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div style="margin-top:1rem;">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Horário</th>
+                      <th>Status</th>
+                      <th>Observação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+          `;
+
+          for (const f of frequenciasFiltradas) {
+            const statusBadge = f.status === 'presente' ? 'badge-pago' : 'badge-atrasado';
+            const statusText = f.status === 'presente' ? '✅ Presente' : '❌ Falta';
+            const observacao = f.marcadoPor === 'aluno' ? 'Check-in Aluno' :
+              f.marcadoAutomaticamente ? 'Automático' :
+                f.isReposicao ? 'Reposição' :
+                  f.marcadoEm ? 'Marcado manualmente' : '—';
+
+            html += `
+              <tr>
+                <td>${fmtDate(f.data)}</td>
+                <td>${f.horarioAula || '—'}</td>
+                <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                <td style="font-size:0.75rem;color:var(--text2);">${observacao}</td>
+              </tr>
+            `;
+          }
+
+          html += `
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+
+        // Remove o conteúdo antigo mantendo o filtro
+        const filtroElement = container.querySelector('.aluno-relatorio-filtro');
+        container.innerHTML = '';
+        if (filtroElement) {
+          container.appendChild(filtroElement);
+        } else {
+          // Reinsere o filtro se não existir
+          const newFiltro = document.createElement('div');
+          newFiltro.className = 'aluno-relatorio-filtro';
+          newFiltro.innerHTML = `
+            <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
+            <input type="month" id="aluno-relatorio-mes" value="${mesSelecionado}">
+            <button class="btn btn-primary btn-sm" onclick="window.carregarAlunoRelatorioComFiltro()">🔍 Filtrar</button>
+            <span style="font-size:0.75rem;color:var(--text3);margin-left:auto;">Os dados são filtrados pelo mês selecionado</span>
+          `;
+          container.appendChild(newFiltro);
+        }
+
+        // Adiciona o conteúdo
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = html;
+        container.appendChild(contentDiv);
+      };
+
+      // Executa a carga inicial com o mês padrão
+      setTimeout(() => {
+        window.carregarAlunoRelatorioComFiltro();
+      }, 100);
     };
 
     // ============================================================
