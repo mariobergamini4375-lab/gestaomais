@@ -1800,7 +1800,7 @@
     </div>
   </div>
 
-  <!-- Modal de Expiração (bloqueio) - ATUALIZADO -->
+  <!-- Modal de Expiração (bloqueio) -->
   <div class="modal-overlay aviso-expiracao-modal" id="modal-expiracao-bloqueio">
     <div class="modal">
       <div class="modal-header">
@@ -2462,7 +2462,7 @@
     </div>
   </div>
 
-  <!-- Modal Cliente (MODIFICADO - com campos de Acesso do Aluno) -->
+  <!-- Modal Cliente -->
   <div class="modal-overlay" id="modal-cliente">
     <div class="modal">
       <div class="modal-header">
@@ -2562,7 +2562,7 @@
     </div>
   </div>
 
-  <!-- Modal Usuario (NÃO ALTERADO) -->
+  <!-- Modal Usuario -->
   <div class="modal-overlay" id="modal-usuario">
     <div class="modal">
       <div class="modal-header">
@@ -2588,7 +2588,7 @@
     </div>
   </div>
 
-  <!-- Modal Status (NÃO ALTERADO) -->
+  <!-- Modal Status -->
   <div class="modal-overlay" id="modal-status">
     <div class="modal">
       <div class="modal-header">
@@ -2607,7 +2607,7 @@
     </div>
   </div>
 
-  <!-- Modal Mensagem (NÃO ALTERADO) -->
+  <!-- Modal Mensagem -->
   <div class="modal-overlay" id="modal-msg">
     <div class="modal">
       <div class="modal-header">
@@ -2811,7 +2811,7 @@
     function horarioParaMinutos(horario) { const [h, m] = horario.split(':').map(Number); return (h * 60) + m; }
 
     // ============================================================
-    // FUNÇÕES DE CONTROLE DE ACESSO (INALTERADAS)
+    // FUNÇÕES DE CONTROLE DE ACESSO
     // ============================================================
     function calcularDataExpiracao(dataInicio, tipoAcesso) {
       if (tipoAcesso === 'admin') return null;
@@ -2902,7 +2902,7 @@
     }
 
     // ============================================================
-    // FUNÇÕES DE NAVEGAÇÃO E MENU (MODIFICADO PARA INCLUIR MENSAGENS)
+    // FUNÇÕES DE NAVEGAÇÃO E MENU
     // ============================================================
     function atualizarMenuPorRole() {
       const menuAdmin = document.getElementById('menu-administrativo');
@@ -3118,7 +3118,7 @@
     }
 
     // ============================================================
-    // FUNÇÕES DE MENSAGEM (INALTERADAS)
+    // FUNÇÕES DE MENSAGEM
     // ============================================================
     const MSG_DEFAULT = "Olá {nome}, a parcela {parcela}/{total_parcelas} da mensalidade \"{tipo}\" com vencimento em {vencimento} no valor de {valor}. Aguardamos seu contato.";
     const MSG_FALTAS_CONSECUTIVAS = "Olá {nome}!\n\nIdentificamos 2 faltas consecutivas nas aulas.\n\nEntre em contato conosco para agendar sua aula de reposição.\n\nEstamos à disposição 🙂";
@@ -3134,7 +3134,7 @@
     window.salvarMsgTemplate = function () { const val = document.getElementById('msg-template').value; if (val) localStorage.setItem('msg_template', val); else localStorage.removeItem('msg_template'); window.closeModal('modal-msg'); alert('Mensagem salva!'); };
 
     // ============================================================
-    // FUNÇÕES DE HIDDEN ITEMS (INALTERADAS)
+    // FUNÇÕES DE HIDDEN ITEMS
     // ============================================================
     let hiddenItems = { hoje: [], atrasadas: [], aniversariantes: [] };
     function loadHiddenItems() {
@@ -3163,7 +3163,7 @@
     setInterval(verificarRestauracaoAtrasadas, 60 * 60 * 1000);
 
     // ============================================================
-    // FUNÇÕES DE FALTAS CONSECUTIVAS (INALTERADAS)
+    // FUNÇÕES DE FALTAS CONSECUTIVAS
     // ============================================================
     async function verificarFaltasConsecutivas() {
       if (!currentUser?.uid) return;
@@ -3321,7 +3321,7 @@
     };
 
     // ============================================================
-    // FUNÇÕES DE HISTÓRICO E ENVIO (INALTERADAS)
+    // FUNÇÕES DE HISTÓRICO E ENVIO
     // ============================================================
     async function registrarEnvioWhatsApp(parcelaId, clienteId, telaOrigem) {
       const agora = new Date();
@@ -3357,7 +3357,7 @@
     };
 
     // ============================================================
-    // FUNÇÕES DE HORÁRIOS (INALTERADAS)
+    // FUNÇÕES DE HORÁRIOS
     // ============================================================
     function gerarOpcoesHorarios() {
       const horarios = [];
@@ -3394,7 +3394,7 @@
     window.toggleClienteParcelamento = function () { const show = document.getElementById('cliente-mensalidade-parcelado').checked; document.getElementById('cliente-parcelamento-fields').style.display = show ? 'block' : 'none'; };
 
     // ============================================================
-    // FUNÇÕES DE CLIENTE (INALTERADAS)
+    // FUNÇÕES DE CLIENTE
     // ============================================================
     window.openClienteModal = function (id = null) {
       popularSelectHorarios();
@@ -3611,7 +3611,7 @@
     };
 
     // ============================================================
-    // FUNÇÕES DE MENSALIDADE (INALTERADAS)
+    // FUNÇÕES DE MENSALIDADE
     // ============================================================
     async function criarMensalidadeParaCliente(clienteId, nomeCliente, valor, vencimento, descricao, parcelado, numParcelas, intervalo) {
       const dividaRef = await getUserCollection('dividas').add({ clienteId, tipo: descricao, descricao, valor, vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1 });
@@ -3658,7 +3658,7 @@
     };
 
     // ============================================================
-    // FUNÇÕES ADMINISTRATIVAS EXISTENTES (INALTERADAS)
+    // FUNÇÕES ADMINISTRATIVAS EXISTENTES
     // ============================================================
     window.atualizarPaginaReposicao = function () {
       window.navigate('reposicao');
@@ -4025,7 +4025,7 @@
     function horarioParaMinutos(horario) { const [h, m] = horario.split(':').map(Number); return (h * 60) + m; }
 
     // ============================================================
-    // FUNÇÃO DE CARREGAR FREQUÊNCIA (INALTERADA)
+    // FUNÇÃO DE CARREGAR FREQUÊNCIA
     // ============================================================
     window.carregarFrequencia = async function () {
       const data = document.getElementById('frequencia-data').value || today();
@@ -4068,19 +4068,40 @@
     };
 
     // ============================================================
-    // FUNÇÃO DE MARCAR PRESENÇA MANUAL (INALTERADA)
+    // FUNÇÃO DE MARCAR PRESENÇA MANUAL (CORRIGIDA)
     // ============================================================
     window.marcarPresencaManual = async function (clienteId, data, status, faltaOriginalId = null) {
-      if (currentUserRole !== 'admin') {
+      // Verifica se o usuário logado é um aluno (deve bloquear)
+      if (currentUserRole === 'aluno') {
         alert('⚠️ Apenas o administrador pode alterar presenças manualmente.');
         return;
       }
 
+      // Obtém o aluno que está sendo alterado
+      const alunoAlvo = clientesCache.find(c => c.id === clienteId);
+      if (!alunoAlvo) {
+        alert('Aluno não encontrado.');
+        return;
+      }
+
+      // Verifica se o usuário atual é o administrador principal
+      const isAdminPrincipal = currentUserRole === 'admin';
+
+      // Verifica se o usuário atual é o responsável pelo cadastro do aluno (adminUid)
+      const isResponsavel = alunoAlvo.adminUid === currentUser.uid;
+
+      // Se não for admin principal nem responsável, bloqueia
+      if (!isAdminPrincipal && !isResponsavel) {
+        alert('⚠️ Você não tem permissão para alterar a presença deste aluno. Apenas o administrador principal ou o responsável pelo cadastro podem fazer esta alteração.');
+        return;
+      }
+
+      // Se chegou aqui, tem permissão para alterar
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
 
       if (status === null && existing) {
         await getUserCollection('frequencias').doc(existing.id).delete();
-        await addHistory(`Presença removida para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`, 'yellow');
+        await addHistory(`Presença removida para ${alunoAlvo?.nome || 'aluno'} em ${fmtDate(data)}`, 'yellow');
       } else if (existing) {
         const updateData = {
           status: status,
@@ -4094,10 +4115,10 @@
         }
         if (existing.marcadoAutomaticamente) {
           updateData.marcadoAutomaticamente = false;
-          updateData.motivo = 'Alterado manualmente pelo administrador';
+          updateData.motivo = 'Alterado manualmente';
         }
         await getUserCollection('frequencias').doc(existing.id).update(updateData);
-        await addHistory(`Presença atualizada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)} (alteração manual)`, status === 'presente' ? 'green' : 'red');
+        await addHistory(`Presença atualizada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${alunoAlvo?.nome} em ${fmtDate(data)} (alteração manual)`, status === 'presente' ? 'green' : 'red');
       } else {
         const newFreqData = {
           clienteId,
@@ -4116,7 +4137,7 @@
           }
         }
         await getUserCollection('frequencias').add(newFreqData);
-        await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`, status === 'presente' ? 'green' : 'red');
+        await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${alunoAlvo?.nome} em ${fmtDate(data)}`, status === 'presente' ? 'green' : 'red');
       }
 
       await refreshCache();
@@ -4186,7 +4207,7 @@
     window.exportarRelatorioDireto = function (tipo) { const tabela = document.getElementById('tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo === 'excel') { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência'); XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`); } else if (tipo === 'pdf') { const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape'); doc.text('Relatório de Frequência', 14, 15); doc.autoTable({ html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 }, theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`); } };
 
     // ============================================================
-    // FUNÇÕES DE PRESENÇA AUTOMÁTICA (INALTERADAS - FRONTEND)
+    // FUNÇÕES DE PRESENÇA AUTOMÁTICA
     // ============================================================
     function calcularFimAula(horarioInicio) {
       const [hora, minuto] = horarioInicio.split(':').map(Number);
@@ -4245,9 +4266,11 @@
         }
       });
 
-      // OBSERVAÇÃO: A VERIFICAÇÃO DE FALTAS AUTOMÁTICAS FOI REMOVIDA DO FRONTEND
-      // POIS AGORA É PROCESSADA PELO BACKEND (CLOUD FUNCTIONS)
-      // Isso evita duplicidade e garante que as faltas sejam registradas mesmo com o site fechado.
+      // ============================================================
+      // ALTERAÇÃO IMPORTANTE: REMOVIDA A CRIAÇÃO DE FALTAS AUTOMÁTICAS DO FRONTEND
+      // A criação de faltas agora é feita exclusivamente pelo backend (Cloud Function)
+      // Isso evita duplicidade e garante que as faltas sejam registradas mesmo com o site fechado
+      // ============================================================
 
       await refreshCache();
 
@@ -4303,7 +4326,7 @@
     };
 
     // ============================================================
-    // FUNÇÃO DE MARCAR PRESENÇA AUTO (INALTERADA - FRONTEND)
+    // FUNÇÃO DE MARCAR PRESENÇA AUTO
     // ============================================================
     window.marcarPresencaAuto = async function (clienteId, data, status, horarioAula, isReposicao, faltaOriginalId) {
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
@@ -4379,19 +4402,98 @@
     };
 
     // ============================================================
-    // FUNÇÕES DE HISTÓRICO E RELATÓRIOS (INALTERADAS)
+    // FUNÇÃO DE RECONCILIAÇÃO DE FALTAS (FALLBACK)
+    // MANTIDA COMO FALLBACK PARA GARANTIR QUE NENHUMA FALTA SEJA PERDIDA
+    // ============================================================
+    async function processarFaltasPeriodoInativo(ultimoLoginISO) {
+      // Esta função serve como FALLBACK para garantir que faltas sejam criadas
+      // mesmo se a Cloud Function falhar. Ela NÃO CRIA faltas se já existirem registros.
+      if (!currentUser?.uid || !ultimoLoginISO) return;
+      try {
+        const ultimoLogin = new Date(ultimoLoginISO);
+        const agora = new Date();
+        if (isNaN(ultimoLogin.getTime()) || agora <= ultimoLogin) return;
+        const mapaDias = {
+          0: 'Domingo',
+          1: 'Segunda-feira',
+          2: 'Terça-feira',
+          3: 'Quarta-feira',
+          4: 'Quinta-feira',
+          5: 'Sexta-feira',
+          6: 'Sábado'
+        };
+        // IMPORTANTE: Verifica registros existentes para evitar duplicidade
+        const frequenciasExistentes = new Set(
+          frequenciasCache.map(f => `${f.clienteId}_${f.data}`)
+        );
+        const batch = db.batch();
+        let totalFaltas = 0;
+        for (const aluno of clientesCache) {
+          if (!Array.isArray(aluno.diasHorarios) || !aluno.diasHorarios.length) continue;
+          for (const aula of aluno.diasHorarios) {
+            let dataVerificacao = new Date(ultimoLogin);
+            while (dataVerificacao <= agora) {
+              const diaSemanaAtual = mapaDias[dataVerificacao.getDay()];
+              const dataISO = dataVerificacao.toISOString().split('T')[0];
+              if (
+                diaSemanaAtual === aula.dia &&
+                !ehFeriado(dataISO)
+              ) {
+                const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
+                const dataHoraAula = new Date(dataVerificacao);
+                dataHoraAula.setHours(horaAula, minutoAula + 30, 0, 0);
+                if (
+                  dataHoraAula > ultimoLogin &&
+                  dataHoraAula < agora
+                ) {
+                  const chaveFrequencia = `${aluno.id}_${dataISO}`;
+                  // SÓ CRIA SE NÃO EXISTIR REGISTRO
+                  if (!frequenciasExistentes.has(chaveFrequencia)) {
+                    const novaFreqRef = getUserCollection('frequencias').doc();
+                    batch.set(novaFreqRef, {
+                      clienteId: aluno.id,
+                      data: dataISO,
+                      status: 'falta',
+                      marcadoAutomaticamente: true,
+                      motivo: 'Reconciliação - sistema inativo (fallback)',
+                      horarioAula: aula.horario,
+                      marcadoEm: new Date().toISOString(),
+                      criadoPor: 'system_reconciliacao_frontend_fallback'
+                    });
+                    frequenciasExistentes.add(chaveFrequencia);
+                    totalFaltas++;
+                  }
+                }
+              }
+              dataVerificacao.setDate(dataVerificacao.getDate() + 1);
+              dataVerificacao.setHours(0, 0, 0, 0);
+            }
+          }
+        }
+        if (totalFaltas > 0) {
+          await batch.commit();
+          await refreshCache();
+          console.log(`Faltas automáticas registradas (fallback): ${totalFaltas}`);
+        }
+      } catch (error) {
+        console.error('Erro ao processar faltas por inatividade (fallback):', error);
+      }
+    }
+
+    // ============================================================
+    // FUNÇÕES DE HISTÓRICO E RELATÓRIOS
     // ============================================================
     window.renderHistorico = async function () { document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join(''); };
     window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
 
     // ============================================================
-    // FUNÇÕES DE UTILITÁRIOS (INALTERADAS)
+    // FUNÇÕES DE UTILITÁRIOS
     // ============================================================
     window.maskPhone = function (input) { let v = input.value.replace(/\D/g, ''); if (v.length > 11) v = v.slice(0, 11); if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`; else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`; else if (v.length > 0) v = `(${v}`; input.value = v; };
     window.salvarBackupManual = async function () { try { const dados = { clientes: clientesCache, dividas: dividasCache, parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache, historico: historicoCache, mensagens: mensagensCache, dataBackup: new Date().toISOString() }; const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`; a.click(); URL.revokeObjectURL(url); alert('Backup salvo com sucesso!'); } catch (error) { alert('Erro ao salvar backup'); } };
 
     // ============================================================
-    // FUNÇÕES DE USUÁRIOS (INALTERADAS)
+    // FUNÇÕES DE USUÁRIOS
     // ============================================================
     window.openUsuarioModal = function (id = null) {
       document.getElementById('usuario-id').value = '';
@@ -4817,7 +4919,7 @@
     };
 
     // ============================================================
-    // FUNÇÕES DE LOGIN E REGISTRO (MODIFICADAS PARA NÃO CRIAR AUTOMATICAMENTE)
+    // FUNÇÕES DE LOGIN E REGISTRO
     // ============================================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
@@ -5020,7 +5122,7 @@
     };
 
     // ============================================================
-    // FUNÇÕES DE CACHE E REFRESH (MODIFICADO PARA INCLUIR MENSAGENS)
+    // FUNÇÕES DE CACHE E REFRESH
     // ============================================================
     async function refreshCache() {
       if (!currentUser?.uid) {
@@ -5096,81 +5198,7 @@
     }
 
     // ============================================================
-    // PROCESSAR FALTAS PERÍODO INATIVO (NÃO REMOVIDO - MANTIDO COMO FALLBACK)
-    // ============================================================
-    async function processarFaltasPeriodoInativo(ultimoLoginISO) {
-      if (!currentUser?.uid || !ultimoLoginISO) return;
-      try {
-        const ultimoLogin = new Date(ultimoLoginISO);
-        const agora = new Date();
-        if (isNaN(ultimoLogin.getTime()) || agora <= ultimoLogin) return;
-        const mapaDias = {
-          0: 'Domingo',
-          1: 'Segunda-feira',
-          2: 'Terça-feira',
-          3: 'Quarta-feira',
-          4: 'Quinta-feira',
-          5: 'Sexta-feira',
-          6: 'Sábado'
-        };
-        const frequenciasExistentes = new Set(
-          frequenciasCache.map(f => `${f.clienteId}_${f.data}`)
-        );
-        const batch = db.batch();
-        let totalFaltas = 0;
-        for (const aluno of clientesCache) {
-          if (!Array.isArray(aluno.diasHorarios) || !aluno.diasHorarios.length) continue;
-          for (const aula of aluno.diasHorarios) {
-            let dataVerificacao = new Date(ultimoLogin);
-            while (dataVerificacao <= agora) {
-              const diaSemanaAtual = mapaDias[dataVerificacao.getDay()];
-              const dataISO = dataVerificacao.toISOString().split('T')[0];
-              if (
-                diaSemanaAtual === aula.dia &&
-                !ehFeriado(dataISO)
-              ) {
-                const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
-                const dataHoraAula = new Date(dataVerificacao);
-                dataHoraAula.setHours(horaAula, minutoAula + 79, 0, 0);
-                if (
-                  dataHoraAula > ultimoLogin &&
-                  dataHoraAula < agora
-                ) {
-                  const chaveFrequencia = `${aluno.id}_${dataISO}`;
-                  if (!frequenciasExistentes.has(chaveFrequencia)) {
-                    const novaFreqRef = getUserCollection('frequencias').doc();
-                    batch.set(novaFreqRef, {
-                      clienteId: aluno.id,
-                      data: dataISO,
-                      status: 'falta',
-                      marcadoAutomaticamente: true,
-                      motivo: 'Reconciliação - sistema inativo',
-                      horarioAula: aula.horario,
-                      marcadoEm: new Date().toISOString(),
-                      criadoPor: 'system_reconciliacao_frontend'
-                    });
-                    frequenciasExistentes.add(chaveFrequencia);
-                    totalFaltas++;
-                  }
-                }
-              }
-              dataVerificacao.setDate(dataVerificacao.getDate() + 1);
-              dataVerificacao.setHours(0, 0, 0, 0);
-            }
-          }
-        }
-        if (totalFaltas > 0) {
-          await batch.commit();
-          await refreshCache();
-          console.log(`Faltas automáticas registradas (reconciliação frontend): ${totalFaltas}`);
-        }
-      } catch (error) {
-        console.error('Erro ao processar faltas por inatividade (frontend):', error);
-      }
-    }
-
-    // ============================================================
-    // VERIFICAR ACESSO DO USUÁRIO (INALTERADO)
+    // VERIFICAR ACESSO DO USUÁRIO
     // ============================================================
     async function verificarAcessoUsuario(user) {
       let tentativas = 0;
@@ -5277,7 +5305,7 @@
     }
 
     // ============================================================
-    // FUNÇÃO PARA MOSTRAR AVISO DE EXPIRAÇÃO (INALTERADO)
+    // FUNÇÃO PARA MOSTRAR AVISO DE EXPIRAÇÃO
     // ============================================================
     window.mostrarAvisoExpiracao = function (dias, mensagem, tipoAcesso) {
       const modal = document.getElementById('modal-aviso-expiracao');
@@ -5296,7 +5324,7 @@
     };
 
     // ============================================================
-    // CRIAÇÃO DO ADMIN PADRÃO (INALTERADO)
+    // CRIAÇÃO DO ADMIN PADRÃO
     // ============================================================
     async function criarUsuarioPadraoAdmin() {
       try {
@@ -5326,7 +5354,7 @@
     }
 
     // ============================================================
-    // FUNÇÕES DE INICIALIZAÇÃO DO APP (MODIFICADO PARA INCLUIR MENSAGENS)
+    // FUNÇÕES DE INICIALIZAÇÃO DO APP
     // ============================================================
     async function criarDadosIniciais() { console.log('Sistema pronto para uso. Nenhum dado de exemplo foi criado.'); }
 
@@ -5424,7 +5452,7 @@
     }
 
     // ============================================================
-    // ÁREA DO ALUNO - FUNÇÕES (MODIFICADO PARA INCLUIR VERIFICAÇÃO DE MENSAGENS)
+    // ÁREA DO ALUNO - FUNÇÕES
     // ============================================================
 
     window.carregarAlunoDashboard = async function () {
@@ -5624,22 +5652,28 @@
 
         if (dentroJanela && !jaConfirmado) {
           encontrouAulaAtiva = true;
-          const minutosParaInicio = Math.max(0, Math.floor((horarioAula - minutosAtuais) / 60));
-          const minutosParaFim = Math.max(0, Math.floor((fimJanela - minutosAtuais) / 60));
+
+          // Cálculo do tempo restante em segundos e formatação
+          const segundosRestantes = Math.max(0, fimJanela * 60 - (minutosAtuais * 60 + agora.getSeconds()));
+          const minutosRestantes = Math.floor(segundosRestantes / 60);
+          const segundosRestantesDisplay = segundosRestantes % 60;
+
+          // Formata o contador como MM:SS
+          const contadorDisplay = `${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantesDisplay).padStart(2, '0')}`;
 
           html += `
-            <div class="checkin-container">
+            <div class="checkin-container" id="checkin-container-${aula.horario.replace(':', '')}">
               <div class="checkin-title">✅ Check-in disponível!</div>
               <div class="checkin-time">${aula.horario}</div>
               <div class="checkin-sub">Aula de ${aluno.modalidade || 'treino'} - ${diaSemanaCapitalized}</div>
               <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.8rem;">
                 Período: 30 min antes até 30 min após a aula
               </div>
-              <button class="checkin-btn" onclick="window.confirmarCheckin('${aluno.id}')">
+              <button class="checkin-btn" id="checkin-btn-${aula.horario.replace(':', '')}" onclick="window.confirmarCheckin('${aluno.id}')">
                 ✅ Confirmar Check-in
               </button>
-              <div style="font-size:0.7rem;color:var(--text3);margin-top:0.5rem;">
-                ⏱️ Janela disponível por ${minutosParaFim} min
+              <div style="font-size:0.9rem;color:var(--text2);margin-top:0.5rem;font-weight:600;" id="checkin-timer-${aula.horario.replace(':', '')}">
+                ⏱️ Janela disponível por <span id="checkin-timer-countdown-${aula.horario.replace(':', '')}">${contadorDisplay}</span>
               </div>
             </div>
           `;
@@ -5673,11 +5707,115 @@
       }
 
       container.innerHTML = html;
+
+      // Inicia os contadores para cada aula ativa
+      // Limpa timers anteriores
+      if (window.checkinTimers) {
+        window.checkinTimers.forEach(timer => clearInterval(timer));
+        window.checkinTimers = [];
+      } else {
+        window.checkinTimers = [];
+      }
+
+      for (const aula of aulasHoje) {
+        const horarioAula = horarioParaMinutos(aula.horario);
+        const [hF, mF] = calcularFimAula(aula.horario);
+        const inicioJanela = horarioAula - 30;
+        const fimJanela = (hF * 60) + mF + 30;
+
+        const dentroJanela = minutosAtuais >= inicioJanela && minutosAtuais <= fimJanela;
+
+        const dataAtual = today();
+        const freqExistente = frequenciasCache.find(f =>
+          f.clienteId === aluno.id && f.data === dataAtual && f.status === 'presente'
+        );
+
+        if (dentroJanela && !freqExistente) {
+          const timerId = aula.horario.replace(':', '');
+          const countdownElement = document.getElementById(`checkin-timer-countdown-${timerId}`);
+          const btnElement = document.getElementById(`checkin-btn-${timerId}`);
+          const containerElement = document.getElementById(`checkin-container-${timerId}`);
+
+          if (countdownElement) {
+            const timer = setInterval(() => {
+              const agoraAtual = new Date();
+              const minutosAtuaisAgora = (agoraAtual.getHours() * 60) + agoraAtual.getMinutes();
+              const segundosAtuais = agoraAtual.getSeconds();
+              const segundosRestantesAgora = Math.max(0, fimJanela * 60 - (minutosAtuaisAgora * 60 + segundosAtuais));
+
+              if (segundosRestantesAgora <= 0) {
+                clearInterval(timer);
+                // Remove o timer da lista
+                window.checkinTimers = window.checkinTimers.filter(t => t !== timer);
+
+                // Atualiza a UI para janela encerrada
+                if (containerElement) {
+                  containerElement.innerHTML = `
+                    <div style="background:var(--surface2);border:2px solid var(--red);border-radius:12px;padding:1.5rem;text-align:center;">
+                      <div style="font-size:2rem;margin-bottom:0.5rem;">⏰</div>
+                      <div style="font-weight:600;color:var(--red);">Janela de check-in encerrada!</div>
+                      <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">
+                        A aula de ${aula.horario} já passou.
+                      </div>
+                    </div>
+                  `;
+                }
+                return;
+              }
+
+              const minutosRestantes = Math.floor(segundosRestantesAgora / 60);
+              const segundosRestantesDisplay = segundosRestantesAgora % 60;
+              countdownElement.textContent =
+                `${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantesDisplay).padStart(2, '0')}`;
+
+              // Desabilita o botão se não houver mais tempo
+              if (btnElement && segundosRestantesAgora <= 0) {
+                btnElement.disabled = true;
+                btnElement.textContent = '⏰ Encerrado';
+              }
+            }, 1000);
+
+            window.checkinTimers.push(timer);
+          }
+        }
+      }
     };
 
     window.confirmarCheckin = async function (alunoId) {
       const dataAtual = today();
       const agora = new Date();
+
+      // Verifica se ainda está dentro da janela de check-in
+      const aluno = alunoLogado;
+      if (!aluno) {
+        alert('Dados do aluno não encontrados.');
+        return;
+      }
+
+      const diasHorarios = aluno.diasHorarios || [];
+      const diaSemanaAtual = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
+      const diaSemanaCapitalized = diaSemanaAtual.charAt(0).toUpperCase() + diaSemanaAtual.slice(1);
+      const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
+
+      const aulasHoje = diasHorarios.filter(dh => dh.dia === diaSemanaCapitalized);
+      let dentroJanela = false;
+
+      for (const aula of aulasHoje) {
+        const horarioAula = horarioParaMinutos(aula.horario);
+        const [hF, mF] = calcularFimAula(aula.horario);
+        const inicioJanela = horarioAula - 30;
+        const fimJanela = (hF * 60) + mF + 30;
+
+        if (minutosAtuais >= inicioJanela && minutosAtuais <= fimJanela) {
+          dentroJanela = true;
+          break;
+        }
+      }
+
+      if (!dentroJanela) {
+        alert('⏰ Período de check-in já encerrado. Procure o administrador para alterar manualmente.');
+        return;
+      }
 
       const freqExistente = frequenciasCache.find(f =>
         f.clienteId === alunoId && f.data === dataAtual
@@ -6031,10 +6169,10 @@
     };
 
     // ============================================================
-    // FUNÇÕES DO SISTEMA DE MENSAGENS - CORRIGIDAS
+    // FUNÇÕES DO SISTEMA DE MENSAGENS
     // ============================================================
 
-    // Abre o formulário para criar uma nova mensagem - CORRIGIDO
+    // Abre o formulário para criar uma nova mensagem
     window.abrirFormularioMensagem = function (id = null) {
       const container = document.getElementById('form-mensagem-container');
       const titulo = document.getElementById('form-mensagem-titulo');
@@ -6047,7 +6185,7 @@
       const oldConfirmacoes = document.getElementById('confirmacoes-container');
       if (oldConfirmacoes) oldConfirmacoes.remove();
 
-      // Reseta o formulário - HABILITA TODOS OS CAMPOS
+      // Reseta o formulário
       document.getElementById('mensagem-id-edit').value = '';
       document.getElementById('mensagem-titulo').value = '';
       document.getElementById('mensagem-conteudo').value = '';
@@ -6059,7 +6197,7 @@
       document.getElementById('selecao-alunos-container').style.display = 'none';
       document.getElementById('mensagem-alunos').innerHTML = '';
 
-      // HABILITA todos os campos do formulário
+      // Habilita todos os campos do formulário
       document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
         el.disabled = false;
       });
@@ -6143,7 +6281,7 @@
       }, 100);
     };
 
-    // Fecha o formulário - CORRIGIDO
+    // Fecha o formulário
     window.fecharFormularioMensagem = function () {
       const container = document.getElementById('form-mensagem-container');
       container.style.display = 'none';
@@ -6169,7 +6307,7 @@
       window.renderMensagens();
     };
 
-    // Visualiza a mensagem (abre modal com detalhes) - CORRIGIDO
+    // Visualiza a mensagem (abre modal com detalhes)
     window.visualizarMensagem = function (id) {
       const msg = mensagensCache.find(m => m.id === id);
       if (!msg) {
