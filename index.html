@@ -1979,14 +1979,12 @@
           <div class="nav-section">
             <div class="nav-section-title">Área do Aluno</div>
             <div class="nav-item active" onclick="window.navigate('aluno-dashboard')"><span class="icon">🏠</span>
-              Página
-              Inicial</div>
+              Página Inicial</div>
             <div class="nav-item" onclick="window.navigate('aluno-checkin')"><span class="icon">✅</span> Check-in</div>
             <div class="nav-item" onclick="window.navigate('aluno-horarios')"><span class="icon">📅</span> Meus Horários
             </div>
             <div class="nav-item" onclick="window.navigate('aluno-mensalidade')"><span class="icon">💰</span>
-              Mensalidade
-            </div>
+              Mensalidade</div>
             <div class="nav-item" onclick="window.navigate('aluno-relatorio')"><span class="icon">📊</span> Relatório de
               Frequência</div>
           </div>
@@ -2123,7 +2121,8 @@
           <div class="page" id="page-hoje">
             <div class="hoje-header-bar">
               <div>
-                <div class="hoje-title">🔥 Vencendo Hoje <span class="hoje-count" id="hoje-count-badge">0</span></div>
+                <div class="hoje-title">🔥 Vencendo Hoje <span class="hoje-count" id="hoje-count-badge">0</span>
+                </div>
                 <div class="hoje-date" id="hoje-date-label"></div>
               </div>
               <button class="btn btn-ghost btn-sm" onclick="window.renderHoje()">↻ Atualizar</button>
@@ -2688,6 +2687,7 @@
     let mensagensCache = [];
     let mensagemEditandoId = null;
     let mensagemAlunoAtual = null;
+    let intervaloFaltasAutomaticas = null;
 
     // ============================================================
     // FERIADOS
@@ -2721,13 +2721,11 @@
         throw new Error('Usuário não autenticado');
       }
 
-      // Para alunos, usamos o adminUid para acessar as coleções do admin que o criou
       if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
         const adminUid = alunoLogado.adminUid;
         if (adminUid) {
           return db.collection('usuarios').doc(adminUid).collection(collectionName);
         }
-        // Fallback: tenta usar o próprio UID do aluno
         return db.collection('usuarios').doc('aluno_' + alunoLogado.id).collection(collectionName);
       }
 
@@ -2735,8 +2733,11 @@
     }
 
     function uid() { return '_' + Math.random().toString(36).substr(2, 9); }
+
     function fmtBRL(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+
     function fmtDate(d) { if (!d) return '—'; return d.split('-').reverse().join('/'); }
+
     function fmtDateTime(d) {
       if (!d) return '—';
       try {
@@ -2751,12 +2752,16 @@
         });
       } catch { return '—'; }
     }
+
     function today() { return new Date().toISOString().split('T')[0]; }
+
     function nowISO() { return new Date().toISOString(); }
+
     function horaAtual() {
       const agora = new Date();
       return String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
     }
+
     function formatarData(data) {
       if (!data) return '—';
       try {
@@ -2779,6 +2784,7 @@
         return '—';
       }
     }
+
     function formatarDataHora(data) {
       if (!data) return '—';
       try {
@@ -2819,6 +2825,7 @@
         return '—';
       }
     }
+
     function horarioParaMinutos(horario) { const [h, m] = horario.split(':').map(Number); return (h * 60) + m; }
 
     // ============================================================
@@ -2875,9 +2882,12 @@
         return { mostrar: false, dias: 0, mensagem: '' };
       }
       let mensagem = '';
-      if (diasRestantes === 3) mensagem = `Seu ${usuarioData.tipoAcesso === 'teste' ? 'período de teste' : 'acesso'} termina em 3 dias.`;
-      else if (diasRestantes === 2) mensagem = `Seu ${usuarioData.tipoAcesso === 'teste' ? 'período de teste' : 'acesso'} termina em 2 dias.`;
-      else if (diasRestantes === 1) mensagem = `Seu ${usuarioData.tipoAcesso === 'teste' ? 'período de teste' : 'acesso'} termina amanhã.`;
+      if (diasRestantes === 3) mensagem =
+        `Seu ${usuarioData.tipoAcesso === 'teste' ? 'período de teste' : 'acesso'} termina em 3 dias.`;
+      else if (diasRestantes === 2) mensagem =
+        `Seu ${usuarioData.tipoAcesso === 'teste' ? 'período de teste' : 'acesso'} termina em 2 dias.`;
+      else if (diasRestantes === 1) mensagem =
+        `Seu ${usuarioData.tipoAcesso === 'teste' ? 'período de teste' : 'acesso'} termina amanhã.`;
       return {
         mostrar: true,
         dias: diasRestantes,
@@ -2977,7 +2987,9 @@
 
     window.navigate = function (page) {
       if (currentUserRole === 'aluno') {
-        const paginasAluno = ['aluno-dashboard', 'aluno-checkin', 'aluno-horarios', 'aluno-mensalidade', 'aluno-relatorio'];
+        const paginasAluno = ['aluno-dashboard', 'aluno-checkin', 'aluno-horarios', 'aluno-mensalidade',
+          'aluno-relatorio'
+        ];
         if (!paginasAluno.includes(page)) {
           page = 'aluno-dashboard';
         }
@@ -3053,7 +3065,10 @@
       if (page === 'relatorios') window.renderRelatorio();
       if (page === 'usuarios') window.renderUsuarios();
       if (page === 'mensagens') window.renderMensagens();
-      if (page === 'aluno-dashboard') { window.carregarAlunoDashboard(); window.verificarMensagensAtivas(); }
+      if (page === 'aluno-dashboard') {
+        window.carregarAlunoDashboard();
+        window.verificarMensagensAtivas();
+      }
       if (page === 'aluno-checkin') window.carregarAlunoCheckin();
       if (page === 'aluno-horarios') window.carregarAlunoHorarios();
       if (page === 'aluno-mensalidade') window.carregarAlunoMensalidade();
@@ -3088,7 +3103,9 @@
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
       const timeString = `${hours}:${minutes}:${seconds}`;
-      const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+      const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira',
+        'Sábado'
+      ];
       const dayName = days[now.getDay()];
       const day = String(now.getDate()).padStart(2, '0');
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -3130,23 +3147,36 @@
     // ============================================================
     // FUNÇÕES DE MENSAGEM
     // ============================================================
-    const MSG_DEFAULT = "Olá {nome}, a parcela {parcela}/{total_parcelas} da mensalidade \"{tipo}\" com vencimento em {vencimento} no valor de {valor}. Aguardamos seu contato.";
-    const MSG_FALTAS_CONSECUTIVAS = "Olá {nome}!\n\nIdentificamos 2 faltas consecutivas nas aulas.\n\nEntre em contato conosco para agendar sua aula de reposição.\n\nEstamos à disposição 🙂";
+    const MSG_DEFAULT =
+      "Olá {nome}, a parcela {parcela}/{total_parcelas} da mensalidade \"{tipo}\" com vencimento em {vencimento} no valor de {valor}. Aguardamos seu contato.";
+    const MSG_FALTAS_CONSECUTIVAS =
+      "Olá {nome}!\n\nIdentificamos 2 faltas consecutivas nas aulas.\n\nEntre em contato conosco para agendar sua aula de reposição.\n\nEstamos à disposição 🙂";
+
     function getMsgTemplate() { return localStorage.getItem('msg_template') || MSG_DEFAULT; }
+
     function buildMsg(p, c, d) {
       let tpl = getMsgTemplate();
-      return tpl.replace(/{nome}/g, c?.nome || '').replace(/{tipo}/g, d?.tipo || 'Mensalidade').replace(/{parcela}/g, p.numeroParcela).replace(/{total_parcelas}/g, p.totalParcelas).replace(/{valor}/g, fmtBRL(p.valor)).replace(/{vencimento}/g, fmtDate(p.dataVencimento));
+      return tpl.replace(/{nome}/g, c?.nome || '').replace(/{tipo}/g, d?.tipo || 'Mensalidade').replace(/{parcela}/g, p
+        .numeroParcela).replace(/{total_parcelas}/g, p.totalParcelas).replace(/{valor}/g, fmtBRL(p.valor))
+        .replace(/{vencimento}/g, fmtDate(p.dataVencimento));
     }
+
     function buildMsgAniversario(cliente) {
       return `🎉 *PARABÉNS ${cliente.nome}!* 🎂\n\nHoje é seu dia especial! Desejamos muita saúde, paz, sucesso e realizações! 🥳🎈\n\nAgradecemos pela confiança e por fazer parte da nossa história! 💝`;
     }
     window.resetMsgTemplate = function () { document.getElementById('msg-template').value = MSG_DEFAULT; };
-    window.salvarMsgTemplate = function () { const val = document.getElementById('msg-template').value; if (val) localStorage.setItem('msg_template', val); else localStorage.removeItem('msg_template'); window.closeModal('modal-msg'); alert('Mensagem salva!'); };
+    window.salvarMsgTemplate = function () {
+      const val = document.getElementById('msg-template').value; if (val)
+        localStorage.setItem('msg_template', val); else localStorage.removeItem('msg_template');
+      window.closeModal('modal-msg');
+      alert('Mensagem salva!');
+    };
 
     // ============================================================
     // FUNÇÕES DE HIDDEN ITEMS
     // ============================================================
     let hiddenItems = { hoje: [], atrasadas: [], aniversariantes: [] };
+
     function loadHiddenItems() {
       const saved = localStorage.getItem('hiddenDashboardItems');
       if (saved) {
@@ -3158,50 +3188,131 @@
         } catch (e) { }
       }
     }
+
     function saveHiddenItems() { localStorage.setItem('hiddenDashboardItems', JSON.stringify(hiddenItems)); }
+
     async function ocultarItemAposEnvio(tipo, id, clienteId = null) {
-      if (tipo === 'hoje') { if (!hiddenItems.hoje.includes(id)) hiddenItems.hoje.push(id); window.renderDashboard(); } else if (tipo === 'atrasada') { if (!hiddenItems.atrasadas.some(item => item.id === id)) { hiddenItems.atrasadas.push({ id: id, hiddenAt: Date.now() }); } window.renderDashboard(); } else if (tipo === 'aniversariante') { if (!hiddenItems.aniversariantes.includes(id)) { hiddenItems.aniversariantes.push(id); await getUserCollection('ultimosParabens').add({ clienteId: id, data: today(), enviadoEm: new Date().toISOString() }); await refreshCache(); } window.renderDashboard(); }
+      if (tipo === 'hoje') {
+        if (!hiddenItems.hoje.includes(id)) hiddenItems.hoje.push(id);
+        window.renderDashboard();
+      } else if (tipo === 'atrasada') {
+        if (!hiddenItems.atrasadas.some(item => item
+          .id === id)) { hiddenItems.atrasadas.push({ id: id, hiddenAt: Date.now() }); }
+        window.renderDashboard();
+      } else if (tipo === 'aniversariante') {
+        if (!hiddenItems.aniversariantes
+          .includes(id)) {
+            hiddenItems.aniversariantes.push(id); await getUserCollection('ultimosParabens')
+              .add({ clienteId: id, data: today(), enviadoEm: new Date().toISOString() });
+          await refreshCache();
+        }
+        window.renderDashboard();
+      }
       saveHiddenItems();
     }
+
     function verificarRestauracaoAtrasadas() {
       const agora = Date.now();
       const doisDiasEmMs = 2 * 24 * 60 * 60 * 1000;
       let alterado = false;
-      hiddenItems.atrasadas = hiddenItems.atrasadas.filter(item => { const deveRestaurar = (agora - item.hiddenAt) >= doisDiasEmMs; if (deveRestaurar) alterado = true; return !deveRestaurar; });
-      if (alterado) { saveHiddenItems(); window.renderDashboard(); }
+      hiddenItems.atrasadas = hiddenItems.atrasadas.filter(item => {
+        const deveRestaurar = (agora - item
+          .hiddenAt) >= doisDiasEmMs; if (deveRestaurar) alterado = true; return !deveRestaurar;
+      });
+      if (alterado) {
+        saveHiddenItems();
+        window.renderDashboard();
+      }
     }
     setInterval(verificarRestauracaoAtrasadas, 60 * 60 * 1000);
 
     // ============================================================
-    // FUNÇÕES DE FALTAS CONSECUTIVAS
+    // FUNÇÕES DE FALTAS CONSECUTIVAS (CORRIGIDA)
     // ============================================================
     async function verificarFaltasConsecutivas() {
-      if (!currentUser?.uid) return;
-      for (const aluno of clientesCache) {
-        const faltasAluno = frequenciasCache.filter(f => f.clienteId === aluno.id && f.status === 'falta').sort((a, b) => a.data.localeCompare(b.data));
-        let faltasConsecutivas = [];
-        let dataAnterior = null;
-        for (const falta of faltasAluno) {
-          if (dataAnterior) {
+      if (!currentUser?.uid) {
+        console.warn('verificarFaltasConsecutivas: usuário não autenticado');
+        return;
+      }
+
+      try {
+        let userUid = currentUser.uid;
+        if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
+          userUid = alunoLogado.adminUid;
+        }
+
+        const userRef = db.collection('usuarios').doc(userUid);
+        const frequenciasSnap = await userRef.collection('frequencias').get();
+        const frequencias = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const alunosSnap = await userRef.collection('clientes').get();
+        const alunos = alunosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const alunosComFaltas = new Map();
+
+        for (const aluno of alunos) {
+          if (!aluno.diasHorarios || !Array.isArray(aluno.diasHorarios) || aluno.diasHorarios.length === 0) {
+            continue;
+          }
+
+          const faltasAluno = frequencias
+            .filter(f => f.clienteId === aluno.id && f.status === 'falta')
+            .sort((a, b) => a.data.localeCompare(b.data));
+
+          if (faltasAluno.length < 2) continue;
+
+          let faltasConsecutivas = [];
+          let dataAnterior = null;
+
+          for (const falta of faltasAluno) {
             const dataFalta = new Date(falta.data + 'T12:00:00');
-            const dataAnteriorDate = new Date(dataAnterior + 'T12:00:00');
-            const diffDias = Math.ceil((dataFalta - dataAnteriorDate) / (1000 * 60 * 60 * 24));
-            if (diffDias <= 7) { faltasConsecutivas.push(falta.data); } else { faltasConsecutivas = [falta.data]; }
-          } else { faltasConsecutivas = [falta.data]; }
-          dataAnterior = falta.data;
-          if (faltasConsecutivas.length >= 2) {
-            const alertaExistente = alertasFaltasCache.find(a => a.alunoId === aluno.id && !a.resolvido && Array.isArray(a.faltas) && a.faltas[0] === faltasConsecutivas[0]);
-            if (!alertaExistente) {
-              await getUserCollection('alertasFaltas').add({
-                alunoId: aluno.id, nome: aluno.nome, telefone: aluno.telefone || '',
-                faltas: [...faltasConsecutivas], ultimaFalta: faltasConsecutivas[faltasConsecutivas.length - 1],
-                resolvido: false, reposicaoAgendada: false, criadoEm: new Date().toISOString(), userId: currentUser.uid
-              });
-              await refreshCache();
+
+            if (dataAnterior) {
+              const diffDias = Math.ceil((dataFalta - dataAnterior) / (1000 * 60 * 60 * 24));
+              if (diffDias <= 7) {
+                faltasConsecutivas.push(falta.data);
+              } else {
+                if (faltasConsecutivas.length >= 2) {
+                  break;
+                }
+                faltasConsecutivas = [falta.data];
+              }
+            } else {
+              faltasConsecutivas = [falta.data];
             }
-            break;
+            dataAnterior = dataFalta;
+
+            if (faltasConsecutivas.length >= 2) {
+              const alertasSnap = await userRef.collection('alertasFaltas')
+                .where('alunoId', '==', aluno.id)
+                .where('resolvido', '==', false)
+                .get();
+
+              if (alertasSnap.empty) {
+                await userRef.collection('alertasFaltas').add({
+                  alunoId: aluno.id,
+                  nome: aluno.nome,
+                  telefone: aluno.telefone || '',
+                  faltas: [...faltasConsecutivas],
+                  ultimaFalta: faltasConsecutivas[faltasConsecutivas.length - 1],
+                  resolvido: false,
+                  reposicaoAgendada: false,
+                  criadoEm: new Date().toISOString()
+                });
+                console.log(`✅ Alerta criado para ${aluno.nome} - ${faltasConsecutivas.length} faltas consecutivas`);
+              }
+              break;
+            }
           }
         }
+
+        await refreshCache();
+        window.renderFaltasConsecutivas();
+        window.renderWhatsAppFaltas();
+        window.renderDashboard();
+
+      } catch (error) {
+        console.error('❌ Erro ao verificar faltas consecutivas:', error);
       }
     }
 
@@ -3209,8 +3320,13 @@
       const container = document.getElementById('faltas-consecutivas-lista');
       if (!container) return;
       const alertas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-      if (alertas.length === 0) { container.innerHTML = '<div class="empty">✅ Nenhum aluno com 2 faltas consecutivas</div>'; return; }
-      container.innerHTML = alertas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join('');
+      if (alertas.length === 0) {
+        container.innerHTML =
+        '<div class="empty">✅ Nenhum aluno com 2 faltas consecutivas</div>'; return;
+      }
+      container.innerHTML = alertas.map(alerta =>
+        `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Datas: ${alerta.faltas.map(f => fmtDate(f)).join(', ')}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`
+      ).join('');
     };
 
     window.renderWhatsAppFaltas = function () {
@@ -3225,7 +3341,8 @@
         if (!alertaExistente) {
           ultimosAlertasPorAluno.set(alunoId, alerta);
         } else {
-          const timestampExistente = alertaExistente.criadoEm ? new Date(alertaExistente.criadoEm).getTime() : 0;
+          const timestampExistente = alertaExistente.criadoEm ? new Date(alertaExistente.criadoEm).getTime() :
+            0;
           const timestampAtual = alerta.criadoEm ? new Date(alerta.criadoEm).getTime() : 0;
           if (timestampAtual > timestampExistente) {
             ultimosAlertasPorAluno.set(alunoId, alerta);
@@ -3238,14 +3355,16 @@
         badge.className = faltas.length > 0 ? 'badge badge-pendente' : 'badge badge-pago';
       }
       if (!faltas.length) {
-        container.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><div>Nenhum aluno com faltas pendentes.</div></div>`;
+        container.innerHTML =
+          `<div class="empty"><div class="empty-icon">✅</div><div>Nenhum aluno com faltas pendentes.</div></div>`;
         return;
       }
-      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Faltas</th><th>Última Mensagem</th><th>Status</th><th>Ações</th></tr></thead><tbody>${faltas.map(alerta => {
-        const ultimaMensagem = alerta.ultimaMensagemData ? `${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviada';
-        const status = alerta.statusWhatsApp === 'enviado' ? '<span class="badge badge-pago">Enviado</span>' : '<span class="badge badge-atrasado">Pendente</span>';
-        return `<tr><td><strong>${alerta.nome}</strong></td><td>${alerta.faltas?.length || 2}</td><td>${ultimaMensagem}</td><td>${status}</td><td class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarMensagemWhatsAppFalta('${alerta.id}')">📲 Enviar</button><button class="btn btn-ghost btn-sm" onclick="window.darBaixaWhatsApp('${alerta.id}')">✅ Dar Baixa</button></td></tr>`;
-      }).join('')}</tbody></table></div>`;
+      container.innerHTML =
+        `<div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Faltas</th><th>Última Mensagem</th><th>Status</th><th>Ações</th></tr></thead><tbody>${faltas.map(alerta => {
+          const ultimaMensagem = alerta.ultimaMensagemData ? `${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviada';
+          const status = alerta.statusWhatsApp === 'enviado' ? '<span class="badge badge-pago">Enviado</span>' : '<span class="badge badge-atrasado">Pendente</span>';
+          return `<tr><td><strong>${alerta.nome}</strong></td><td>${alerta.faltas?.length || 2}</td><td>${ultimaMensagem}</td><td>${status}</td><td class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarMensagemWhatsAppFalta('${alerta.id}')">📲 Enviar</button><button class="btn btn-ghost btn-sm" onclick="window.darBaixaWhatsApp('${alerta.id}')">✅ Dar Baixa</button></td></tr>`;
+        }).join('')}</tbody></table></div>`;
     };
 
     window.enviarMensagemWhatsAppFalta = async function (id) {
@@ -3279,7 +3398,10 @@
 
     window.darBaixaWhatsApp = async function (id) {
       try {
-        await getUserCollection('alertasFaltas').doc(id).set({ baixaWhatsApp: true, baixaWhatsAppData: Date.now() }, { merge: true });
+        await getUserCollection('alertasFaltas').doc(id).set({
+          baixaWhatsApp: true, baixaWhatsAppData: Date
+            .now()
+        }, { merge: true });
         const alerta = alertasFaltasCache.find(a => a.id === id);
         if (alerta) alerta.baixaWhatsApp = true;
         window.renderWhatsAppFaltas();
@@ -3323,7 +3445,10 @@
 
     window.ocultarAlertaFalta = async function (id) {
       if (!confirm('Dar baixa neste alerta? Ele será removido da lista do Dashboard.')) return;
-      await getUserCollection('alertasFaltas').doc(id).update({ resolvido: true, resolvidoEm: new Date().toISOString(), resolvidoVia: 'dashboard' });
+      await getUserCollection('alertasFaltas').doc(id).update({
+        resolvido: true, resolvidoEm: new Date()
+          .toISOString(), resolvidoVia: 'dashboard'
+      });
       await refreshCache();
       window.renderFaltasConsecutivas();
       window.renderWhatsAppFaltas();
@@ -3338,28 +3463,46 @@
       const dataHora = agora.toLocaleString('pt-BR');
       const apenasData = agora.toISOString().split('T')[0];
       const parcela = parcelasCache.find(p => p.id === parcelaId);
-      if (parcela) { await getUserCollection('parcelas').doc(parcelaId).update({ ultimoEnvio: dataHora, ultimoEnvioLembrete: apenasData, ultimoEnvioTela: telaOrigem }); }
+      if (parcela) {
+        await getUserCollection('parcelas').doc(parcelaId).update({
+          ultimoEnvio: dataHora,
+          ultimoEnvioLembrete: apenasData, ultimoEnvioTela: telaOrigem
+        });
+      }
       const cliente = clientesCache.find(c => c.id === clienteId);
       await addHistory(`WhatsApp enviado para ${cliente?.nome} - Tela: ${telaOrigem}`, 'whatsapp');
       await refreshCache();
-      window.renderParcelas(); window.renderHoje(); window.renderDisparoTable(); window.renderDashboard();
+      window.renderParcelas();
+      window.renderHoje();
+      window.renderDisparoTable();
+      window.renderDashboard();
     }
+
     async function registrarEnvioAniversario(clienteId, telaOrigem) {
       const agora = new Date();
-      await getUserCollection('ultimosParabens').add({ clienteId, data: today(), enviadoEm: agora.toLocaleString('pt-BR'), telaOrigem });
+      await getUserCollection('ultimosParabens').add({
+        clienteId, data: today(), enviadoEm: agora.toLocaleString(
+          'pt-BR'), telaOrigem
+      });
       await addHistory(`Parabéns enviado para aniversariante - Tela: ${telaOrigem}`, 'pink');
       await refreshCache();
-      window.renderParcelas(); window.renderHoje(); window.renderDisparoTable(); window.renderDashboard();
+      window.renderParcelas();
+      window.renderHoje();
+      window.renderDisparoTable();
+      window.renderDashboard();
     }
+
     window.enviarWhatsAppComRegistro = async function (parcelaId, clienteId, telaOrigem, telefone, mensagem) {
       await registrarEnvioWhatsApp(parcelaId, clienteId, telaOrigem);
       const parcela = parcelasCache.find(p => p.id === parcelaId);
       if (parcela && telaOrigem === 'dashboard') {
-        if (parcela.dataVencimento === today() && parcela.status !== 'pago') ocultarItemAposEnvio('hoje', parcelaId);
+        if (parcela.dataVencimento === today() && parcela.status !== 'pago') ocultarItemAposEnvio('hoje',
+          parcelaId);
         else if (parcela.status === 'atrasado') ocultarItemAposEnvio('atrasada', parcelaId);
       }
       window.open(`https://wa.me/55${telefone}?text=${mensagem}`, '_blank');
     };
+
     window.enviarParabensComRegistro = function (clienteId, telaOrigem, telefone, mensagem) {
       registrarEnvioAniversario(clienteId, telaOrigem);
       ocultarItemAposEnvio('aniversariante', clienteId);
@@ -3379,29 +3522,47 @@
       }
       return horarios;
     }
+
     function popularSelectHorarios() {
       const horarios = gerarOpcoesHorarios();
       const selectHorario = document.getElementById('novo-horario');
       if (selectHorario) selectHorario.innerHTML = horarios.map(h => `<option value="${h}">${h}</option>`).join('');
       const selectReposicao = document.getElementById('reposicao-horario');
-      if (selectReposicao) selectReposicao.innerHTML = horarios.map(h => `<option value="${h}">${h}</option>`).join('');
+      if (selectReposicao) selectReposicao.innerHTML = horarios.map(h => `<option value="${h}">${h}</option>`).join(
+        '');
     }
+
     window.adicionarDiaHorario = function () {
       const dia = document.getElementById('novo-dia').value;
       const horario = document.getElementById('novo-horario').value;
       currentDiasHorarios.push({ dia, horario });
       atualizarListaDiasHorarios();
     };
+
     window.removerDiaHorario = function (index) {
-      if (confirm('Remover este dia/horário?')) { currentDiasHorarios.splice(index, 1); atualizarListaDiasHorarios(); }
+      if (confirm('Remover este dia/horário?')) {
+        currentDiasHorarios.splice(index, 1);
+        atualizarListaDiasHorarios();
+      }
     };
+
     function atualizarListaDiasHorarios() {
       const container = document.getElementById('dias-horarios-list');
       if (!container) return;
-      if (currentDiasHorarios.length === 0) { container.innerHTML = '<div style="padding:0.5rem;text-align:center;color:var(--text3);">Nenhum dia/horário</div>'; return; }
-      container.innerHTML = currentDiasHorarios.map((item, idx) => `<div class="dia-horario-item"><span>${item.dia} às ${item.horario}</span><button class="remove-dia-btn" onclick="window.removerDiaHorario(${idx})">❌</button></div>`).join('');
+      if (currentDiasHorarios.length === 0) {
+        container.innerHTML =
+        '<div style="padding:0.5rem;text-align:center;color:var(--text3);">Nenhum dia/horário</div>'; return;
+      }
+      container.innerHTML = currentDiasHorarios.map((item, idx) =>
+        `<div class="dia-horario-item"><span>${item.dia} às ${item.horario}</span><button class="remove-dia-btn" onclick="window.removerDiaHorario(${idx})">❌</button></div>`
+      ).join('');
     }
-    window.toggleClienteParcelamento = function () { const show = document.getElementById('cliente-mensalidade-parcelado').checked; document.getElementById('cliente-parcelamento-fields').style.display = show ? 'block' : 'none'; };
+
+    window.toggleClienteParcelamento = function () {
+      const show = document.getElementById(
+        'cliente-mensalidade-parcelado').checked; document.getElementById('cliente-parcelamento-fields').style
+          .display = show ? 'block' : 'none';
+    };
 
     // ============================================================
     // FUNÇÕES DE CLIENTE
@@ -3448,12 +3609,17 @@
           if (c.diasHorarios) currentDiasHorarios = [...c.diasHorarios];
           if (c.mensalidadeInfo) {
             document.getElementById('cliente-mensalidade-valor').value = c.mensalidadeInfo.valor || '';
-            document.getElementById('cliente-mensalidade-vencimento').value = c.mensalidadeInfo.vencimento || today();
-            document.getElementById('cliente-mensalidade-descricao').value = c.mensalidadeInfo.descricao || '';
-            document.getElementById('cliente-mensalidade-parcelado').checked = c.mensalidadeInfo.parcelado || false;
+            document.getElementById('cliente-mensalidade-vencimento').value = c.mensalidadeInfo
+              .vencimento || today();
+            document.getElementById('cliente-mensalidade-descricao').value = c.mensalidadeInfo
+              .descricao || '';
+            document.getElementById('cliente-mensalidade-parcelado').checked = c.mensalidadeInfo
+              .parcelado || false;
             if (c.mensalidadeInfo.parcelado) {
-              document.getElementById('cliente-mensalidade-parcelas').value = c.mensalidadeInfo.numParcelas || 2;
-              document.getElementById('cliente-mensalidade-intervalo').value = c.mensalidadeInfo.intervalo || 'mensal';
+              document.getElementById('cliente-mensalidade-parcelas').value = c.mensalidadeInfo
+                .numParcelas || 2;
+              document.getElementById('cliente-mensalidade-intervalo').value = c.mensalidadeInfo
+                .intervalo || 'mensal';
               document.getElementById('cliente-parcelamento-fields').style.display = 'block';
             }
           }
@@ -3508,7 +3674,8 @@
           const userData = userDoc.data();
           if (userData.role === 'admin' || userData.role === 'user') {
             try {
-              const alunosSnap = await db.collection('usuarios').doc(userDoc.id).collection('clientes').get();
+              const alunosSnap = await db.collection('usuarios').doc(userDoc.id).collection('clientes')
+                .get();
               const alunos = alunosSnap.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
@@ -3548,7 +3715,8 @@
         const observacao = document.getElementById('cliente-observacao').value.trim();
         const valorMensalidade = parseFloat(document.getElementById('cliente-mensalidade-valor').value);
         const vencimentoMensalidade = document.getElementById('cliente-mensalidade-vencimento').value;
-        const descricaoMensalidade = document.getElementById('cliente-mensalidade-descricao').value || 'Mensalidade';
+        const descricaoMensalidade = document.getElementById('cliente-mensalidade-descricao').value ||
+          'Mensalidade';
         const parcelado = document.getElementById('cliente-mensalidade-parcelado').checked;
         const numParcelas = parseInt(document.getElementById('cliente-mensalidade-parcelas').value) || 1;
         const intervalo = document.getElementById('cliente-mensalidade-intervalo').value;
@@ -3559,7 +3727,10 @@
         if (!nome || !telefone) { alert('Preencha nome e telefone!'); return; }
 
         if (!emailLogin) { alert('Preencha o email de acesso do aluno!'); return; }
-        if (!senhaLogin || senhaLogin.length < 6) { alert('A senha deve ter pelo menos 6 caracteres!'); return; }
+        if (!senhaLogin || senhaLogin.length < 6) {
+          alert('A senha deve ter pelo menos 6 caracteres!');
+          return;
+        }
 
         const emailCheck = await verificarEmailLoginUnico(emailLogin, id);
         if (!emailCheck.valido) {
@@ -3601,18 +3772,23 @@
           await refreshCache();
           await addHistory(`Aluno ${nome} atualizado com acesso de aluno`, 'green');
         } else {
-          if (!valorMensalidade || !vencimentoMensalidade) { alert('Preencha valor e vencimento!'); return; }
+          if (!valorMensalidade || !vencimentoMensalidade) {
+            alert('Preencha valor e vencimento!');
+            return;
+          }
           const docRef = await getUserCollection('clientes').add(dadosAluno);
           await refreshCache();
           await addHistory(`Aluno ${nome} cadastrado com acesso de aluno`, 'green');
-          await criarMensalidadeParaCliente(docRef.id, nome, valorMensalidade, vencimentoMensalidade, descricaoMensalidade, parcelado, numParcelas, intervalo);
+          await criarMensalidadeParaCliente(docRef.id, nome, valorMensalidade, vencimentoMensalidade,
+            descricaoMensalidade, parcelado, numParcelas, intervalo);
         }
 
         window.closeModal('modal-cliente');
         window.renderClientes();
         window.renderDashboard();
 
-        alert('✅ Aluno cadastrado com sucesso!\n\nO aluno poderá acessar o sistema usando:\nEmail: ' + emailLogin + '\nSenha: ' + senhaLogin);
+        alert('✅ Aluno cadastrado com sucesso!\n\nO aluno poderá acessar o sistema usando:\nEmail: ' +
+          emailLogin + '\nSenha: ' + senhaLogin);
 
       } finally {
         saveBtn.disabled = false;
@@ -3623,8 +3799,12 @@
     // ============================================================
     // FUNÇÕES DE MENSALIDADE
     // ============================================================
-    async function criarMensalidadeParaCliente(clienteId, nomeCliente, valor, vencimento, descricao, parcelado, numParcelas, intervalo) {
-      const dividaRef = await getUserCollection('dividas').add({ clienteId, tipo: descricao, descricao, valor, vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1 });
+    async function criarMensalidadeParaCliente(clienteId, nomeCliente, valor, vencimento, descricao, parcelado,
+      numParcelas, intervalo) {
+      const dividaRef = await getUserCollection('dividas').add({
+        clienteId, tipo: descricao, descricao, valor,
+        vencimento, status: 'pendente', parcelado, totalParcelas: parcelado ? numParcelas : 1
+      });
       await refreshCache();
       if (parcelado && numParcelas > 1) {
         const valorParcela = valor / numParcelas;
@@ -3637,11 +3817,20 @@
             else if (intervalo === 'semanal') d.setDate(d.getDate() + (i * 7));
             dataVenc = d.toISOString().split('T')[0];
           }
-          await getUserCollection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: i + 1, totalParcelas: numParcelas, valor: parseFloat(valorParcela.toFixed(2)), dataVencimento: dataVenc, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
+          await getUserCollection('parcelas').add({
+            dividaId: dividaRef.id, clienteId, numeroParcela: i +
+              1, totalParcelas: numParcelas, valor: parseFloat(valorParcela.toFixed(2)),
+            dataVencimento: dataVenc, status: 'pendente', ultimoEnvio: null,
+            ultimoEnvioLembrete: null
+          });
         }
         await addHistory(`${numParcelas} parcelas geradas para ${nomeCliente}`, 'purple');
       } else {
-        await getUserCollection('parcelas').add({ dividaId: dividaRef.id, clienteId, numeroParcela: 1, totalParcelas: 1, valor, dataVencimento: vencimento, status: 'pendente', ultimoEnvio: null, ultimoEnvioLembrete: null });
+        await getUserCollection('parcelas').add({
+          dividaId: dividaRef.id, clienteId, numeroParcela: 1,
+          totalParcelas: 1, valor, dataVencimento: vencimento, status: 'pendente', ultimoEnvio: null,
+          ultimoEnvioLembrete: null
+        });
         await addHistory(`Mensalidade criada para ${nomeCliente}`, 'green');
       }
       await refreshCache();
@@ -3703,20 +3892,20 @@
         tbody.innerHTML = clientesFiltrados.map(cliente => {
           const temLogin = cliente.emailLogin ? '✅' : '❌';
           return `
-            <tr>
-              <td><strong>${cliente.nome || '-'}</strong></td>
-              <td>${cliente.telefone || '-'}</td>
-              <td>${cliente.responsavel || '-'}</td>
-              <td>${cliente.modalidade || '-'}</td>
-              <td>${cliente.plano || '-'}</td>
-              <td><span class="badge badge-${cliente.status === 'Ativo' ? 'pago' : 'atrasado'}">${cliente.status || 'Ativo'}</span></td>
-              <td class="td-actions">
-                <button class="btn btn-primary btn-sm" onclick="window.editarCliente('${cliente.id}')">✏ Editar</button>
-                <button class="btn btn-red btn-sm" onclick="window.excluirCliente('${cliente.id}')">🗑 Excluir</button>
-                <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">Login: ${temLogin}</span>
-              </td>
-            </tr>
-          `;
+                <tr>
+                  <td><strong>${cliente.nome || '-'}</strong></td>
+                  <td>${cliente.telefone || '-'}</td>
+                  <td>${cliente.responsavel || '-'}</td>
+                  <td>${cliente.modalidade || '-'}</td>
+                  <td>${cliente.plano || '-'}</td>
+                  <td><span class="badge badge-${cliente.status === 'Ativo' ? 'pago' : 'atrasado'}">${cliente.status || 'Ativo'}</span></td>
+                  <td class="td-actions">
+                    <button class="btn btn-primary btn-sm" onclick="window.editarCliente('${cliente.id}')">✏ Editar</button>
+                    <button class="btn btn-red btn-sm" onclick="window.excluirCliente('${cliente.id}')">🗑 Excluir</button>
+                    <span style="font-size:0.7rem;color:var(--text3);margin-left:0.3rem;">Login: ${temLogin}</span>
+                  </td>
+                </tr>
+              `;
         }).join('');
       } catch (error) {
         console.error('Erro ao renderizar alunos:', error);
@@ -3727,31 +3916,52 @@
       }
     };
 
-    window.limparFiltrosParcelas = function () { document.getElementById('search-parcelas').value = ''; document.getElementById('filter-data-de').value = ''; document.getElementById('filter-data-ate').value = ''; document.getElementById('filter-parcela-status').value = ''; window.renderParcelas(); };
+    window.limparFiltrosParcelas = function () {
+      document.getElementById('search-parcelas').value = '';
+      document.getElementById('filter-data-de').value = '';
+      document.getElementById('filter-data-ate').value = '';
+      document.getElementById('filter-parcela-status').value = '';
+      window.renderParcelas();
+    };
+
     window.renderParcelas = async function () {
       const search = document.getElementById('search-parcelas')?.value.toLowerCase().trim() || '';
       const filtroStatus = document.getElementById('filter-parcela-status')?.value || '';
       const dataDe = document.getElementById('filter-data-de')?.value || '';
       const dataAte = document.getElementById('filter-data-ate')?.value || '';
-      const mapaClientes = {}; clientesCache.forEach(c => { mapaClientes[c.id] = c; });
-      const mapaDividas = {}; dividasCache.forEach(d => { mapaDividas[d.id] = d; });
+      const mapaClientes = {};
+      clientesCache.forEach(c => { mapaClientes[c.id] = c; });
+      const mapaDividas = {};
+      dividasCache.forEach(d => { mapaDividas[d.id] = d; });
       let parcelas = parcelasCache.filter(p => {
-        const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId];
-        const nomeAluno = (c?.nome || '').toLowerCase(); const tipoMensalidade = (d?.tipo || '').toLowerCase();
+        const c = mapaClientes[p.clienteId];
+        const d = mapaDividas[p.dividaId];
+        const nomeAluno = (c?.nome || '').toLowerCase();
+        const tipoMensalidade = (d?.tipo || '').toLowerCase();
         const matchBusca = !search || nomeAluno.includes(search) || tipoMensalidade.includes(search);
-        let matchData = true; if (dataDe && p.dataVencimento < dataDe) matchData = false; if (dataAte && p.dataVencimento > dataAte) matchData = false;
+        let matchData = true;
+        if (dataDe && p.dataVencimento < dataDe) matchData = false;
+        if (dataAte && p.dataVencimento > dataAte) matchData = false;
         const matchStatus = !filtroStatus || p.status === filtroStatus;
         return matchBusca && matchData && matchStatus;
       });
       const tbody = document.getElementById('parcelas-tbody');
-      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty">Nenhuma parcela</div></td></tr>'; return; }
+      if (!parcelas.length) {
+        tbody.innerHTML =
+        '<tr><td colspan="8"><div class="empty">Nenhuma parcela</div></td></tr>'; return;
+      }
       let html = '';
       for (const p of parcelas) {
-        const c = mapaClientes[p.clienteId]; const d = mapaDividas[p.dividaId]; const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, d));
-        html += `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></td></tr>`;
+        const c = mapaClientes[p.clienteId];
+        const d = mapaDividas[p.dividaId];
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, d));
+        html +=
+          `<tr><td><strong>${c?.nome || '—'}</strong></td><td>${d?.tipo || '—'}</td><td><span class="pill-num">${p.numeroParcela}/${p.totalParcelas}</span></td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><button class="btn btn-ghost btn-sm" onclick="window.openStatusModal('${p.id}', 'parcela')">🔄</button><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Mensalidades/Controle', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a><button class="btn btn-red btn-sm" onclick="window.deleteDividaHandler('${p.dividaId}')">🗑</button></td></tr>`;
       }
       tbody.innerHTML = html;
     };
+
     window.deleteDividaHandler = async function (id) {
       if (!confirm('Excluir mensalidade e parcelas?')) return;
       const parcelasDaDivida = parcelasCache.filter(p => p.dividaId === id);
@@ -3759,38 +3969,100 @@
       await getUserCollection('dividas').doc(id).delete();
       await refreshCache();
       await addHistory(`Mensalidade excluída`, 'red');
-      window.renderParcelas(); window.renderDashboard();
+      window.renderParcelas();
+      window.renderDashboard();
     };
-    window.openStatusModal = function (id, tipo) { document.getElementById('status-id').value = id; document.getElementById('status-tipo').value = tipo; const item = tipo === 'parcela' ? parcelasCache.find(x => x.id === id) : dividasCache.find(x => x.id === id); document.getElementById('status-novo').value = item?.status || 'pendente'; window.openModal('modal-status'); };
+
+    window.openStatusModal = function (id, tipo) {
+      document.getElementById('status-id').value = id;
+      document.getElementById('status-tipo').value = tipo; const item = tipo === 'parcela' ? parcelasCache.find(x =>
+        x.id === id) : dividasCache.find(x => x.id === id); document.getElementById('status-novo').value = item
+          ?.status || 'pendente';
+      window.openModal('modal-status');
+    };
+
     window.saveStatus = async function () {
-      const id = document.getElementById('status-id').value; const tipo = document.getElementById('status-tipo').value; const novoStatus = document.getElementById('status-novo').value;
-      if (tipo === 'parcela') { const p = parcelasCache.find(x => x.id === id); await getUserCollection('parcelas').doc(id).update({ status: novoStatus }); await addHistory(`Parcela ${p.numeroParcela}/${p.totalParcelas}: ${p.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow'); } else { const d = dividasCache.find(x => x.id === id); await getUserCollection('dividas').doc(id).update({ status: novoStatus }); await addHistory(`Mensalidade: ${d.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow'); }
-      await refreshCache(); window.closeModal('modal-status'); window.renderParcelas(); window.renderDashboard(); window.renderHoje();
+      const id = document.getElementById('status-id').value;
+      const tipo = document.getElementById('status-tipo').value;
+      const novoStatus = document.getElementById('status-novo').value;
+      if (tipo === 'parcela') {
+        const p = parcelasCache.find(x => x.id === id); await getUserCollection(
+          'parcelas').doc(id).update({ status: novoStatus }); await addHistory(
+            `Parcela ${p.numeroParcela}/${p.totalParcelas}: ${p.status} → ${novoStatus}`, novoStatus ===
+              'pago' ? 'green' : 'yellow');
+      } else {
+        const d = dividasCache.find(x => x.id === id); await
+          getUserCollection('dividas').doc(id).update({ status: novoStatus }); await addHistory(
+            `Mensalidade: ${d.status} → ${novoStatus}`, novoStatus === 'pago' ? 'green' : 'yellow');
+      }
+      await refreshCache();
+      window.closeModal('modal-status');
+      window.renderParcelas();
+      window.renderDashboard();
+      window.renderHoje();
     };
 
     window.renderDashboard = async function () {
       const hoje = today();
       let parcelas = parcelasCache;
       let changed = false;
-      for (let i = 0; i < parcelas.length; i++) { if (parcelas[i].status === 'pendente' && parcelas[i].dataVencimento < hoje) { await getUserCollection('parcelas').doc(parcelas[i].id).update({ status: 'atrasado' }); changed = true; } }
+      for (let i = 0; i < parcelas.length; i++) {
+        if (parcelas[i].status === 'pendente' && parcelas[i]
+          .dataVencimento < hoje) {
+            await getUserCollection('parcelas').doc(parcelas[i].id).update({
+              status:
+                'atrasado'
+            });
+          changed = true;
+        }
+      }
       if (changed) await refreshCache();
       parcelas = parcelasCache;
-      const hojeParcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago' && p.ultimoEnvioLembrete !== hoje && !hiddenItems.hoje.includes(p.id));
+      const hojeParcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago' && p
+        .ultimoEnvioLembrete !== hoje && !hiddenItems.hoje.includes(p.id));
       document.getElementById('dashboard-stat-hoje').textContent = hojeParcelas.length;
-      document.getElementById('dashboard-lista-hoje').innerHTML = hojeParcelas.length ? hojeParcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Vence hoje</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`; }).join('') : '<div class="empty">✅ Nenhuma cobrança para hoje</div>';
-      const atrasadas = parcelas.filter(p => p.status === 'atrasado' && !hiddenItems.atrasadas.some(item => item.id === p.id));
+      document.getElementById('dashboard-lista-hoje').innerHTML = hojeParcelas.length ? hojeParcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
+        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Vence hoje</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`;
+      }).join('') :
+        '<div class="empty">✅ Nenhuma cobrança para hoje</div>';
+      const atrasadas = parcelas.filter(p => p.status === 'atrasado' && !hiddenItems.atrasadas.some(item => item
+        .id === p.id));
       document.getElementById('dashboard-stat-atrasadas').textContent = atrasadas.length;
-      document.getElementById('dashboard-lista-atrasadas').innerHTML = atrasadas.length ? atrasadas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Atrasado</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`; }).join('') : '<div class="empty">✅ Nenhuma parcela em atraso</div>';
+      document.getElementById('dashboard-lista-atrasadas').innerHTML = atrasadas.length ? atrasadas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId);
+        const tel = c?.telefone?.replace(/\D/g, '');
+        const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId)));
+        return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c?.nome}</div><div class="cobranca-valor">${fmtBRL(p.valor)}</div><div class="cobranca-vencimento">Atrasado</div></div><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬</a></div>`;
+      }).join('') :
+        '<div class="empty">✅ Nenhuma parcela em atraso</div>';
       let aniversariantes = clientesCache.filter(c => c.nascimento && c.nascimento.slice(5) === hoje.slice(5));
-      aniversariantes = aniversariantes.filter(c => !ultimosParabensCache.some(item => item.clienteId === c.id && item.data === hoje) && !hiddenItems.aniversariantes.includes(c.id));
+      aniversariantes = aniversariantes.filter(c => !ultimosParabensCache.some(item => item.clienteId === c.id &&
+        item.data === hoje) && !hiddenItems.aniversariantes.includes(c.id));
       document.getElementById('dashboard-stat-aniversariantes').textContent = aniversariantes.length;
-      document.getElementById('dashboard-lista-aniversariantes').innerHTML = aniversariantes.length ? aniversariantes.map(c => { const tel = c.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsgAniversario(c)); return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="#" onclick="window.enviarParabensComRegistro('${c.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`; }).join('') : '<div class="empty">🎂 Nenhum aniversariante</div>';
+      document.getElementById('dashboard-lista-aniversariantes').innerHTML = aniversariantes.length ?
+        aniversariantes.map(c => {
+          const tel = c.telefone?.replace(/\D/g, '');
+          const msg = encodeURIComponent(buildMsgAniversario(c));
+          return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="#" onclick="window.enviarParabensComRegistro('${c.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`;
+        }).join('') :
+        '<div class="empty">🎂 Nenhum aniversariante</div>';
       const alertasFaltas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
       const dashboardFaltasContainer = document.getElementById('dashboard-lista-faltas');
       const dashboardFaltasStat = document.getElementById('dashboard-stat-faltas');
       if (dashboardFaltasContainer) {
         dashboardFaltasStat.textContent = alertasFaltas.length;
-        if (alertasFaltas.length === 0) { dashboardFaltasContainer.innerHTML = '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>'; } else { dashboardFaltasContainer.innerHTML = alertasFaltas.map(alerta => `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`).join(''); }
+        if (alertasFaltas.length === 0) {
+          dashboardFaltasContainer.innerHTML =
+          '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>';
+        } else {
+          dashboardFaltasContainer
+            .innerHTML = alertasFaltas.map(alerta =>
+              `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`
+            ).join('');
+        }
       }
     };
 
@@ -3798,13 +4070,50 @@
       const hoje = today();
       const parcelas = parcelasCache.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
       document.getElementById('hoje-count-badge').textContent = parcelas.length;
-      document.getElementById('hoje-date-label').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-      document.getElementById('hoje-content').innerHTML = !parcelas.length ? '<div class="empty">✅ Nenhuma cobrança para hoje</div>' : `<div class="hoje-cards">${parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="hoje-card"><div><div class="hoje-card-nome">${c?.nome}</div><div class="hoje-card-valor">${fmtBRL(p.valor)}</div></div><div class="hoje-card-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Vencendo Hoje', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a><button class="btn btn-green btn-sm" onclick="window.marcarPago('${p.id}')">✔ Marcar Pago</button></div></div>`; }).join('')}</div>`;
+      document.getElementById('hoje-date-label').textContent = new Date().toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long'
+      });
+      document.getElementById('hoje-content').innerHTML = !parcelas.length ?
+        '<div class="empty">✅ Nenhuma cobrança para hoje</div>' :
+        `<div class="hoje-cards">${parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<div class="hoje-card"><div><div class="hoje-card-nome">${c?.nome}</div><div class="hoje-card-valor">${fmtBRL(p.valor)}</div></div><div class="hoje-card-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Vencendo Hoje', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">💬 WhatsApp</a><button class="btn btn-green btn-sm" onclick="window.marcarPago('${p.id}')">✔ Marcar Pago</button></div></div>`; }).join('')}</div>`;
     };
-    window.marcarPago = async function (parcelaId) { await getUserCollection('parcelas').doc(parcelaId).update({ status: 'pago' }); await refreshCache(); await addHistory(`Parcela marcada como paga`, 'green'); window.renderHoje(); window.renderDashboard(); };
 
-    function getParcelasDisparo() { const filtro = document.getElementById('disparo-filter-status').value; const hoje = today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p.status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro === 'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago'); else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro === 'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(p => p.status !== 'pago'); return parcelas; }
-    window.renderDisparoTable = async function () { const parcelas = getParcelasDisparo(); const tbody = document.getElementById('disparo-tbody'); if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return; } tbody.innerHTML = parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); const tel = c?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x => x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></td></tr>`; }).join(''); };
+    window.marcarPago = async function (parcelaId) {
+      await getUserCollection('parcelas').doc(parcelaId).update({
+        status:
+          'pago'
+      });
+      await refreshCache();
+      await addHistory(`Parcela marcada como paga`, 'green');
+      window.renderHoje();
+      window.renderDashboard();
+    };
+
+    function getParcelasDisparo() {
+      const filtro = document.getElementById('disparo-filter-status').value; const hoje =
+        today(); let parcelas = parcelasCache; if (filtro === 'urgente') parcelas = parcelas.filter(p => p
+          .status === 'atrasado' || (p.dataVencimento === hoje && p.status !== 'pago')); else if (filtro ===
+            'vencendo_hoje') parcelas = parcelas.filter(p => p.dataVencimento === hoje && p.status !== 'pago');
+      else if (filtro === 'atrasado') parcelas = parcelas.filter(p => p.status === 'atrasado'); else if (filtro ===
+        'pendente') parcelas = parcelas.filter(p => p.status === 'pendente'); else parcelas = parcelas.filter(
+          p => p.status !== 'pago'); return parcelas;
+    }
+
+    window.renderDisparoTable = async function () {
+      const parcelas = getParcelasDisparo(); const tbody = document
+        .getElementById('disparo-tbody'); if (!parcelas.length) {
+          tbody.innerHTML =
+          '<tr><td colspan="9"><div class="empty">Nenhuma parcela</div></td></tr>'; return;
+        }
+      tbody.innerHTML = parcelas.map(p => {
+        const c = clientesCache.find(x => x.id === p.clienteId); const tel = c
+          ?.telefone?.replace(/\D/g, ''); const msg = encodeURIComponent(buildMsg(p, c, dividasCache.find(x =>
+            x.id === p.dividaId))); return `<tr><td><strong>${c?.nome}</strong></td><td>${c?.telefone}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td><td>${p.ultimoEnvio ? fmtDate(p.ultimoEnvio) : '—'}</td><td class="td-actions"><a href="#" onclick="window.enviarWhatsAppComRegistro('${p.id}', '${c?.id}', 'Disparo', '${tel}', '${msg}'); return false;" class="btn btn-whatsapp btn-sm">📤 Enviar</a></td></tr>`;
+      })
+        .join('');
+    };
 
     window.carregarAniversariantesSemana = async function () {
       const agora = new Date();
@@ -3820,30 +4129,73 @@
         if (!c.nascimento) return false;
         const [ano, mes, dia] = c.nascimento.split('-');
         const dataAniversarioEsteAno = new Date(agora.getFullYear(), parseInt(mes) - 1, parseInt(dia));
-        if (dataAniversarioEsteAno < inicioSemana) dataAniversarioEsteAno.setFullYear(agora.getFullYear() + 1);
+        if (dataAniversarioEsteAno < inicioSemana) dataAniversarioEsteAno.setFullYear(agora.getFullYear() +
+          1);
         return dataAniversarioEsteAno >= inicioSemana && dataAniversarioEsteAno <= fimSemana;
-      }).sort((a, b) => { const aData = a.nascimento.slice(5); const bData = b.nascimento.slice(5); return aData.localeCompare(bData); });
+      }).sort((a, b) => {
+        const aData = a.nascimento.slice(5); const bData = b.nascimento.slice(5); return aData
+          .localeCompare(bData);
+      });
       const infoElement = document.getElementById('aniversariantes-semana-info');
-      const periodoStr = `${fmtDate(inicioSemana.toISOString().split('T')[0])} a ${fmtDate(fimSemana.toISOString().split('T')[0])}`;
+      const periodoStr =
+        `${fmtDate(inicioSemana.toISOString().split('T')[0])} a ${fmtDate(fimSemana.toISOString().split('T')[0])}`;
       infoElement.textContent = `${aniversariantes.length} aniversariante(s) - ${periodoStr}`;
       const content = document.getElementById('aniversariantes-content');
-      if (!aniversariantes.length) { content.innerHTML = '<div class="empty">🎂 Nenhum aniversariante nesta semana</div>'; } else { content.innerHTML = `<div class="aniversariantes-grid">${aniversariantes.map(a => `<div class="aniversariante-card"><div class="aniversariante-icon">🎂</div><div class="aniversariante-info"><div class="aniversariante-nome">${a.nome}</div><div class="aniversariante-data">${fmtDate(a.nascimento)}</div><div class="aniversariante-dia-semana">${new Date(agora.getFullYear(), parseInt(a.nascimento.split('-')[1]) - 1, parseInt(a.nascimento.split('-')[2])).toLocaleDateString('pt-BR', { weekday: 'long' })}</div></div></div>`).join('')}</div>`; }
+      if (!aniversariantes.length) {
+        content.innerHTML =
+        '<div class="empty">🎂 Nenhum aniversariante nesta semana</div>';
+      } else {
+        content.innerHTML =
+          `<div class="aniversariantes-grid">${aniversariantes.map(a => `<div class="aniversariante-card"><div class="aniversariante-icon">🎂</div><div class="aniversariante-info"><div class="aniversariante-nome">${a.nome}</div><div class="aniversariante-data">${fmtDate(a.nascimento)}</div><div class="aniversariante-dia-semana">${new Date(agora.getFullYear(), parseInt(a.nascimento.split('-')[1]) - 1, parseInt(a.nascimento.split('-')[2])).toLocaleDateString('pt-BR', { weekday: 'long' })}</div></div></div>`).join('')}</div>`;
+      }
     };
 
     window.carregarAlunosPorHora = function () {
-      const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+      const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado',
+        'Domingo'
+      ];
       const horarios = gerarOpcoesHorarios();
       const mapa = {};
-      horarios.forEach(h => { mapa[h] = {}; dias.forEach(d => mapa[h][d] = []); });
-      clientesCache.forEach(c => { if (c.diasHorarios) c.diasHorarios.forEach(dh => { if (mapa[dh.horario]?.[dh.dia]) mapa[dh.horario][dh.dia].push(c.nome); }); });
+      horarios.forEach(h => {
+        mapa[h] = {};
+        dias.forEach(d => mapa[h][d] = []);
+      });
+      clientesCache.forEach(c => {
+        if (c.diasHorarios) c.diasHorarios.forEach(dh => {
+          if (mapa[dh.horario]?.[dh
+            .dia]) mapa[dh.horario][dh.dia].push(c.nome);
+        });
+      });
       const tbody = document.getElementById('alunos-por-hora-tbody');
-      tbody.innerHTML = horarios.map(horario => `<tr><th>${horario}</th>${dias.map(dia => `<td>${mapa[horario][dia].length ? `<span class="badge">${mapa[horario][dia].length}</span><ul class="alunos-lista">${mapa[horario][dia].map(n => `<li>👤 ${n}</li>`).join('')}</ul>` : '—'}</td>`).join('')}</tr>`).join('');
+      tbody.innerHTML = horarios.map(horario =>
+        `<tr><th>${horario}</th>${dias.map(dia => `<td>${mapa[horario][dia].length ? `<span class="badge">${mapa[horario][dia].length}</span><ul class="alunos-lista">${mapa[horario][dia].map(n => `<li>👤 ${n}</li>`).join('')}</ul>` : '—'}</td>`).join('')}</tr>`
+      )
+        .join('');
     };
-    window.exportarAlunosHoraExcel = function () { const tabela = document.querySelector('.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Alunos por Hora'); XLSX.writeFile(wb, 'alunos-por-hora.xlsx'); };
-    window.exportarAlunosHoraPDF = function () { const { jsPDF } = window.jspdf; const tabela = document.querySelector('.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const doc = new jsPDF('landscape'); doc.text('Relatório - Alunos por Hora', 14, 15); doc.autoTable({ html: '.alunos-por-hora-table', startY: 20, styles: { fontSize: 7 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save('alunos-por-hora.pdf'); };
+
+    window.exportarAlunosHoraExcel = function () {
+      const tabela = document.querySelector(
+        '.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const wb =
+          XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true });
+      XLSX.utils.book_append_sheet(wb, ws, 'Alunos por Hora');
+      XLSX.writeFile(wb, 'alunos-por-hora.xlsx');
+    };
+
+    window.exportarAlunosHoraPDF = function () {
+      const { jsPDF } = window.jspdf; const tabela = document.querySelector(
+        '.alunos-por-hora-table'); if (!tabela) { alert('Nenhum dado para exportar'); return; } const doc =
+          new jsPDF('landscape');
+      doc.text('Relatório - Alunos por Hora', 14, 15);
+      doc.autoTable({
+        html: '.alunos-por-hora-table', startY: 20, styles: { fontSize: 7 },
+        headStyles: { fillColor: [59, 130, 246], textColor: 255 }
+      });
+      doc.save('alunos-por-hora.pdf');
+    };
 
     window.carregarReposicao = async function () {
-      document.getElementById('reposicao-aluno').innerHTML = '<option value="">-- Selecione --</option>' + clientesCache.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+      document.getElementById('reposicao-aluno').innerHTML = '<option value="">-- Selecione --</option>' +
+        clientesCache.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
       faltaSelecionada = null;
       popularSelectHorarios();
       await carregarReposicoesAgendadas();
@@ -3891,40 +4243,34 @@
           return db - da;
         });
         if (!faltasUnicas.length) {
-          faltasContainer.innerHTML = `<div class="empty">Nenhuma falta encontrada no Relatório de Frequência</div>`;
+          faltasContainer.innerHTML =
+            `<div class="empty">Nenhuma falta encontrada no Relatório de Frequência</div>`;
           return;
         }
         faltasContainer.innerHTML = faltasUnicas.map(falta => {
           const dataFalta = falta.data || falta.dataAula || '';
           const disciplina = falta.disciplina || falta.modalidade || '-';
           const professor = falta.professor || '-';
-          const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === falta.id && !r.foiCumprida);
+          const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === falta.id && !r
+            .foiCumprida);
           const temReposicao = !!reposicaoExistente;
           const classeExtra = temReposicao ? 'has-reposicao' : '';
           let infoReposicao = '';
           if (temReposicao && reposicaoExistente) {
             infoReposicao = `
-              <div class="reposicao-info" style="margin-top: 5px; font-size: 0.7rem; color: var(--yellow);">
-                📅 Reposição agendada: ${fmtDate(reposicaoExistente.dataReposicao)} às ${reposicaoExistente.horarioReposicao}
-              </div>
-            `;
+                    <div class="reposicao-info" style="margin-top:5px;font-size:0.7rem;color:var(--yellow);">
+                        📅 Reposição agendada: ${fmtDate(reposicaoExistente.dataReposicao)} às ${reposicaoExistente.horarioReposicao}
+                    </div>`;
           }
           return `
-            <div class="reposicao-falta-item ${classeExtra}" onclick="window.selecionarFalta('${falta.id}', this)" data-falta-id="${falta.id}">
-              <div class="checkbox-content">
-                <div class="checkbox-title">
-                  ${fmtDate(dataFalta)}
-                </div>
-                <div class="checkbox-subtitle">
-                  ${disciplina}
-                </div>
-                <div class="checkbox-description">
-                  Professor: ${professor}
-                </div>
-                ${infoReposicao}
-              </div>
-            </div>
-          `;
+                    <div class="reposicao-falta-item ${classeExtra}" onclick="window.selecionarFalta('${falta.id}', this)" data-falta-id="${falta.id}">
+                        <div class="checkbox-content">
+                            <div class="checkbox-title">${fmtDate(dataFalta)}</div>
+                            <div class="checkbox-subtitle">${disciplina}</div>
+                            <div class="checkbox-description">Professor: ${professor}</div>
+                            ${infoReposicao}
+                        </div>
+                    </div>`;
         }).join('');
       } catch (error) {
         console.error('Erro ao carregar faltas do aluno:', error);
@@ -3952,15 +4298,21 @@
       if (!dataReposicao) { alert('Selecione a data da reposição!'); return; }
       const saveBtn = event?.target;
       const originalText = saveBtn ? saveBtn.innerHTML : 'Salvar';
-      if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '⏳ Salvando...'; }
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '⏳ Salvando...';
+      }
       try {
         const agoraDashboard = new Date();
         const dataHoraReposicao = new Date(`${dataReposicao}T${horarioReposicao}:00`);
         if (dataHoraReposicao.getTime() <= agoraDashboard.getTime()) {
-          alert('Não é permitido agendar reposição em horário que já passou. Utilize sempre um horário futuro baseado no relógio do dashboard.');
+          alert(
+            'Não é permitido agendar reposição em horário que já passou. Utilize sempre um horário futuro baseado no relógio do dashboard.'
+          );
           return;
         }
-        const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r.foiCumprida);
+        const reposicaoExistente = reposicoesCache.find(r => r.faltaOriginalId === faltaSelecionada && !r
+          .foiCumprida);
         if (reposicaoExistente) { alert('Esta falta já possui uma reposição agendada!'); return; }
         await getUserCollection('reposicoes').add({
           alunoId,
@@ -3970,11 +4322,15 @@
           foiCumprida: false
         });
         await refreshCache();
-        await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`, 'green');
+        await addHistory(`Reposição agendada para ${clientesCache.find(c => c.id === alunoId)?.nome}`,
+          'green');
         alert('Reposição agendada com sucesso!');
         const alerta = alertasFaltasCache.find(a => a.alunoId === alunoId && !a.resolvido);
         if (alerta) {
-          await getUserCollection('alertasFaltas').doc(alerta.id).update({ resolvido: true, reposicaoAgendada: true });
+          await getUserCollection('alertasFaltas').doc(alerta.id).update({
+            resolvido: true,
+            reposicaoAgendada: true
+          });
           await refreshCache();
           window.renderFaltasConsecutivas();
           window.renderWhatsAppFaltas();
@@ -3985,7 +4341,10 @@
         await window.carregarFaltasAluno(alunoId);
         await carregarReposicoesAgendadas();
       } finally {
-        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalText; }
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = originalText;
+        }
       }
     };
 
@@ -4007,19 +4366,8 @@
         container.innerHTML = '<div class="empty">Nenhuma reposição agendada</div>';
         return;
       }
-      container.innerHTML = `<div class="frequencia-grid">${reposFuturas.map(r => {
-        const aluno = clientesCache.find(c => c.id === r.alunoId);
-        const faltaOriginal = frequenciasCache.find(f => f.id === r.faltaOriginalId);
-        return `<div class="frequencia-card" data-reposicao-id="${r.id}">
-          <div class="frequencia-aluno-nome">${aluno?.nome || 'Aluno não encontrado'}</div>
-          <div class="frequencia-dias">
-            <strong>Falta original:</strong> ${fmtDate(faltaOriginal?.data || 'Data não disponível')}<br>
-            <strong>Reposição:</strong> ${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}
-          </div>
-          <div class="frequencia-status"><span class="badge badge-pendente">⏳ Agendada</span></div>
-          <button class="btn btn-red btn-sm" onclick="window.cancelarReposicao('${r.id}')">Cancelar</button>
-        </div>`;
-      }).join('')}</div>`;
+      container.innerHTML =
+        `<div class="frequencia-grid">${reposFuturas.map(r => { const aluno = clientesCache.find(c => c.id === r.alunoId); const faltaOriginal = frequenciasCache.find(f => f.id === r.faltaOriginalId); return `<div class="frequencia-card" data-reposicao-id="${r.id}"><div class="frequencia-aluno-nome">${aluno?.nome || 'Aluno não encontrado'}</div><div class="frequencia-dias"><strong>Falta original:</strong> ${fmtDate(faltaOriginal?.data || 'Data não disponível')}<br><strong>Reposição:</strong> ${fmtDate(r.dataReposicao)} às ${r.horarioReposicao}</div><div class="frequencia-status"><span class="badge badge-pendente">⏳ Agendada</span></div><button class="btn btn-red btn-sm" onclick="window.cancelarReposicao('${r.id}')">Cancelar</button></div>`; }).join('')}</div>`;
     }
 
     window.cancelarReposicao = async function (id) {
@@ -4032,8 +4380,6 @@
       await addHistory(`Reposição cancelada`, 'red');
     };
 
-    function horarioParaMinutos(horario) { const [h, m] = horario.split(':').map(Number); return (h * 60) + m; }
-
     // ============================================================
     // FUNÇÃO DE CARREGAR FREQUÊNCIA
     // ============================================================
@@ -4044,34 +4390,43 @@
       const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
       let alunos = clientesCache.filter(c => c.diasHorarios?.some(dh => dh.dia === diaSemanaCapitalized));
       const buscaInput = document.getElementById('buscar-frequencia');
-      if (buscaInput && buscaInput.value) { const termoBusca = buscaInput.value.toLowerCase().trim(); alunos = alunos.filter(c => c.nome.toLowerCase().includes(termoBusca)); }
+      if (buscaInput && buscaInput.value) {
+        const termoBusca = buscaInput.value.toLowerCase().trim();
+        alunos = alunos.filter(c => c.nome.toLowerCase().includes(termoBusca));
+      }
       const container = document.getElementById('frequencia-content');
-      if (!alunos.length) { container.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>Nenhum aluno com aula neste dia<br><small>Dia selecionado: ${diaSemanaCapitalized}</small></div>`; return; }
+      if (!alunos.length) {
+        container.innerHTML =
+        `<div class="empty"><div class="empty-icon">📅</div>Nenhum aluno com aula neste dia<br><small>Dia selecionado: ${diaSemanaCapitalized}</small></div>`;
+        return;
+      }
       let html = '<div class="frequencia-grid">';
       for (const a of alunos) {
         const freq = frequenciasCache.find(f => f.clienteId === a.id && f.data === data);
-        const reposicaoParaHoje = reposicoesCache.find(r => r.alunoId === a.id && r.dataReposicao === data && !r.foiCumprida);
+        const reposicaoParaHoje = reposicoesCache.find(r => r.alunoId === a.id && r.dataReposicao === data && !r
+          .foiCumprida);
         const isAulaReposicao = !!reposicaoParaHoje;
         const aulaOriginalId = reposicaoParaHoje?.faltaOriginalId;
         const statusAtual = freq?.status || 'pendente';
         const isPresente = statusAtual === 'presente';
         const isFalta = statusAtual === 'falta';
 
-        html += `<div class="frequencia-card" data-nome="${a.nome.toLowerCase()}" data-aluno-id="${a.id}" data-data="${data}">
-          <div class="frequencia-aluno-nome">${a.nome}${isAulaReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : ''}</div>
-          <div class="frequencia-dias">${a.diasHorarios?.filter(dh => dh.dia === diaSemanaCapitalized).map(dh => `Aula: ${dh.horario}`).join(', ')}</div>
-          <div class="frequencia-status">
-            <button class="presenca-btn ${isPresente ? 'presente' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'presente'${isAulaReposicao ? `, '${aulaOriginalId}'` : ''})">✅ Presente</button>
-            <button class="presenca-btn ${isFalta ? 'falta' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'falta')">❌ Falta</button>
-            <button class="presenca-btn" onclick="window.marcarPresencaManual('${a.id}', '${data}', null)">🗑 Remover</button>
-          </div>
-          <div class="frequencia-data">
-            ${fmtDate(data)}
-            ${freq?.marcadoEm ? `<br><small>Marcado em: ${new Date(freq.marcadoEm).toLocaleString('pt-BR')}</small>` : ''}
-            ${freq?.marcadoAutomaticamente ? `<br><small>🔄 Registrado automaticamente</small>` : ''}
-            ${freq?.status === 'falta' && freq?.marcadoAutomaticamente ? `<br><small>⏰ Falta automática (30min sem check-in)</small>` : ''}
-          </div>
-        </div>`;
+        html +=
+          `<div class="frequencia-card" data-nome="${a.nome.toLowerCase()}" data-aluno-id="${a.id}" data-data="${data}">
+                        <div class="frequencia-aluno-nome">${a.nome}${isAulaReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : ''}</div>
+                        <div class="frequencia-dias">${a.diasHorarios?.filter(dh => dh.dia === diaSemanaCapitalized).map(dh => `Aula: ${dh.horario}`).join(', ')}</div>
+                        <div class="frequencia-status">
+                            <button class="presenca-btn ${isPresente ? 'presente' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'presente'${isAulaReposicao ? `, '${aulaOriginalId}'` : ''})">✅ Presente</button>
+                            <button class="presenca-btn ${isFalta ? 'falta' : ''}" onclick="window.marcarPresencaManual('${a.id}', '${data}', 'falta')">❌ Falta</button>
+                            <button class="presenca-btn" onclick="window.marcarPresencaManual('${a.id}', '${data}', null)">🗑 Remover</button>
+                        </div>
+                        <div class="frequencia-data">
+                            ${fmtDate(data)}
+                            ${freq?.marcadoEm ? `<br><small>Marcado em: ${new Date(freq.marcadoEm).toLocaleString('pt-BR')}</small>` : ''}
+                            ${freq?.marcadoAutomaticamente ? `<br><small>🔄 Registrado automaticamente</small>` : ''}
+                            ${freq?.status === 'falta' && freq?.marcadoAutomaticamente ? `<br><small>⏰ Falta automática (30min sem check-in)</small>` : ''}
+                        </div>
+                    </div>`;
       }
       html += '</div>';
       container.innerHTML = html;
@@ -4096,7 +4451,9 @@
       const isResponsavel = alunoAlvo.adminUid === currentUser.uid;
 
       if (!isAdminPrincipal && !isResponsavel) {
-        alert('⚠️ Você não tem permissão para alterar a presença deste aluno. Apenas o administrador principal ou o responsável pelo cadastro podem fazer esta alteração.');
+        alert(
+          '⚠️ Você não tem permissão para alterar a presença deste aluno. Apenas o administrador principal ou o responsável pelo cadastro podem fazer esta alteração.'
+        );
         return;
       }
 
@@ -4104,7 +4461,8 @@
 
       if (status === null && existing) {
         await getUserCollection('frequencias').doc(existing.id).delete();
-        await addHistory(`Presença removida para ${alunoAlvo?.nome || 'aluno'} em ${fmtDate(data)}`, 'yellow');
+        await addHistory(
+          `Presença removida para ${alunoAlvo?.nome || 'aluno'} em ${fmtDate(data)}`, 'yellow');
       } else if (existing) {
         const updateData = {
           status: status,
@@ -4121,7 +4479,9 @@
           updateData.motivo = 'Alterado manualmente';
         }
         await getUserCollection('frequencias').doc(existing.id).update(updateData);
-        await addHistory(`Presença atualizada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${alunoAlvo?.nome} em ${fmtDate(data)} (alteração manual)`, status === 'presente' ? 'green' : 'red');
+        await addHistory(
+          `Presença atualizada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${alunoAlvo?.nome} em ${fmtDate(data)} (alteração manual)`,
+          status === 'presente' ? 'green' : 'red');
       } else {
         const newFreqData = {
           clienteId,
@@ -4134,13 +4494,16 @@
         if (faltaOriginalId) {
           newFreqData.isReposicao = true;
           newFreqData.faltaOriginalId = faltaOriginalId;
-          const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida);
+          const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r
+            .foiCumprida);
           if (reposicao) {
             await getUserCollection('reposicoes').doc(reposicao.id).update({ foiCumprida: true });
           }
         }
         await getUserCollection('frequencias').add(newFreqData);
-        await addHistory(`Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${alunoAlvo?.nome} em ${fmtDate(data)}`, status === 'presente' ? 'green' : 'red');
+        await addHistory(
+          `Presença marcada: ${status === 'presente' ? 'Presente' : 'Falta'} para ${alunoAlvo?.nome} em ${fmtDate(data)}`,
+          status === 'presente' ? 'green' : 'red');
       }
 
       await refreshCache();
@@ -4156,17 +4519,60 @@
       }
     };
 
-    window.buscarAlunoFrequencia = function () { clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => { const termo = document.getElementById('buscar-frequencia')?.value.toLowerCase().trim() || ''; document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => { const nome = card.getAttribute('data-nome') || ''; card.style.display = nome.includes(termo) ? 'block' : 'none'; }); }, 300); };
-    window.buscarPendenciasFrequencia = async function (nomeAluno) { const aluno = clientesCache.find(c => c.nome.toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; } const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno.diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula + 'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) { const dataStr = dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1); if (diasAula.includes(diaSemanaCapitalized)) { const freqExistente = frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) { pendentes.push({ data: dataStr, dia: diaSemanaCapitalized }); } } dataAtual.setDate(dataAtual.getDate() + 1); } const container = document.getElementById('frequencia-content'); if (!pendentes.length) { container.innerHTML = '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return; } let html = `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"> <div class="frequencia-grid">`; for (const p of pendentes) { html += `<div class="frequencia-card"><div class="frequencia-aluno-nome">${fmtDate(p.data)} - ${p.dia}</div><div class="frequencia-status"><button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></div></div>`; } html += `</div></div>`; container.innerHTML = html; };
+    window.buscarAlunoFrequencia = function () {
+      clearTimeout(buscaFrequenciaTimeout);
+      buscaFrequenciaTimeout = setTimeout(() => {
+        const termo = document.getElementById('buscar-frequencia')
+          ?.value.toLowerCase().trim() || '';
+        document.querySelectorAll('#frequencia-content .frequencia-card').forEach(card => {
+          const nome = card
+            .getAttribute('data-nome') || '';
+          card.style.display = nome.includes(termo) ? 'block' : 'none';
+        });
+      }, 300);
+    };
+
+    window.buscarPendenciasFrequencia = async function (nomeAluno) {
+      const aluno = clientesCache.find(c => c.nome
+        .toLowerCase().includes(nomeAluno.toLowerCase())); if (!aluno) { alert('Aluno não encontrado!'); return; }
+      const dataMatricula = aluno.dataMatricula || today(); const hoje = today(); const diasAula = aluno
+        .diasHorarios?.map(dh => dh.dia) || []; const pendentes = []; let dataAtual = new Date(dataMatricula +
+          'T12:00:00'); const dataFim = new Date(hoje + 'T12:00:00'); while (dataAtual <= dataFim) {
+            const dataStr =
+              dataAtual.toISOString().split('T')[0]; const diaSemana = dataAtual.toLocaleDateString('pt-BR', {
+                weekday: 'long'
+              }); const diaSemanaCapitalized = diaSemana.charAt(0).toUpperCase() + diaSemana
+                .slice(1); if (diasAula.includes(diaSemanaCapitalized)) {
+                  const freqExistente =
+                    frequenciasCache.find(f => f.clienteId === aluno.id && f.data === dataStr); if (!freqExistente) {
+                      pendentes.push({ data: dataStr, dia: diaSemanaCapitalized });
+                    }
+                } dataAtual.setDate(dataAtual
+                  .getDate() + 1);
+          } const container = document.getElementById('frequencia-content'); if (!
+            pendentes.length) {
+              container.innerHTML =
+              '<div class="empty">✅ Nenhuma pendência de frequência encontrada!</div>'; return;
+      } let html =
+        `<div class="section-header"><h3>Pendências para ${aluno.nome}</h3></div><div class="table-wrap"><div class="frequencia-grid">`;
+      for (const p of pendentes) {
+        html +=
+        `<div class="frequencia-card"><div class="frequencia-aluno-nome">${fmtDate(p.data)} - ${p.dia}</div><div class="frequencia-status"><button class="btn btn-primary btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'presente')">✅ Marcar Presença</button> <button class="btn btn-red btn-sm" onclick="window.marcarPresencaManual('${aluno.id}', '${p.data}', 'falta')">❌ Marcar Falta</button></div></div>`;
+      }
+      html += `</div></div>`;
+      container.innerHTML = html;
+    };
 
     window.carregarRelatorioFrequencia = async function () {
       const mes = document.getElementById('rel-frequencia-mes').value;
       if (!mes) { alert('Selecione um mês'); return; }
       const [ano, mesNum] = mes.split('-');
       const diasNoMes = new Date(parseInt(ano), parseInt(mesNum), 0).getDate();
-      const diasDoMes = Array.from({ length: diasNoMes }, (_, i) => `${ano}-${mesNum}-${String(i + 1).padStart(2, '0')}`);
+      const diasDoMes = Array.from({ length: diasNoMes }, (_, i) =>
+        `${ano}-${mesNum}-${String(i + 1).padStart(2, '0')}`);
       const container = document.getElementById('relatorio-frequencia-content');
-      let html = `<div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;"><button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button><button class="btn btn-red" onclick="window.exportarRelatorioDireto('pdf')">📕 PDF</button></div><div class="table-wrap"><table id="tabela-relatorio-frequencia"><thead><tr><th>Aluno</th>`;
+      let html =
+        `<div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;"><button class="btn btn-green" onclick="window.exportarRelatorioDireto('excel')">📗 Excel</button><button class="btn btn-red" onclick="window.exportarRelatorioDireto('pdf')">📕 PDF</button></div><div class="table-wrap"><table id="tabela-relatorio-frequencia"><thead><tr><th>Aluno</th>`;
       for (const d of diasDoMes) {
         const dataObj = new Date(d + 'T12:00:00');
         const diaSemanaNum = dataObj.getDay();
@@ -4178,7 +4584,10 @@
       html += `<th>Total Aulas</th><th>% Presença</th><th>Faltas</th><th>Reposições</th></tr></thead><tbody>`;
       const alunosComAula = clientesCache.filter(c => c.diasHorarios && c.diasHorarios.length > 0);
       for (const aluno of alunosComAula) {
-        let totalDias = 0, presentes = 0, faltas = 0, reposicoes = 0;
+        let totalDias = 0,
+          presentes = 0,
+          faltas = 0,
+          reposicoes = 0;
         html += `<tr><th><strong>${aluno.nome}</strong></th>`;
         for (const data of diasDoMes) {
           const dataObj = new Date(data + 'T12:00:00');
@@ -4195,27 +4604,60 @@
             html += `<td style="background:var(--green);color:white;" title="Presente">✅</td>`;
           } else if (freq?.status === 'falta') {
             faltas++;
-            const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === freq.id && r.foiCumprida);
-            if (temReposicao) { html += `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</td>`; } else { html += `<td style="background:var(--red);color:white;" title="Falta">❌</td>`; }
+            const temReposicao = reposicoesCache.some(r => r.faltaOriginalId === freq.id && r
+              .foiCumprida);
+            if (temReposicao) {
+              html +=
+              `<td style="background:var(--yellow);color:black;" title="Falta com reposição">🔄</td>`;
+            } else {
+              html +=
+              `<td style="background:var(--red);color:white;" title="Falta">❌</td>`;
+            }
           } else {
             html += `<td class="empty-cell" title="Aguardando marcação de presença">🧭</td>`;
           }
         }
         const percentual = totalDias ? ((presentes / totalDias) * 100).toFixed(1) : 0;
-        html += `<td>${totalDias}</td><td>${percentual}%</td><td>${faltas}</td><td>${reposicoes}</td></tr>`;
+        html +=
+          `<td>${totalDias}</td><td>${percentual}%</td><td>${faltas}</td><td>${reposicoes}</td></tr>`;
       }
       html += `</tbody></table></div>`;
       container.innerHTML = html;
     };
-    window.exportarRelatorioDireto = function (tipo) { const tabela = document.getElementById('tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo === 'excel') { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true }); XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência'); XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`); } else if (tipo === 'pdf') { const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape'); doc.text('Relatório de Frequência', 14, 15); doc.autoTable({ html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 }, theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [59, 130, 246], textColor: 255 } }); doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`); } };
+
+    window.exportarRelatorioDireto = function (tipo) {
+      const tabela = document.getElementById(
+        'tabela-relatorio-frequencia'); if (!tabela) { alert('Nenhum dado para exportar'); return; } if (tipo ===
+          'excel') {
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.table_to_sheet(tabela, { raw: true });
+        XLSX.utils.book_append_sheet(wb, ws, 'Relatório Frequência');
+        XLSX.writeFile(wb, `relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.xlsx`);
+      } else if (
+        tipo === 'pdf') {
+          const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape');
+        doc.text('Relatório de Frequência', 14, 15);
+        doc.autoTable({
+          html: '#tabela-relatorio-frequencia', startY: 20, margin: { top: 10 },
+          theme: 'striped', styles: { fontSize: 7, cellPadding: 2 }, headStyles: {
+            fillColor: [59, 130,
+              246], textColor: 255
+          }
+        });
+        doc.save(`relatorio-frequencia-${new Date().toISOString().slice(0, 7)}.pdf`);
+      }
+    };
 
     // ============================================================
     // FUNÇÕES DE PRESENÇA AUTOMÁTICA - SEM CRIAÇÃO DE FALTAS
     // ============================================================
     function calcularFimAula(horarioInicio) {
       const [hora, minuto] = horarioInicio.split(':').map(Number);
-      let horaFim = hora, minutoFim = minuto + 59;
-      if (minutoFim >= 60) { horaFim += Math.floor(minutoFim / 60); minutoFim = minutoFim % 60; }
+      let horaFim = hora,
+        minutoFim = minuto + 59;
+      if (minutoFim >= 60) {
+        horaFim += Math.floor(minutoFim / 60);
+        minutoFim = minutoFim % 60;
+      }
       return [horaFim, minutoFim];
     }
 
@@ -4225,10 +4667,13 @@
 
       if (ehFeriado(dataAtual)) {
         document.getElementById('presenca-auto-count').textContent = `0 alunos`;
-        document.getElementById('presenca-auto-dia').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long' });
+        document.getElementById('presenca-auto-dia').textContent = new Date().toLocaleDateString('pt-BR', {
+          weekday: 'long'
+        });
         document.getElementById('presenca-auto-horario').innerHTML = `Feriado hoje`;
         const container = document.getElementById('presenca-automatica-content');
-        if (container) container.innerHTML = '<div class="empty">📅 Hoje é feriado. Nenhuma aula para marcar presença.</div>';
+        if (container) container.innerHTML =
+          '<div class="empty">📅 Hoje é feriado. Nenhuma aula para marcar presença.</div>';
         return;
       }
 
@@ -4269,14 +4714,12 @@
         }
       });
 
-      // Importante: NÃO criar faltas aqui. A Cloud Function é responsável por isso.
-      // Esta função apenas verifica e exibe os check-ins disponíveis.
-
       await refreshCache();
 
       const alunosParaProcessar = [];
       for (const aluno of alunosAgora) {
-        const horarioAula = aluno.reposicao ? aluno.horarioAtual : aluno.diasHorarios?.find(dh => dh.dia === diaSemanaCapitalized)?.horario;
+        const horarioAula = aluno.reposicao ? aluno.horarioAtual : aluno.diasHorarios?.find(dh => dh.dia ===
+          diaSemanaCapitalized)?.horario;
         if (!horarioAula) continue;
 
         const horarioInicio = horarioParaMinutos(horarioAula);
@@ -4310,15 +4753,17 @@
           const tempoRestante = Math.max(0, (horarioInicio + TEMPO_CHECKIN_DEPOIS) - minutosAtuais);
           const minutosRestantes = Math.ceil(tempoRestante / 1);
 
-          const badgeReposicao = item.isReposicao ? '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : '';
-          html += `<div class="frequencia-card" data-aluno="${item.id}">
-            <div class="frequencia-aluno-nome">${item.nome}${badgeReposicao}</div>
-            <div class="frequencia-dias">Aula: ${item.horarioAula}</div>
-            <div class="frequencia-status">
-              <button class="presenca-btn" onclick="window.marcarPresencaAuto('${item.id}', '${dataAtual}', 'presente', '${item.horarioAula}', ${item.isReposicao}, '${item.faltaOriginalId || ''}')">✅ Check-in</button>
-            </div>
-            <div class="frequencia-data">⏱️ ${minutosRestantes} min restantes para check-in</div>
-          </div>`;
+          const badgeReposicao = item.isReposicao ?
+            '<span class="badge badge-pendente" style="margin-left: 8px;">🔄 REPOSIÇÃO</span>' : '';
+          html +=
+            `<div class="frequencia-card" data-aluno="${item.id}">
+                                <div class="frequencia-aluno-nome">${item.nome}${badgeReposicao}</div>
+                                <div class="frequencia-dias">Aula: ${item.horarioAula}</div>
+                                <div class="frequencia-status">
+                                    <button class="presenca-btn" onclick="window.marcarPresencaAuto('${item.id}', '${dataAtual}', 'presente', '${item.horarioAula}', ${item.isReposicao}, '${item.faltaOriginalId || ''}')">✅ Check-in</button>
+                                </div>
+                                <div class="frequencia-data">⏱️ ${minutosRestantes} min restantes para check-in</div>
+                            </div>`;
         }
         html += '</div>';
         container.innerHTML = html;
@@ -4328,7 +4773,8 @@
     // ============================================================
     // FUNÇÃO DE MARCAR PRESENÇA AUTO
     // ============================================================
-    window.marcarPresencaAuto = async function (clienteId, data, status, horarioAula, isReposicao, faltaOriginalId) {
+    window.marcarPresencaAuto = async function (clienteId, data, status, horarioAula, isReposicao,
+      faltaOriginalId) {
       const existing = frequenciasCache.find(f => f.clienteId === clienteId && f.data === data);
 
       if (existing && existing.status === 'falta' && existing.marcadoAutomaticamente) {
@@ -4346,7 +4792,9 @@
             motivo: 'Check-in realizado pelo aluno'
           };
           await getUserCollection('frequencias').doc(existing.id).update(updateData);
-          await addHistory(`Check-in realizado por ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)} (alteração de falta automática)`, 'green');
+          await addHistory(
+            `Check-in realizado por ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)} (alteração de falta automática)`,
+            'green');
         } else {
           alert('⏰ Período de check-in já encerrado. Procure o administrador para alterar manualmente.');
           return;
@@ -4358,7 +4806,8 @@
           marcadoPor: 'aluno_checkin'
         };
         await getUserCollection('frequencias').doc(existing.id).update(updateData);
-        await addHistory(`Check-in atualizado para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`, 'green');
+        await addHistory(`Check-in atualizado para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`,
+          'green');
       } else {
         const newFreqData = {
           clienteId,
@@ -4372,14 +4821,16 @@
         if (isReposicao && faltaOriginalId) {
           newFreqData.isReposicao = true;
           newFreqData.faltaOriginalId = faltaOriginalId;
-          const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r.foiCumprida);
+          const reposicao = reposicoesCache.find(r => r.faltaOriginalId === faltaOriginalId && !r
+            .foiCumprida);
           if (reposicao) {
             await getUserCollection('reposicoes').doc(reposicao.id).update({ foiCumprida: true });
             await refreshCache();
           }
         }
         await getUserCollection('frequencias').add(newFreqData);
-        await addHistory(`Check-in registrado para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`, 'green');
+        await addHistory(`Check-in registrado para ${clientesCache.find(c => c.id === clienteId)?.nome} em ${fmtDate(data)}`,
+          'green');
       }
 
       await refreshCache();
@@ -4402,15 +4853,44 @@
     };
 
     // ============================================================
-    // FUNÇÃO DE RECONCILIAÇÃO DE FALTAS (FALLBACK)
-    // MANTIDA COMO FALLBACK PARA GARANTIR QUE NENHUMA FALTA SEJA PERDIDA
+    // FUNÇÃO DE PROCESSAMENTO AUTOMÁTICO DE FALTAS (CORRIGIDA)
+    // Mantida para compatibilidade, mas NÃO é mais chamada automaticamente
+    // A automação foi migrada para Cloud Functions
     // ============================================================
-    async function processarFaltasPeriodoInativo(ultimoLoginISO) {
-      if (!currentUser?.uid || !ultimoLoginISO) return;
+    async function processarFaltasAutomaticas() {
+      if (!currentUser?.uid) {
+        console.warn('processarFaltasAutomaticas: usuário não autenticado');
+        return;
+      }
+
       try {
-        const ultimoLogin = new Date(ultimoLoginISO);
+        console.log('🔄 Iniciando verificação automática de faltas...');
+
+        let userUid = currentUser.uid;
+        if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
+          userUid = alunoLogado.adminUid;
+        }
+
+        const userRef = db.collection('usuarios').doc(userUid);
+
+        const alunosSnap = await userRef.collection('clientes').get();
+        const alunos = alunosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const frequenciasSnap = await userRef.collection('frequencias').get();
+        const frequenciasExistentes = new Set();
+        frequenciasSnap.docs.forEach(doc => {
+          const data = doc.data();
+          frequenciasExistentes.add(`${data.clienteId}_${data.data}`);
+        });
+
         const agora = new Date();
-        if (isNaN(ultimoLogin.getTime()) || agora <= ultimoLogin) return;
+        const minutosAtuais = (agora.getHours() * 60) + agora.getMinutes();
+        const dataAtual = today();
+
+        const batch = db.batch();
+        let totalFaltasCriadas = 0;
+        let alunosProcessados = 0;
+
         const mapaDias = {
           0: 'Domingo',
           1: 'Segunda-feira',
@@ -4420,73 +4900,298 @@
           5: 'Sexta-feira',
           6: 'Sábado'
         };
-        const frequenciasExistentes = new Set(
-          frequenciasCache.map(f => `${f.clienteId}_${f.data}`)
-        );
-        const batch = db.batch();
-        let totalFaltas = 0;
-        for (const aluno of clientesCache) {
-          if (!Array.isArray(aluno.diasHorarios) || !aluno.diasHorarios.length) continue;
+
+        for (const aluno of alunos) {
+          if (!aluno.diasHorarios || !Array.isArray(aluno.diasHorarios) || aluno.diasHorarios.length ===
+            0) {
+            continue;
+          }
+
           for (const aula of aluno.diasHorarios) {
-            let dataVerificacao = new Date(ultimoLogin);
-            while (dataVerificacao <= agora) {
-              const diaSemanaAtual = mapaDias[dataVerificacao.getDay()];
-              const dataISO = dataVerificacao.toISOString().split('T')[0];
-              if (
-                diaSemanaAtual === aula.dia &&
-                !ehFeriado(dataISO)
-              ) {
-                const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
-                const dataHoraAula = new Date(dataVerificacao);
-                dataHoraAula.setHours(horaAula, minutoAula + 30, 0, 0);
-                if (
-                  dataHoraAula > ultimoLogin &&
-                  dataHoraAula < agora
-                ) {
+            const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
+            const minutosAula = (horaAula * 60) + minutoAula;
+            const fimJanelaCheckin = minutosAula + 30;
+
+            if (minutosAtuais <= fimJanelaCheckin) {
+              continue;
+            }
+
+            let dataVerificacao = new Date(agora);
+            const diasAtraso = Math.floor((minutosAtuais - fimJanelaCheckin) / (24 * 60));
+
+            if (diasAtraso >= 1) {
+              const dataCriacao = aluno.dataMatricula || aluno.dataCriacaoAcesso || new Date()
+                .toISOString().split('T')[0];
+              const dataInicio = new Date(dataCriacao + 'T00:00:00');
+
+              let dataAtualVerificacao = new Date(dataInicio);
+              while (dataAtualVerificacao <= agora) {
+                const diaSemanaAtual = mapaDias[dataAtualVerificacao.getDay()];
+                if (diaSemanaAtual === aula.dia) {
+                  const dataISO = dataAtualVerificacao.toISOString().split('T')[0];
+
                   const chaveFrequencia = `${aluno.id}_${dataISO}`;
                   if (!frequenciasExistentes.has(chaveFrequencia)) {
-                    const novaFreqRef = getUserCollection('frequencias').doc();
+                    const dataHoraAula = new Date(dataAtualVerificacao);
+                    dataHoraAula.setHours(horaAula, minutoAula + 30, 0, 0);
+
+                    if (dataHoraAula <= agora && !ehFeriado(dataISO)) {
+                      const novaFreqRef = userRef.collection('frequencias').doc();
+                      batch.set(novaFreqRef, {
+                        clienteId: aluno.id,
+                        data: dataISO,
+                        status: 'falta',
+                        marcadoAutomaticamente: true,
+                        motivo: 'Falta automática - sem check-in',
+                        horarioAula: aula.horario,
+                        marcadoEm: new Date().toISOString(),
+                        criadoPor: 'system_automacao',
+                        dataAula: dataISO,
+                        horarioAulaOriginal: aula.horario,
+                        diaSemana: aula.dia
+                      });
+                      frequenciasExistentes.add(chaveFrequencia);
+                      totalFaltasCriadas++;
+                    }
+                  }
+                }
+                dataAtualVerificacao.setDate(dataAtualVerificacao.getDate() + 1);
+                dataAtualVerificacao.setHours(0, 0, 0, 0);
+              }
+            } else {
+              const diaSemanaAtual = mapaDias[agora.getDay()];
+              if (diaSemanaAtual === aula.dia) {
+                const dataISO = today();
+                const chaveFrequencia = `${aluno.id}_${dataISO}`;
+                if (!frequenciasExistentes.has(chaveFrequencia)) {
+                  const dataHoraAula = new Date(agora);
+                  dataHoraAula.setHours(horaAula, minutoAula + 30, 0, 0);
+
+                  if (dataHoraAula <= agora && !ehFeriado(dataISO)) {
+                    const novaFreqRef = userRef.collection('frequencias').doc();
                     batch.set(novaFreqRef, {
                       clienteId: aluno.id,
                       data: dataISO,
                       status: 'falta',
                       marcadoAutomaticamente: true,
-                      motivo: 'Reconciliação - sistema inativo (fallback)',
+                      motivo: 'Falta automática - sem check-in',
                       horarioAula: aula.horario,
                       marcadoEm: new Date().toISOString(),
-                      criadoPor: 'system_reconciliacao_frontend_fallback'
+                      criadoPor: 'system_automacao',
+                      dataAula: dataISO,
+                      horarioAulaOriginal: aula.horario,
+                      diaSemana: aula.dia
                     });
                     frequenciasExistentes.add(chaveFrequencia);
-                    totalFaltas++;
+                    totalFaltasCriadas++;
                   }
                 }
               }
-              dataVerificacao.setDate(dataVerificacao.getDate() + 1);
-              dataVerificacao.setHours(0, 0, 0, 0);
             }
+
+            alunosProcessados++;
           }
         }
-        if (totalFaltas > 0) {
+
+        if (totalFaltasCriadas > 0) {
           await batch.commit();
+          console.log(`✅ ${totalFaltasCriadas} falta(s) automática(s) criada(s)`);
+
           await refreshCache();
-          console.log(`Faltas automáticas registradas (fallback): ${totalFaltas}`);
+          await verificarFaltasConsecutivas();
+          window.renderFaltasConsecutivas();
+          window.renderWhatsAppFaltas();
+          window.renderDashboard();
+
+          if (document.getElementById('page-frequencia').classList.contains('active')) {
+            window.carregarFrequencia();
+          }
+          if (document.getElementById('page-relatorio-frequencia').classList.contains('active')) {
+            window.carregarRelatorioFrequencia();
+          }
+          if (document.getElementById('page-aluno-relatorio').classList.contains('active')) {
+            window.carregarAlunoRelatorio();
+          }
+        } else {
+          console.log('✅ Nenhuma falta automática necessária no momento');
         }
+
       } catch (error) {
-        console.error('Erro ao processar faltas por inatividade (fallback):', error);
+        console.error('❌ Erro ao processar faltas automáticas:', error);
+      }
+    }
+
+    // ============================================================
+    // FUNÇÃO DE VERIFICAÇÃO PERIÓDICA DE FALTAS - DESATIVADA
+    // A automação foi migrada para Cloud Functions
+    // ============================================================
+    function iniciarVerificacaoFaltasAutomaticas() {
+      // A automação client-side foi desativada. 
+      // As faltas agora são processadas pelas Cloud Functions agendadas.
+      console.log('🔄 Automação de faltas migrada para Cloud Functions. Esta função não está mais ativa.');
+    }
+
+    // ============================================================
+    // FUNÇÃO DE RECONCILIAÇÃO DE FALTAS (FALLBACK)
+    // ============================================================
+    async function processarFaltasPeriodoInativo(ultimoLoginISO) {
+      if (!currentUser?.uid) {
+        console.warn('processarFaltasPeriodoInativo: usuário não autenticado');
+        return;
+      }
+
+      try {
+        console.log('🔄 Iniciando reconciliação de faltas por inatividade...');
+
+        let userUid = currentUser.uid;
+        if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
+          userUid = alunoLogado.adminUid;
+        }
+
+        const userRef = db.collection('usuarios').doc(userUid);
+
+        const alunosSnap = await userRef.collection('clientes').get();
+        const alunos = alunosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const frequenciasSnap = await userRef.collection('frequencias').get();
+        const frequenciasExistentes = new Set();
+        frequenciasSnap.docs.forEach(doc => {
+          const data = doc.data();
+          frequenciasExistentes.add(`${data.clienteId}_${data.data}`);
+        });
+
+        const agora = new Date();
+        const batch = db.batch();
+        let totalFaltasCriadas = 0;
+
+        const mapaDias = {
+          0: 'Domingo',
+          1: 'Segunda-feira',
+          2: 'Terça-feira',
+          3: 'Quarta-feira',
+          4: 'Quinta-feira',
+          5: 'Sexta-feira',
+          6: 'Sábado'
+        };
+
+        for (const aluno of alunos) {
+          if (!aluno.diasHorarios || !Array.isArray(aluno.diasHorarios) || aluno.diasHorarios.length ===
+            0) {
+            continue;
+          }
+
+          const dataCriacao = aluno.dataMatricula || aluno.dataCriacaoAcesso || new Date().toISOString()
+            .split('T')[0];
+          const dataInicio = new Date(dataCriacao + 'T00:00:00');
+
+          let dataAtualVerificacao = new Date(dataInicio);
+
+          while (dataAtualVerificacao <= agora) {
+            const diaSemanaAtual = mapaDias[dataAtualVerificacao.getDay()];
+            const dataISO = dataAtualVerificacao.toISOString().split('T')[0];
+
+            for (const aula of aluno.diasHorarios) {
+              if (diaSemanaAtual === aula.dia) {
+                const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
+                const dataHoraAula = new Date(dataAtualVerificacao);
+                dataHoraAula.setHours(horaAula, minutoAula + 30, 0, 0);
+
+                if (dataHoraAula <= agora && !ehFeriado(dataISO)) {
+                  const chaveFrequencia = `${aluno.id}_${dataISO}`;
+                  if (!frequenciasExistentes.has(chaveFrequencia)) {
+                    const novaFreqRef = userRef.collection('frequencias').doc();
+                    batch.set(novaFreqRef, {
+                      clienteId: aluno.id,
+                      data: dataISO,
+                      status: 'falta',
+                      marcadoAutomaticamente: true,
+                      motivo: 'Reconciliação - período inativo',
+                      horarioAula: aula.horario,
+                      marcadoEm: new Date().toISOString(),
+                      criadoPor: 'system_reconciliacao',
+                      dataAula: dataISO,
+                      horarioAulaOriginal: aula.horario,
+                      diaSemana: aula.dia
+                    });
+                    frequenciasExistentes.add(chaveFrequencia);
+                    totalFaltasCriadas++;
+                  }
+                }
+              }
+            }
+
+            dataAtualVerificacao.setDate(dataAtualVerificacao.getDate() + 1);
+            dataAtualVerificacao.setHours(0, 0, 0, 0);
+          }
+        }
+
+        if (totalFaltasCriadas > 0) {
+          await batch.commit();
+          console.log(`✅ ${totalFaltasCriadas} falta(s) criada(s) na reconciliação`);
+          await refreshCache();
+          await verificarFaltasConsecutivas();
+          window.renderFaltasConsecutivas();
+          window.renderWhatsAppFaltas();
+          window.renderDashboard();
+        } else {
+          console.log('✅ Nenhuma falta a reconciliar');
+        }
+
+      } catch (error) {
+        console.error('❌ Erro ao processar faltas por inatividade:', error);
       }
     }
 
     // ============================================================
     // FUNÇÕES DE HISTÓRICO E RELATÓRIOS
     // ============================================================
-    window.renderHistorico = async function () { document.getElementById('historico-list').innerHTML = !historicoCache.length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h => `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`).join(''); };
-    window.renderRelatorio = async function () { const de = document.getElementById('rel-de').value; const ate = document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value; let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate) parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p.status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ? '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => { const c = clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td>`; }).join(''); };
+    window.renderHistorico = async function () {
+      document.getElementById('historico-list').innerHTML = !historicoCache
+        .length ? '<div class="empty">Sem histórico</div>' : historicoCache.map(h =>
+          `<div class="history-item"><div class="history-dot ${h.tipo || ''}"></div><div><div>${h.acao}</div><div class="history-time">${h.dt}</div></div></div>`
+        ).join('');
+    };
+
+    window.renderRelatorio = async function () {
+      const de = document.getElementById('rel-de').value; const ate =
+        document.getElementById('rel-ate').value; const status = document.getElementById('rel-status').value;
+      let parcelas = parcelasCache; if (de) parcelas = parcelas.filter(p => p.dataVencimento >= de); if (ate)
+        parcelas = parcelas.filter(p => p.dataVencimento <= ate); if (status) parcelas = parcelas.filter(p => p
+          .status === status); document.getElementById('relatorio-tbody').innerHTML = !parcelas.length ?
+            '<tr><td colspan="6"><div class="empty">Nenhum resultado</div></td></tr>' : parcelas.map(p => {
+              const c =
+                clientesCache.find(x => x.id === p.clienteId); return `<tr><td>${c?.nome}</td><td>${dividasCache.find(x => x.id === p.dividaId)?.tipo}</td><td>${p.numeroParcela}/${p.totalParcelas}</td><td>${fmtBRL(p.valor)}</td><td>${fmtDate(p.dataVencimento)}</td><td><span class="badge badge-${p.status}">${p.status}</span></td>`;
+            })
+              .join('');
+    };
 
     // ============================================================
     // FUNÇÕES DE UTILITÁRIOS
     // ============================================================
-    window.maskPhone = function (input) { let v = input.value.replace(/\D/g, ''); if (v.length > 11) v = v.slice(0, 11); if (v.length > 6) v = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`; else if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`; else if (v.length > 0) v = `(${v}`; input.value = v; };
-    window.salvarBackupManual = async function () { try { const dados = { clientes: clientesCache, dividas: dividasCache, parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache, historico: historicoCache, mensagens: mensagensCache, dataBackup: new Date().toISOString() }; const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`; a.click(); URL.revokeObjectURL(url); alert('Backup salvo com sucesso!'); } catch (error) { alert('Erro ao salvar backup'); } };
+    window.maskPhone = function (input) {
+      let v = input.value.replace(/\D/g, ''); if (v.length > 11) v = v.slice(0,
+        11); if (v.length > 6) v =
+          `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`; else if (v.length > 2) v =
+            `(${v.slice(0, 2)}) ${v.slice(2)}`; else if (v.length > 0) v = `(${v}`;
+      input.value = v;
+    };
+
+    window.salvarBackupManual = async function () {
+      try {
+        const dados = {
+          clientes: clientesCache, dividas: dividasCache,
+          parcelas: parcelasCache, frequencias: frequenciasCache, reposicoes: reposicoesCache,
+          historico: historicoCache, mensagens: mensagensCache, dataBackup: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a');
+        a.href = url;
+        a.download = `gestaomais_backup_${new Date().toISOString().slice(0, 19)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('Backup salvo com sucesso!');
+      } catch (error) { alert('Erro ao salvar backup'); }
+    };
 
     // ============================================================
     // FUNÇÕES DE USUÁRIOS
@@ -4528,7 +5233,10 @@
           });
           await addHistory(`Usuário ${nome} atualizado`, 'green');
         } else {
-          if (!senha || senha.length < 6) { alert('A senha deve ter pelo menos 6 caracteres!'); return; }
+          if (!senha || senha.length < 6) {
+            alert('A senha deve ter pelo menos 6 caracteres!');
+            return;
+          }
 
           const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
           const uid = userCredential.user.uid;
@@ -4558,7 +5266,7 @@
             await initDoc.delete();
           }
 
-          await addHistory(`Novo usuário ${nome} criado (aguardando aprovação)`, 'yellow');
+          await addHistory(`Novo usuário ${nome} criado(aguardando aprovação)`, 'yellow');
           await verificarNovosUsuariosPendentes();
         }
 
@@ -4658,7 +5366,7 @@
         } else {
           await refreshUsuariosCache();
         }
-        await addHistory(`Usuário liberado para acesso mensal (30 dias)`, 'green');
+        await addHistory(`Usuário liberado para acesso mensal(30 dias)`, 'green');
         if (document.getElementById('page-usuarios').classList.contains('active')) {
           window.renderUsuarios();
         }
@@ -4725,7 +5433,7 @@
         } else {
           await refreshUsuariosCache();
         }
-        await addHistory(`Usuário ativado com acesso mensal (30 dias)`, 'green');
+        await addHistory(`Usuário ativado com acesso mensal(30 dias)`, 'green');
         if (document.getElementById('page-usuarios').classList.contains('active')) {
           window.renderUsuarios();
         }
@@ -4737,10 +5445,15 @@
 
     window.excluirUsuario = async function (id, email) {
       if (currentUserRole !== 'admin') { alert('Acesso negado'); return; }
-      if (!confirm(`⚠️ ATENÇÃO! Você está prestes a excluir PERMANENTEMENTE o usuário:\n\n📧 ${email}\n\nTODOS os dados deste usuário serão perdidos!\n\nEsta ação NÃO pode ser desfeita.\n\nDeseja continuar?`)) return;
+      if (!confirm(
+        `⚠️ ATENÇÃO! Você está prestes a excluir PERMANENTEMENTE o usuário: \n\n📧 ${email}\n\nTODOS os dados deste usuário serão perdidos!\n\nEsta ação NÃO pode ser desfeita.\n\nDeseja continuar?`
+      )) return;
       const excluirBtn = event?.target;
       const originalText = excluirBtn ? excluirBtn.innerHTML : 'Excluir';
-      if (excluirBtn) { excluirBtn.disabled = true; excluirBtn.innerHTML = '⏳ Excluindo...'; }
+      if (excluirBtn) {
+        excluirBtn.disabled = true;
+        excluirBtn.innerHTML = '⏳ Excluindo...';
+      }
       try {
         const userRef = db.collection('usuarios').doc(id);
         const userDoc = await userRef.get();
@@ -4750,7 +5463,9 @@
           alert('❌ Você não pode excluir seu próprio usuário!');
           return;
         }
-        const collections = ['clientes', 'dividas', 'parcelas', 'frequencias', 'reposicoes', 'historico', 'ultimosParabens', 'alertasFaltas', 'mensagens'];
+        const collections = ['clientes', 'dividas', 'parcelas', 'frequencias', 'reposicoes', 'historico',
+          'ultimosParabens', 'alertasFaltas', 'mensagens'
+        ];
         for (const col of collections) {
           try {
             const snap = await userRef.collection(col).get();
@@ -4768,7 +5483,7 @@
             }
             if (count > 0) { await batch.commit(); }
           } catch (colError) {
-            console.log(`  ⚠️ Erro ao excluir coleção ${col}:`, colError.message);
+            console.log(`  ⚠️ Erro ao excluir coleção ${col}: `, colError.message);
           }
         }
         await userRef.delete();
@@ -4782,14 +5497,19 @@
       } catch (error) {
         console.error('Erro detalhado ao excluir:', error);
         if (error.code === 'permission-denied') {
-          alert('❌ Erro de permissão!\n\nVocê precisa configurar as regras de segurança do Firestore.\n\nAcesse o Firebase Console → Firestore Database → Rules e configure corretamente.');
+          alert(
+            '❌ Erro de permissão!\n\nVocê precisa configurar as regras de segurança do Firestore.\n\nAcesse o Firebase Console → Firestore Database → Rules e configure corretamente.'
+          );
         } else if (error.code === 'not-found') {
           alert('❌ Usuário não encontrado no banco de dados.');
         } else {
           alert('❌ Erro ao excluir usuário: ' + error.message);
         }
       } finally {
-        if (excluirBtn) { excluirBtn.disabled = false; excluirBtn.innerHTML = originalText; }
+        if (excluirBtn) {
+          excluirBtn.disabled = false;
+          excluirBtn.innerHTML = originalText;
+        }
       }
     };
 
@@ -4827,13 +5547,15 @@
         } else if (u.status === 'bloqueado' && u.motivoBloqueio === 'bloqueio_administrativo') {
           statusBadge = '<span class="badge badge-bloqueado">🔒 Bloqueado</span>';
           statusText = 'Bloqueado';
-        } else if (u.status === 'bloqueado' && (u.motivoBloqueio === 'expiracao_teste' || u.motivoBloqueio === 'expiracao_mensal')) {
+        } else if (u.status === 'bloqueado' && (u.motivoBloqueio === 'expiracao_teste' || u
+          .motivoBloqueio === 'expiracao_mensal')) {
           statusBadge = '<span class="badge badge-expirado">⏰ Expirado</span>';
           statusText = 'Expirado';
         } else if (u.status === 'ativo' && u.tipoAcesso === 'teste') {
           const { diasRestantes } = verificarAcessoExpirado(u);
           if (diasRestantes <= 3 && diasRestantes > 0) {
-            statusBadge = `<span class="badge badge-pendente">⚠️ Expira em ${diasRestantes} dias</span>`;
+            statusBadge =
+              `<span class="badge badge-pendente">⚠️ Expira em ${diasRestantes} dias</span>`;
             statusText = `Expira em ${diasRestantes} dias`;
           } else {
             statusBadge = '<span class="badge badge-teste">🧪 Teste</span>';
@@ -4842,7 +5564,8 @@
         } else if (u.status === 'ativo' && u.tipoAcesso === 'mensal') {
           const { diasRestantes } = verificarAcessoExpirado(u);
           if (diasRestantes <= 3 && diasRestantes > 0) {
-            statusBadge = `<span class="badge badge-pendente">⚠️ Expira em ${diasRestantes} dias</span>`;
+            statusBadge =
+              `<span class="badge badge-pendente">⚠️ Expira em ${diasRestantes} dias</span>`;
             statusText = `Expira em ${diasRestantes} dias`;
           } else {
             statusBadge = '<span class="badge badge-mensal">📅 Mensal</span>';
@@ -4855,7 +5578,8 @@
           statusBadge = '<span class="badge badge-ativo">✅ Ativo</span>';
           statusText = 'Ativo';
         } else {
-          statusBadge = `<span class="badge badge-${u.status === 'ativo' ? 'pago' : 'atrasado'}">${u.status || '—'}</span>`;
+          statusBadge =
+            `<span class="badge badge-${u.status === 'ativo' ? 'pago' : 'atrasado'}">${u.status || '—'}</span>`;
           statusText = u.status || '—';
         }
         let tipoBadge = '';
@@ -4880,19 +5604,24 @@
         if (u.role !== 'admin') {
           if (u.status === 'bloqueado' &&
             (u.motivoBloqueio === 'expiracao_teste' || u.motivoBloqueio === 'expiracao_mensal')) {
-            actions += `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Liberar</button>`;
+            actions +=
+              `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Liberar</button>`;
           }
           if (u.aprovado === false || u.status === 'aguardando') {
-            actions += `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Liberar</button>`;
+            actions +=
+              `<button class="btn btn-green btn-sm" onclick="window.aprovarUsuario('${u.id}')">✅ Liberar</button>`;
           }
           if (u.status === 'bloqueado' && u.motivoBloqueio === 'bloqueio_administrativo') {
-            actions += `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`;
+            actions +=
+              `<button class="btn btn-green btn-sm" onclick="window.ativarUsuario('${u.id}')">✅ Ativar</button>`;
           }
           if (u.status === 'ativo' && u.aprovado === true && u.role !== 'admin') {
-            actions += `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>`;
+            actions +=
+              `<button class="btn btn-red btn-sm" onclick="window.bloquearUsuario('${u.id}')">🔒 Bloquear</button>`;
           }
           if (u.role !== 'admin') {
-            actions += `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>`;
+            actions +=
+              `<button class="btn btn-red btn-sm" onclick="window.excluirUsuario('${u.id}', '${u.email}')">🗑 Excluir</button>`;
           }
         }
         const dataCadastro = formatarData(u.createdAt);
@@ -4900,45 +5629,51 @@
         const dataExpiracao = u.dataExpiracao ? fmtDateTime(u.dataExpiracao) : '—';
         const ultimoLogin = formatarData(u.lastLogin);
         return `<tr>
-          <td><strong>${u.nome || '—'}</strong></td>
-          <td>${u.email}</td>
-          <td><code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:0.75rem;">${senhaDisplay}</code></td>
-          <td>${tipoBadge}</td>
-          <td>${statusBadge}</td>
-          <td style="font-size:0.7rem;">${dataCadastro}</td>
-          <td style="font-size:0.7rem;">${dataLiberacao}</td>
-          <td style="font-size:0.7rem;">${dataExpiracao}</td>
-          <td style="font-size:0.7rem;">${ultimoLogin}</td>
-          <td class="td-actions" style="min-width:120px;">${actions}</td>
-        </tr>`;
+                      <td><strong>${u.nome || '—'}</strong></td>
+                      <td>${u.email}</td>
+                      <td><code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:0.75rem;">${senhaDisplay}</code></td>
+                      <td>${tipoBadge}</td>
+                      <td>${statusBadge}</td>
+                      <td style="font-size:0.7rem;">${dataCadastro}</td>
+                      <td style="font-size:0.7rem;">${dataLiberacao}</td>
+                      <td style="font-size:0.7rem;">${dataExpiracao}</td>
+                      <td style="font-size:0.7rem;">${ultimoLogin}</td>
+                      <td class="td-actions" style="min-width:120px;">${actions}</td>
+                    </tr>`;
       }).join('');
     };
 
     // ============================================================
-    // FUNÇÕES DE LOGIN E REGISTRO
+    // FUNÇÕES DE LOGIN E REGISTRO - CORRIGIDAS
     // ============================================================
     window.doLogin = async function () {
       const email = document.getElementById('login-user').value;
       const password = document.getElementById('login-pass').value;
       const errorDiv = document.getElementById('login-error');
+
       if (!email || !password) {
         errorDiv.textContent = '❌ Preencha email e senha!';
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 3000);
         return;
       }
+
       const loginBtn = document.getElementById('login-btn');
       const originalText = loginBtn.innerHTML;
       loginBtn.disabled = true;
       loginBtn.innerHTML = '⏳ Entrando...';
+
       try {
+        // PRIMEIRO: Carregar todos os alunos para verificar login de aluno
         await carregarTodosAlunos();
 
+        // Verificar se é um login de aluno válido
         const resultadoAluno = await validarLoginAlunoComCache(email, password);
 
         if (resultadoAluno.sucesso) {
           const aluno = resultadoAluno.aluno;
 
+          // Criar um usuário "fake" para o aluno logado
           const fakeUser = {
             uid: 'aluno_' + aluno.id,
             email: email,
@@ -4955,9 +5690,7 @@
           document.getElementById('app').style.display = 'block';
 
           atualizarMenuPorRole();
-
           await initApp();
-
           window.navigate('aluno-dashboard');
 
           errorDiv.style.display = 'none';
@@ -4966,19 +5699,51 @@
           return;
         }
 
+        // Se não for aluno, tentar autenticação via Firebase Authentication
         try {
           const userCredential = await auth.signInWithEmailAndPassword(email, password);
-          await verificarAcessoUsuario(userCredential.user);
+
+          // Verificar acesso do usuário no Firestore
+          const usuarioData = await verificarAcessoUsuario(userCredential.user);
+
+          // Atualizar variáveis globais
+          currentUser = userCredential.user;
+          currentUserRole = usuarioData.role;
+          currentUserEmail = usuarioData.email;
+          alunoLogado = null;
+
+          // Esconder tela de login e mostrar app
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+
+          // Atualizar menus e inicializar app
+          atualizarMenuPorRole();
+          await initApp();
+
+          // Navegar para a tela apropriada
+          if (currentUserRole === 'admin') {
+            window.navigate('dashboard');
+          } else {
+            window.navigate('dashboard');
+          }
+
           errorDiv.style.display = 'none';
           loginBtn.disabled = false;
           loginBtn.innerHTML = originalText;
-          return;
+
         } catch (authError) {
-          throw new Error('Email ou senha incorretos!');
+          // Se o erro for de credencial inválida, pode ser um aluno que não existe no Firebase
+          if (authError.code === 'auth/invalid-credential' ||
+            authError.code === 'auth/user-not-found' ||
+            authError.code === 'auth/wrong-password') {
+            throw new Error('Email ou senha incorretos!');
+          }
+          throw authError;
         }
 
       } catch (error) {
         console.error('Erro no login:', error);
+
         let mensagemErro = '';
         if (error.message === 'Email ou senha incorretos!') {
           mensagemErro = '❌ Email ou senha incorretos!';
@@ -4999,10 +5764,20 @@
               mensagemErro = '❌ ' + (error.message || 'Erro ao fazer login');
           }
         }
+
         errorDiv.textContent = mensagemErro;
         errorDiv.style.display = 'block';
         setTimeout(() => errorDiv.style.display = 'none', 5000);
-        try { await auth.signOut(); } catch (e) { }
+
+        // Garantir que o usuário não fique autenticado parcialmente
+        try {
+          if (auth.currentUser) {
+            await auth.signOut();
+          }
+        } catch (e) {
+          console.log('Erro ao fazer logout após falha:', e);
+        }
+
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerHTML = originalText;
@@ -5054,7 +5829,9 @@
         }
 
         await auth.signOut();
-        alert('✅ Cadastro realizado com sucesso!\n\nSeu período de teste de 7 dias já está ativo.\nVocê pode acessar o sistema imediatamente.');
+        alert(
+          '✅ Cadastro realizado com sucesso!\n\nSeu período de teste de 7 dias já está ativo.\nVocê pode acessar o sistema imediatamente.'
+        );
         window.closeModal('modal-register-publico');
         document.getElementById('register-nome').value = '';
         document.getElementById('register-email').value = '';
@@ -5101,6 +5878,10 @@
         if (pendingUsersCheckInterval) {
           clearInterval(pendingUsersCheckInterval);
           pendingUsersCheckInterval = null;
+        }
+        if (intervaloFaltasAutomaticas) {
+          clearInterval(intervaloFaltasAutomaticas);
+          intervaloFaltasAutomaticas = null;
         }
         await auth.signOut();
         currentUser = null;
@@ -5185,7 +5966,10 @@
     async function addHistory(acao, tipo) {
       if (!currentUser?.uid) return;
       try {
-        await getUserCollection('historico').add({ id: uid(), acao, tipo, dt: new Date().toLocaleString('pt-BR') });
+        await getUserCollection('historico').add({
+          id: uid(), acao, tipo, dt: new Date().toLocaleString(
+            'pt-BR')
+        });
         await refreshCache();
       } catch (error) {
         console.error('Erro ao adicionar histórico:', error);
@@ -5205,7 +5989,8 @@
         if (usuarioDoc.exists) {
           let usuarioData = usuarioDoc.data();
 
-          if (usuarioData.status === 'bloqueado' && usuarioData.motivoBloqueio === 'bloqueio_administrativo') {
+          if (usuarioData.status === 'bloqueado' && usuarioData.motivoBloqueio ===
+            'bloqueio_administrativo') {
             throw new Error('Usuário bloqueado pelo administrador.');
           }
 
@@ -5257,7 +6042,8 @@
           if (usuarioData.tipoAcesso === 'teste' || usuarioData.tipoAcesso === 'mensal') {
             usuarioData = await atualizarStatusPorExpiracao(usuarioData, user.uid);
             if (usuarioData.status === 'bloqueado' &&
-              (usuarioData.motivoBloqueio === 'expiracao_teste' || usuarioData.motivoBloqueio === 'expiracao_mensal')) {
+              (usuarioData.motivoBloqueio === 'expiracao_teste' || usuarioData.motivoBloqueio ===
+                'expiracao_mensal')) {
               setTimeout(() => {
                 window.openModal('modal-expiracao-bloqueio');
               }, 500);
@@ -5275,6 +6061,7 @@
             }
           } else {
             if (usuarioData.status === 'ativo' && usuarioData.aprovado === true) {
+              // OK
             } else if (usuarioData.status === 'aguardando' || usuarioData.aprovado === false) {
               throw new Error('Aguardando liberação pelo administrador.');
             } else if (usuarioData.status === 'bloqueado') {
@@ -5323,9 +6110,11 @@
     // ============================================================
     async function criarUsuarioPadraoAdmin() {
       try {
-        const usuariosSnap = await db.collection('usuarios').where('email', '==', 'mario.bergamini4375@gmail.com').get();
+        const usuariosSnap = await db.collection('usuarios').where('email', '==',
+          'mario.bergamini4375@gmail.com').get();
         if (usuariosSnap.empty) {
-          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini4375@gmail.com', '202606');
+          const userCredential = await auth.createUserWithEmailAndPassword('mario.bergamini4375@gmail.com',
+            '202606');
           await db.collection('usuarios').doc(userCredential.user.uid).set({
             nome: 'Administrador',
             email: 'mario.bergamini4375@gmail.com',
@@ -5361,7 +6150,9 @@
       const userData = userDoc.data();
       if (userData && userData.dadosMigrados) return;
       console.log(`Migrando dados para o usuário ${uid}...`);
-      const colecoes = ['clientes', 'dividas', 'parcelas', 'frequencias', 'reposicoes', 'historico', 'alertasFaltas', 'ultimosParabens', 'mensagens'];
+      const colecoes = ['clientes', 'dividas', 'parcelas', 'frequencias', 'reposicoes', 'historico',
+        'alertasFaltas', 'ultimosParabens', 'mensagens'
+      ];
       for (const colecao of colecoes) {
         const snapshot = await db.collection(colecao).get();
         const batch = db.batch();
@@ -5379,7 +6170,12 @@
 
     async function initApp() {
       document.getElementById('msg-template').value = getMsgTemplate();
-      document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+      document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
       loadTheme();
       updateClock();
       setInterval(updateClock, 1000);
@@ -5389,16 +6185,27 @@
       const frequenciaHeader = document.querySelector('#page-frequencia .section-header');
       if (frequenciaHeader && !document.getElementById('buscar-frequencia')) {
         const buscaDiv = document.createElement('div');
-        buscaDiv.innerHTML = `<div class="search-box" style="margin-left: auto;"><span class="search-icon">🔍</span><input type="text" id="buscar-frequencia" placeholder="Buscar aluno por nome..." style="padding: 0.5rem 0.5rem 0.5rem 2rem;"></div>`;
+        buscaDiv.innerHTML =
+          `<div class="search-box" style="margin-left: auto;"><span class="search-icon">🔍</span><input type="text" id="buscar-frequencia" placeholder="Buscar aluno por nome..." style="padding: 0.5rem 0.5rem 0.5rem 2rem;"></div>`;
         frequenciaHeader.appendChild(buscaDiv);
         const buscaInput = document.getElementById('buscar-frequencia');
-        if (buscaInput) { buscaInput.addEventListener('input', function () { if (buscaFrequenciaTimeout) clearTimeout(buscaFrequenciaTimeout); buscaFrequenciaTimeout = setTimeout(() => window.carregarFrequencia(), 300); }); }
+        if (buscaInput) {
+          buscaInput.addEventListener('input', function () {
+            if (buscaFrequenciaTimeout)
+              clearTimeout(buscaFrequenciaTimeout);
+            buscaFrequenciaTimeout = setTimeout(() => window.carregarFrequencia(), 300);
+          });
+        }
       }
 
       const sidebarFooter = document.querySelector('.sidebar-footer');
       if (sidebarFooter && !document.getElementById('backup-btn')) {
         const backupBtn = document.createElement('button');
-        backupBtn.id = 'backup-btn'; backupBtn.className = 'logout-btn'; backupBtn.style.marginBottom = '0.5rem'; backupBtn.innerHTML = '💾 Backup Manual'; backupBtn.onclick = window.salvarBackupManual;
+        backupBtn.id = 'backup-btn';
+        backupBtn.className = 'logout-btn';
+        backupBtn.style.marginBottom = '0.5rem';
+        backupBtn.innerHTML = '💾 Backup Manual';
+        backupBtn.onclick = window.salvarBackupManual;
         sidebarFooter.insertBefore(backupBtn, sidebarFooter.firstChild);
       }
 
@@ -5406,7 +6213,8 @@
       if (frequenciaDataInput && !frequenciaDataInput.value) frequenciaDataInput.value = today();
 
       const relFrequenciaMes = document.getElementById('rel-frequencia-mes');
-      if (relFrequenciaMes && !relFrequenciaMes.value) relFrequenciaMes.value = new Date().toISOString().slice(0, 7);
+      if (relFrequenciaMes && !relFrequenciaMes.value) relFrequenciaMes.value = new Date().toISOString().slice(0,
+        7);
 
       await refreshCache();
       await migrarDadosParaMultitenant();
@@ -5426,7 +6234,8 @@
       if (alunosPorHoraHeader && !document.getElementById('btn-export-alunos-hora')) {
         const btnDiv = document.createElement('div');
         btnDiv.id = 'btn-export-alunos-hora';
-        btnDiv.innerHTML = `<button class="btn btn-green btn-sm" onclick="window.exportarAlunosHoraExcel()">📗 Exportar Excel</button><button class="btn btn-red btn-sm" onclick="window.exportarAlunosHoraPDF()">📕 Salvar PDF</button>`;
+        btnDiv.innerHTML =
+          `<button class="btn btn-green btn-sm" onclick="window.exportarAlunosHoraExcel()">📗 Exportar Excel</button> <button class="btn btn-red btn-sm" onclick="window.exportarAlunosHoraPDF()">📕 Salvar PDF</button>`;
         alunosPorHoraHeader.appendChild(btnDiv);
       }
 
@@ -5443,6 +6252,12 @@
       if (document.getElementById('page-mensagens').classList.contains('active')) {
         window.renderMensagens();
       }
+
+      // ============================================================
+      // AUTOMAÇÃO DE FALTAS - DESATIVADA (MIGRADA PARA CLOUD FUNCTIONS)
+      // A chamada abaixo foi comentada para evitar duplicidade de processamento
+      // ============================================================
+      // iniciarVerificacaoFaltasAutomaticas();
     }
 
     // ============================================================
@@ -5482,11 +6297,10 @@
         }
         if (!alunoLogado) {
           container.innerHTML = `
-            <div class="empty">
-              <div class="empty-icon">⚠️</div>
-              <div>Dados do aluno não encontrados. Entre em contato com o administrador.</div>
-            </div>
-          `;
+                    <div class="empty">
+                        <div class="empty-icon">⚠️</div>
+                        <div>Dados do aluno não encontrados. Entre em contato com o administrador.</div>
+                    </div>`;
           return;
         }
       }
@@ -5510,7 +6324,8 @@
       const agora = new Date();
       const diaSemanaAtual = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
       const diaSemanaCapitalized = diaSemanaAtual.charAt(0).toUpperCase() + diaSemanaAtual.slice(1);
-      const horaAtualStr = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
+      const horaAtualStr = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2,
+        '0');
 
       let proximaAula = null;
       for (const dh of diasHorarios) {
@@ -5520,7 +6335,9 @@
         }
       }
       if (!proximaAula) {
-        const diasSemana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+        const diasSemana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira',
+          'Sábado', 'Domingo'
+        ];
         const diaAtualIndex = diasSemana.indexOf(diaSemanaCapitalized);
         for (let i = 1; i <= 7; i++) {
           const proximoIndex = (diaAtualIndex + i) % 7;
@@ -5537,81 +6354,77 @@
       const anoAtual = agora.getFullYear();
 
       let html = `
-        <div class="aluno-area-card">
-          <div class="aluno-welcome">👋 Olá, <span>${aluno.nome}</span>!</div>
-          <div style="color:var(--text2);font-size:0.9rem;margin-bottom:0.5rem;">Bem-vindo à sua área exclusiva</div>
-      `;
+                <div class="aluno-area-card">
+                    <div class="aluno-welcome">👋 Olá, <span>${aluno.nome}</span>!</div>
+                    <div style="color:var(--text2);font-size:0.9rem;margin-bottom:0.5rem;">Bem-vindo à sua área exclusiva</div>
+                `;
 
       if (mensalidadeAtrasada) {
         html += `
-          <div class="aluno-mensalidade-alerta">
-            <span class="alert-icon">⚠️</span>
-            <span class="alert-text">Sua mensalidade está em atraso. Procure o responsável pela academia para regularizar sua situação.</span>
-          </div>
-        `;
+                    <div class="aluno-mensalidade-alerta">
+                        <span class="alert-icon">⚠️</span>
+                        <span class="alert-text">Sua mensalidade está em atraso. Procure o responsável pela academia para regularizar sua situação.</span>
+                    </div>`;
       }
 
       html += `
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
-            <span style="font-size:0.8rem;color:var(--text2);background:var(--surface2);padding:0.2rem 0.8rem;border-radius:20px;border:1px solid var(--border);">
-              📅 ${nomeMes} ${anoAtual}
-            </span>
-          </div>
-          <div class="aluno-info-grid">
-            <div class="aluno-info-item">
-              <div class="label">📅 Plano</div>
-              <div class="value">${aluno.plano || '—'}</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">🏋️ Modalidade</div>
-              <div class="value">${aluno.modalidade || '—'}</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">📊 Frequência (${nomeMes})</div>
-              <div class="value">${percentual}%</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">✅ Presenças (${nomeMes})</div>
-              <div class="value">${presencas}</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">❌ Faltas (${nomeMes})</div>
-              <div class="value">${faltas}</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">📚 Total de Aulas (${nomeMes})</div>
-              <div class="value">${totalAulas}</div>
-            </div>
-          </div>
-        </div>
-      `;
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+                    <span style="font-size:0.8rem;color:var(--text2);background:var(--surface2);padding:0.2rem 0.8rem;border-radius:20px;border:1px solid var(--border);">
+                        📅 ${nomeMes} ${anoAtual}
+                    </span>
+                </div>
+                <div class="aluno-info-grid">
+                    <div class="aluno-info-item">
+                        <div class="label">📅 Plano</div>
+                        <div class="value">${aluno.plano || '—'}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">🏋️ Modalidade</div>
+                        <div class="value">${aluno.modalidade || '—'}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">📊 Frequência (${nomeMes})</div>
+                        <div class="value">${percentual}%</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">✅ Presenças (${nomeMes})</div>
+                        <div class="value">${presencas}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">❌ Faltas (${nomeMes})</div>
+                        <div class="value">${faltas}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">📚 Total de Aulas (${nomeMes})</div>
+                        <div class="value">${totalAulas}</div>
+                    </div>
+                </div>
+                </div>`;
 
       if (proximaAula) {
         html += `
-          <div class="aluno-area-card" style="border-color:var(--accent);">
-            <h3>⏰ Próxima Aula</h3>
-            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-              <div style="font-size:1.2rem;font-weight:700;color:var(--accent);">${proximaAula.dia} às ${proximaAula.horario}</div>
-              ${proximaAula.dia === diaSemanaCapitalized ? '<span class="badge badge-pendente">📢 Hoje!</span>' : ''}
-            </div>
-          </div>
-        `;
+                    <div class="aluno-area-card" style="border-color:var(--accent);">
+                        <h3>⏰ Próxima Aula</h3>
+                        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                            <div style="font-size:1.2rem;font-weight:700;color:var(--accent);">${proximaAula.dia} às ${proximaAula.horario}</div>
+                            ${proximaAula.dia === diaSemanaCapitalized ? '<span class="badge badge-pendente">📢 Hoje!</span>' : ''}
+                        </div>
+                    </div>`;
       }
 
       if (diasHorarios.length > 0) {
         html += `
-          <div class="aluno-area-card">
-            <h3>📅 Meus Horários</h3>
-            <div class="aluno-info-grid">
-              ${diasHorarios.map(dh => `
-                <div class="aluno-info-item">
-                  <div class="label">${dh.dia}</div>
-                  <div class="value" style="color:var(--accent);">${dh.horario}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
+                    <div class="aluno-area-card">
+                        <h3>📅 Meus Horários</h3>
+                        <div class="aluno-info-grid">
+                            ${diasHorarios.map(dh => `
+                                <div class="aluno-info-item">
+                                    <div class="label">${dh.dia}</div>
+                                    <div class="value" style="color:var(--accent);">${dh.horario}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>`;
       }
 
       container.innerHTML = html;
@@ -5647,12 +6460,11 @@
 
       if (aulasHoje.length === 0) {
         container.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">📅</div>
-            <div>Nenhuma aula agendada para hoje.</div>
-            <div style="font-size:0.8rem;color:var(--text3);margin-top:0.5rem;">${diaSemanaCapitalized}</div>
-          </div>
-        `;
+                    <div class="empty">
+                        <div class="empty-icon">📅</div>
+                        <div>Nenhuma aula agendada para hoje.</div>
+                        <div style="font-size:0.8rem;color:var(--text3);margin-top:0.5rem;">${diaSemanaCapitalized}</div>
+                    </div>`;
         return;
       }
 
@@ -5681,51 +6493,49 @@
           const minutosRestantes = Math.floor(segundosRestantes / 60);
           const segundosRestantesDisplay = segundosRestantes % 60;
 
-          const contadorDisplay = `${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantesDisplay).padStart(2, '0')}`;
+          const contadorDisplay =
+            `${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantesDisplay).padStart(2, '0')}`;
 
           html += `
-            <div class="checkin-container" id="checkin-container-${aula.horario.replace(':', '')}">
-              <div class="checkin-title">✅ Check-in disponível!</div>
-              <div class="checkin-time">${aula.horario}</div>
-              <div class="checkin-sub">Aula de ${aluno.modalidade || 'treino'} - ${diaSemanaCapitalized}</div>
-              <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.8rem;">
-                Período: 30 min antes até 30 min após a aula
-              </div>
-              <button class="checkin-btn" id="checkin-btn-${aula.horario.replace(':', '')}" onclick="window.confirmarCheckin('${aluno.id}')">
-                ✅ Confirmar Check-in
-              </button>
-              <div style="font-size:0.9rem;color:var(--text2);margin-top:0.5rem;font-weight:600;" id="checkin-timer-${aula.horario.replace(':', '')}">
-                ⏱️ Janela disponível por <span id="checkin-timer-countdown-${aula.horario.replace(':', '')}">${contadorDisplay}</span>
-              </div>
-            </div>
-          `;
+                        <div class="checkin-container" id="checkin-container-${aula.horario.replace(':', '')}">
+                            <div class="checkin-title">✅ Check-in disponível!</div>
+                            <div class="checkin-time">${aula.horario}</div>
+                            <div class="checkin-sub">Aula de ${aluno.modalidade || 'treino'} - ${diaSemanaCapitalized}</div>
+                            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:0.8rem;">
+                                Período: 30 min antes até 30 min após a aula
+                            </div>
+                            <button class="checkin-btn" id="checkin-btn-${aula.horario.replace(':', '')}" onclick="window.confirmarCheckin('${aluno.id}')">
+                                ✅ Confirmar Check-in
+                            </button>
+                            <div style="font-size:0.9rem;color:var(--text2);margin-top:0.5rem;font-weight:600;" id="checkin-timer-${aula.horario.replace(':', '')}">
+                                ⏱️ Janela disponível por <span id="checkin-timer-countdown-${aula.horario.replace(':', '')}">${contadorDisplay}</span>
+                            </div>
+                        </div>`;
         } else if (jaConfirmado) {
           encontrouAulaAtiva = true;
           html += `
-            <div class="checkin-confirmado">
-              <div class="checkin-icon">✅</div>
-              <div class="checkin-msg">Check-in já confirmado hoje!</div>
-              <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">
-                Aula: ${aula.horario} - ${fmtDate(today())}
-              </div>
-            </div>
-          `;
+                        <div class="checkin-confirmado">
+                            <div class="checkin-icon">✅</div>
+                            <div class="checkin-msg">Check-in já confirmado hoje!</div>
+                            <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">
+                                Aula: ${aula.horario} - ${fmtDate(today())}
+                            </div>
+                        </div>`;
         }
       }
 
       if (!encontrouAulaAtiva) {
         html += `
-          <div class="empty">
-            <div class="empty-icon">⏳</div>
-            <div>Nenhum check-in disponível no momento.</div>
-            <div style="font-size:0.8rem;color:var(--text3);margin-top:0.5rem;">
-              Aulas de hoje: ${aulasHoje.map(a => `${a.horario}`).join(', ')}
-            </div>
-            <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">
-              O check-in fica disponível 30 min antes da aula.
-            </div>
-          </div>
-        `;
+                    <div class="empty">
+                        <div class="empty-icon">⏳</div>
+                        <div>Nenhum check-in disponível no momento.</div>
+                        <div style="font-size:0.8rem;color:var(--text3);margin-top:0.5rem;">
+                            Aulas de hoje: ${aulasHoje.map(a => `${a.horario}`).join(', ')}
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--text3);margin-top:0.2rem;">
+                            O check-in fica disponível 30 min antes da aula.
+                        </div>
+                    </div>`;
       }
 
       container.innerHTML = html;
@@ -5761,7 +6571,8 @@
               const agoraAtual = new Date();
               const minutosAtuaisAgora = (agoraAtual.getHours() * 60) + agoraAtual.getMinutes();
               const segundosAtuais = agoraAtual.getSeconds();
-              const segundosRestantesAgora = Math.max(0, fimJanela * 60 - (minutosAtuaisAgora * 60 + segundosAtuais));
+              const segundosRestantesAgora = Math.max(0, fimJanela * 60 - (minutosAtuaisAgora *
+                60 + segundosAtuais));
 
               if (segundosRestantesAgora <= 0) {
                 clearInterval(timer);
@@ -5769,14 +6580,13 @@
 
                 if (containerElement) {
                   containerElement.innerHTML = `
-                    <div style="background:var(--surface2);border:2px solid var(--red);border-radius:12px;padding:1.5rem;text-align:center;">
-                      <div style="font-size:2rem;margin-bottom:0.5rem;">⏰</div>
-                      <div style="font-weight:600;color:var(--red);">Janela de check-in encerrada!</div>
-                      <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">
-                        A aula de ${aula.horario} já passou.
-                      </div>
-                    </div>
-                  `;
+                                        <div style="background:var(--surface2);border:2px solid var(--red);border-radius:12px;padding:1.5rem;text-align:center;">
+                                            <div style="font-size:2rem;margin-bottom:0.5rem;">⏰</div>
+                                            <div style="font-weight:600;color:var(--red);">Janela de check-in encerrada!</div>
+                                            <div style="font-size:0.8rem;color:var(--text2);margin-top:0.3rem;">
+                                                A aula de ${aula.horario} já passou.
+                                            </div>
+                                        </div>`;
                 }
                 return;
               }
@@ -5893,63 +6703,63 @@
 
       if (diasHorarios.length === 0) {
         container.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">📅</div>
-            <div>Nenhum horário de treino cadastrado.</div>
-          </div>
-        `;
+                    <div class="empty">
+                        <div class="empty-icon">📅</div>
+                        <div>Nenhum horário de treino cadastrado.</div>
+                    </div>`;
         return;
       }
 
-      const ordemDias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+      const ordemDias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado',
+        'Domingo'
+      ];
       const diasOrdenados = diasHorarios.sort((a, b) => {
         return ordemDias.indexOf(a.dia) - ordemDias.indexOf(b.dia);
       });
 
       let html = `
-        <div class="aluno-area-card">
-          <h3>📅 Meus Dias e Horários de Treino</h3>
-          <div style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem;">
-            ${aluno.nome} - ${aluno.modalidade || 'Modalidade não informada'}
-          </div>
-          <div class="aluno-info-grid">
-      `;
+                <div class="aluno-area-card">
+                    <h3>📅 Meus Dias e Horários de Treino</h3>
+                    <div style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem;">
+                        ${aluno.nome} - ${aluno.modalidade || 'Modalidade não informada'}
+                    </div>
+                    <div class="aluno-info-grid">
+                `;
 
       for (const dh of diasOrdenados) {
-        const isHoje = dh.dia === new Date().toLocaleDateString('pt-BR', { weekday: 'long' }).charAt(0).toUpperCase() +
+        const isHoje = dh.dia === new Date().toLocaleDateString('pt-BR', { weekday: 'long' }).charAt(0)
+          .toUpperCase() +
           new Date().toLocaleDateString('pt-BR', { weekday: 'long' }).slice(1);
         html += `
-          <div class="aluno-info-item" style="${isHoje ? 'border-color:var(--accent);border-width:2px;' : ''}">
-            <div class="label">${dh.dia} ${isHoje ? '📌' : ''}</div>
-            <div class="value" style="color:${isHoje ? 'var(--accent)' : 'var(--text)'};">${dh.horario}</div>
-          </div>
-        `;
+                        <div class="aluno-info-item" style="${isHoje ? 'border-color:var(--accent);border-width:2px;' : ''}">
+                            <div class="label">${dh.dia} ${isHoje ? '📌' : ''}</div>
+                            <div class="value" style="color:${isHoje ? 'var(--accent)' : 'var(--text)'};">${dh.horario}</div>
+                        </div>
+                    `;
       }
 
       html += `
-          </div>
-        </div>
-      `;
+                    </div>
+                </div>`;
 
       html += `
-        <div class="aluno-area-card">
-          <h3>📊 Resumo da Semana</h3>
-          <div class="aluno-info-grid">
-            <div class="aluno-info-item">
-              <div class="label">📅 Dias de Treino</div>
-              <div class="value">${diasOrdenados.length}</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">🏋️ Modalidade</div>
-              <div class="value">${aluno.modalidade || '—'}</div>
-            </div>
-            <div class="aluno-info-item">
-              <div class="label">📋 Plano</div>
-              <div class="value">${aluno.plano || '—'}</div>
-            </div>
-          </div>
-        </div>
-      `;
+                <div class="aluno-area-card">
+                    <h3>📊 Resumo da Semana</h3>
+                    <div class="aluno-info-grid">
+                        <div class="aluno-info-item">
+                            <div class="label">📅 Dias de Treino</div>
+                            <div class="value">${diasOrdenados.length}</div>
+                        </div>
+                        <div class="aluno-info-item">
+                            <div class="label">🏋️ Modalidade</div>
+                            <div class="value">${aluno.modalidade || '—'}</div>
+                        </div>
+                        <div class="aluno-info-item">
+                            <div class="label">📋 Plano</div>
+                            <div class="value">${aluno.plano || '—'}</div>
+                        </div>
+                    </div>
+                </div>`;
 
       container.innerHTML = html;
     };
@@ -5969,101 +6779,97 @@
 
       if (parcelasAluno.length === 0) {
         container.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">💰</div>
-            <div>Nenhuma mensalidade cadastrada.</div>
-          </div>
-        `;
+                    <div class="empty">
+                        <div class="empty-icon">💰</div>
+                        <div>Nenhuma mensalidade cadastrada.</div>
+                    </div>`;
         return;
       }
 
       parcelasAluno.sort((a, b) => a.dataVencimento.localeCompare(b.dataVencimento));
 
       const hoje = today();
-      const vencidas = parcelasAluno.filter(p => p.status === 'atrasado' || (p.status === 'pendente' && p.dataVencimento < hoje));
+      const vencidas = parcelasAluno.filter(p => p.status === 'atrasado' || (p.status === 'pendente' && p
+        .dataVencimento < hoje));
       const pendentes = parcelasAluno.filter(p => p.status === 'pendente' && p.dataVencimento >= hoje);
       const pagas = parcelasAluno.filter(p => p.status === 'pago');
 
       let html = `
-        <div class="aluno-area-card">
-          <h3>💰 Situação Financeira</h3>
-      `;
+                <div class="aluno-area-card">
+                    <h3>💰 Situação Financeira</h3>
+                `;
 
       if (vencidas.length > 0) {
         html += `
-          <div class="aluno-mensalidade-alerta">
-            <span class="alert-icon">⚠️</span>
-            <span class="alert-text">Sua mensalidade está em atraso. Procure o responsável pela academia para regularizar sua situação.</span>
-          </div>
-        `;
+                    <div class="aluno-mensalidade-alerta">
+                        <span class="alert-icon">⚠️</span>
+                        <span class="alert-text">Sua mensalidade está em atraso. Procure o responsável pela academia para regularizar sua situação.</span>
+                    </div>`;
       } else {
         html += `
-          <div style="background:rgba(16,185,129,0.15);border:2px solid var(--green);border-radius:12px;padding:1rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem;">
-            <span style="font-size:1.5rem;">✅</span>
-            <span style="font-weight:600;color:var(--green);">Mensalidades em dia!</span>
-          </div>
-        `;
+                    <div style="background:rgba(16,185,129,0.15);border:2px solid var(--green);border-radius:12px;padding:1rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem;">
+                        <span style="font-size:1.5rem;">✅</span>
+                        <span style="font-weight:600;color:var(--green);">Mensalidades em dia!</span>
+                    </div>`;
       }
 
       html += `
-        <div class="aluno-info-grid">
-          <div class="aluno-info-item">
-            <div class="label">✅ Pagas</div>
-            <div class="value" style="color:var(--green);">${pagas.length}</div>
-          </div>
-          <div class="aluno-info-item">
-            <div class="label">⏳ Pendentes</div>
-            <div class="value" style="color:var(--yellow);">${pendentes.length}</div>
-          </div>
-          <div class="aluno-info-item">
-            <div class="label">⚠️ Atrasadas</div>
-            <div class="value" style="color:var(--red);">${vencidas.length}</div>
-          </div>
-          <div class="aluno-info-item">
-            <div class="label">📊 Total</div>
-            <div class="value">${parcelasAluno.length}</div>
-          </div>
-        </div>
-      `;
+                <div class="aluno-info-grid">
+                    <div class="aluno-info-item">
+                        <div class="label">✅ Pagas</div>
+                        <div class="value" style="color:var(--green);">${pagas.length}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">⏳ Pendentes</div>
+                        <div class="value" style="color:var(--yellow);">${pendentes.length}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">⚠️ Atrasadas</div>
+                        <div class="value" style="color:var(--red);">${vencidas.length}</div>
+                    </div>
+                    <div class="aluno-info-item">
+                        <div class="label">📊 Total</div>
+                        <div class="value">${parcelasAluno.length}</div>
+                    </div>
+                </div>`;
 
       html += `
-        <div style="margin-top:1rem;">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Mensalidade</th>
-                  <th>Parcela</th>
-                  <th>Valor</th>
-                  <th>Vencimento</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-      `;
+                <div style="margin-top:1rem;">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mensalidade</th>
+                                    <th>Parcela</th>
+                                    <th>Valor</th>
+                                    <th>Vencimento</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
       for (const p of parcelasAluno) {
         const divida = dividasCache.find(d => d.id === p.dividaId);
-        const statusBadge = p.status === 'pago' ? 'badge-pago' : p.status === 'atrasado' || (p.status === 'pendente' && p.dataVencimento < hoje) ? 'badge-atrasado' : 'badge-pendente';
-        const statusText = p.status === 'pago' ? 'Pago' : p.status === 'atrasado' ? 'Atrasado' : p.dataVencimento < hoje ? 'Atrasado' : 'Pendente';
+        const statusBadge = p.status === 'pago' ? 'badge-pago' : p.status === 'atrasado' || (p.status ===
+          'pendente' && p.dataVencimento < hoje) ? 'badge-atrasado' : 'badge-pendente';
+        const statusText = p.status === 'pago' ? 'Pago' : p.status === 'atrasado' ? 'Atrasado' : p
+          .dataVencimento < hoje ? 'Atrasado' : 'Pendente';
 
         html += `
-          <tr>
-            <td>${divida?.tipo || 'Mensalidade'}</td>
-            <td>${p.numeroParcela}/${p.totalParcelas}</td>
-            <td>${fmtBRL(p.valor)}</td>
-            <td>${fmtDate(p.dataVencimento)}</td>
-            <td><span class="badge ${statusBadge}">${statusText}</span></td>
-          </tr>
-        `;
+                                <tr>
+                                    <td>${divida?.tipo || 'Mensalidade'}</td>
+                                    <td>${p.numeroParcela}/${p.totalParcelas}</td>
+                                    <td>${fmtBRL(p.valor)}</td>
+                                    <td>${fmtDate(p.dataVencimento)}</td>
+                                    <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                                </tr>`;
       }
 
       html += `
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
 
       html += `</div>`;
 
@@ -6083,16 +6889,17 @@
       const aluno = alunoLogado;
 
       const agora = new Date();
-      const mesPadrao = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`;
+      const mesPadrao =
+        `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}`;
 
       let filtroHTML = `
-        <div class="aluno-relatorio-filtro">
-          <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
-          <input type="month" id="aluno-relatorio-mes" value="${mesPadrao}">
-          <button class="btn btn-primary btn-sm" onclick="window.carregarAlunoRelatorioComFiltro()">🔍 Filtrar</button>
-          <span style="font-size:0.75rem;color:var(--text3);margin-left:auto;">Os dados são filtrados pelo mês selecionado</span>
-        </div>
-      `;
+                <div class="aluno-relatorio-filtro">
+                    <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
+                    <input type="month" id="aluno-relatorio-mes" value="${mesPadrao}">
+                    <button class="btn btn-primary btn-sm" onclick="window.carregarAlunoRelatorioComFiltro()">🔍 Filtrar</button>
+                    <span style="font-size:0.75rem;color:var(--text3);margin-left:auto;">Os dados são filtrados pelo mês selecionado</span>
+                </div>
+            `;
 
       const filtroExistente = container.querySelector('.aluno-relatorio-filtro');
       if (filtroExistente) {
@@ -6134,65 +6941,62 @@
         const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long' });
 
         let html = `
-          <div class="aluno-area-card">
-            <h3>📊 Relatório de Frequência - ${nomeMes}/${ano}</h3>
-            <div style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem;">
-              ${aluno.nome} - ${aluno.modalidade || 'Modalidade não informada'}
-            </div>
-        `;
+                    <div class="aluno-area-card">
+                        <h3>📊 Relatório de Frequência - ${nomeMes}/${ano}</h3>
+                        <div style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem;">
+                            ${aluno.nome} - ${aluno.modalidade || 'Modalidade não informada'}
+                        </div>
+                    `;
 
         html += `
-          <div class="aluno-relatorio-grid">
-            <div class="aluno-relatorio-item">
-              <div class="number green">${presencas}</div>
-              <div class="label">✅ Presenças</div>
-            </div>
-            <div class="aluno-relatorio-item">
-              <div class="number red">${faltas}</div>
-              <div class="label">❌ Faltas</div>
-            </div>
-            <div class="aluno-relatorio-item">
-              <div class="number accent">${totalAulas}</div>
-              <div class="label">📚 Total de Aulas</div>
-            </div>
-            <div class="aluno-relatorio-item">
-              <div class="number ${percentual >= 70 ? 'green' : percentual >= 50 ? 'yellow' : 'red'}">${percentual}%</div>
-              <div class="label">📊 Percentual</div>
-            </div>
-          </div>
-        `;
+                    <div class="aluno-relatorio-grid">
+                        <div class="aluno-relatorio-item">
+                            <div class="number green">${presencas}</div>
+                            <div class="label">✅ Presenças</div>
+                        </div>
+                        <div class="aluno-relatorio-item">
+                            <div class="number red">${faltas}</div>
+                            <div class="label">❌ Faltas</div>
+                        </div>
+                        <div class="aluno-relatorio-item">
+                            <div class="number accent">${totalAulas}</div>
+                            <div class="label">📚 Total de Aulas</div>
+                        </div>
+                        <div class="aluno-relatorio-item">
+                            <div class="number ${percentual >= 70 ? 'green' : percentual >= 50 ? 'yellow' : 'red'}">${percentual}%</div>
+                            <div class="label">📊 Percentual</div>
+                        </div>
+                    </div>
+                `;
 
         if (faltasConsecutivas.length > 0) {
           html += `
-            <div class="aluno-mensalidade-alerta" style="border-color:var(--orange);background:rgba(245,158,11,0.15);">
-              <span class="alert-icon">⚠️</span>
-              <span class="alert-text">Você possui ${faltasConsecutivas.length} alerta(s) de faltas consecutivas. Procure o responsável para agendar reposição.</span>
-            </div>
-          `;
+                        <div class="aluno-mensalidade-alerta" style="border-color:var(--orange);background:rgba(245,158,11,0.15);">
+                            <span class="alert-icon">⚠️</span>
+                            <span class="alert-text">Você possui ${faltasConsecutivas.length} alerta(s) de faltas consecutivas. Procure o responsável para agendar reposição.</span>
+                        </div>`;
         }
 
         if (frequenciasFiltradas.length === 0) {
           html += `
-            <div class="empty" style="margin-top:1rem;">
-              <div class="empty-icon">📅</div>
-              <div>Nenhum registro de frequência encontrado para ${nomeMes}/${ano}.</div>
-            </div>
-          `;
+                        <div class="empty" style="margin-top:1rem;">
+                            <div class="empty-icon">📅</div>
+                            <div>Nenhum registro de frequência encontrado para ${nomeMes}/${ano}.</div>
+                        </div>`;
         } else {
           html += `
-            <div style="margin-top:1rem;">
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Data</th>
-                      <th>Horário</th>
-                      <th>Status</th>
-                      <th>Observação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-          `;
+                        <div style="margin-top:1rem;">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Horário</th>
+                                            <th>Status</th>
+                                            <th>Observação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
 
           for (const f of frequenciasFiltradas) {
             const statusBadge = f.status === 'presente' ? 'badge-pago' : 'badge-atrasado';
@@ -6203,21 +7007,19 @@
                   f.marcadoEm ? 'Marcado manualmente' : '—';
 
             html += `
-              <tr>
-                <td>${fmtDate(f.data)}</td>
-                <td>${f.horarioAula || '—'}</td>
-                <td><span class="badge ${statusBadge}">${statusText}</span></td>
-                <td style="font-size:0.75rem;color:var(--text2);">${observacao}</td>
-              </tr>
-            `;
+                                <tr>
+                                    <td>${fmtDate(f.data)}</td>
+                                    <td>${f.horarioAula || '—'}</td>
+                                    <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                                    <td style="font-size:0.75rem;color:var(--text2);">${observacao}</td>
+                                </tr>`;
           }
 
           html += `
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>`;
         }
 
         html += `</div>`;
@@ -6230,11 +7032,11 @@
           const newFiltro = document.createElement('div');
           newFiltro.className = 'aluno-relatorio-filtro';
           newFiltro.innerHTML = `
-            <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
-            <input type="month" id="aluno-relatorio-mes" value="${mesSelecionado}">
-            <button class="btn btn-primary btn-sm" onclick="window.carregarAlunoRelatorioComFiltro()">🔍 Filtrar</button>
-            <span style="font-size:0.75rem;color:var(--text3);margin-left:auto;">Os dados são filtrados pelo mês selecionado</span>
-          `;
+                        <label for="aluno-relatorio-mes">📅 Mês/Ano:</label>
+                        <input type="month" id="aluno-relatorio-mes" value="${mesSelecionado}">
+                        <button class="btn btn-primary btn-sm" onclick="window.carregarAlunoRelatorioComFiltro()">🔍 Filtrar</button>
+                        <span style="font-size:0.75rem;color:var(--text3);margin-left:auto;">Os dados são filtrados pelo mês selecionado</span>
+                    `;
           container.appendChild(newFiltro);
         }
 
@@ -6274,9 +7076,10 @@
       document.getElementById('selecao-alunos-container').style.display = 'none';
       document.getElementById('mensagem-alunos').innerHTML = '';
 
-      document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
-        el.disabled = false;
-      });
+      document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select')
+        .forEach(el => {
+          el.disabled = false;
+        });
 
       const selectAlunos = document.getElementById('mensagem-alunos');
       selectAlunos.innerHTML = clientesCache.map(c =>
@@ -6304,7 +7107,8 @@
 
           const statusAtual = window.calcularStatusMensagem(msg);
           statusDisplay.textContent = statusAtual;
-          statusDisplay.className = `badge badge-${statusAtual === 'Aguardando' ? 'aguardando' : statusAtual === 'Ativa' ? 'ativa' : statusAtual === 'Encerrada' ? 'encerrada' : 'expirada'}`;
+          statusDisplay.className =
+            `badge badge-${statusAtual === 'Aguardando' ? 'aguardando' : statusAtual === 'Ativa' ? 'ativa' : statusAtual === 'Encerrada' ? 'encerrada' : 'expirada'}`;
 
           if (msg.alunos && msg.alunos.length > 0) {
             document.querySelector('input[name="destinatario-tipo"][value="especificos"]').checked = true;
@@ -6357,9 +7161,10 @@
       const oldConfirmacoes = document.getElementById('confirmacoes-container');
       if (oldConfirmacoes) oldConfirmacoes.remove();
 
-      document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
-        el.disabled = false;
-      });
+      document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select')
+        .forEach(el => {
+          el.disabled = false;
+        });
 
       document.querySelectorAll('#form-mensagem-container .btn').forEach(el => {
         el.style.display = '';
@@ -6391,11 +7196,13 @@
       const status = window.calcularStatusMensagem(msg);
       const statusDisplay = document.getElementById('mensagem-status-display');
       statusDisplay.textContent = status;
-      statusDisplay.className = `badge badge-${status === 'Aguardando' ? 'aguardando' : status === 'Ativa' ? 'ativa' : status === 'Encerrada' ? 'encerrada' : 'expirada'}`;
+      statusDisplay.className =
+        `badge badge-${status === 'Aguardando' ? 'aguardando' : status === 'Ativa' ? 'ativa' : status === 'Encerrada' ? 'encerrada' : 'expirada'}`;
 
-      document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select').forEach(el => {
-        el.disabled = true;
-      });
+      document.querySelectorAll('#form-mensagem-container input, #form-mensagem-container textarea, #form-mensagem-container select')
+        .forEach(el => {
+          el.disabled = true;
+        });
 
       document.querySelectorAll('#form-mensagem-container .btn').forEach(el => {
         if (el.id !== 'btn-editar-mensagem' && el.id !== 'btn-excluir-mensagem') {
@@ -6410,29 +7217,33 @@
       const totalConf = msg.confirmacoes ? msg.confirmacoes.length : 0;
 
       if (msg.confirmacoes && msg.confirmacoes.length > 0) {
-        confirmacoesHtml = `<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">
-          <h4 style="font-size:0.9rem;margin-bottom:0.5rem;color:var(--green);">✅ CONFIRMAÇÕES (${totalConf})</h4>
-          <div style="max-height:200px;overflow-y:auto;">`;
+        confirmacoesHtml =
+          `<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">
+                        <h4 style="font-size:0.9rem;margin-bottom:0.5rem;color:var(--green);">✅ CONFIRMAÇÕES (${totalConf})</h4>
+                        <div style="max-height:200px;overflow-y:auto;">`;
         for (const conf of msg.confirmacoes) {
           const aluno = clientesCache.find(c => c.id === conf.alunoId);
-          confirmacoesHtml += `<div class="mensagem-confirmacao-item" style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;">
-            <span>✔ ${aluno?.nome || conf.nome || 'Aluno'}</span>
-            <span style="color:var(--text2);">${fmtDate(conf.data)} ${conf.hora || ''}</span>
-          </div>`;
+          confirmacoesHtml +=
+            `<div class="mensagem-confirmacao-item" style="display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;">
+                            <span>✔ ${aluno?.nome || conf.nome || 'Aluno'}</span>
+                            <span style="color:var(--text2);">${fmtDate(conf.data)} ${conf.hora || ''}</span>
+                        </div>`;
         }
         confirmacoesHtml += `</div></div>`;
       } else {
-        confirmacoesHtml = `<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">
-          <h4 style="font-size:0.9rem;margin-bottom:0.5rem;color:var(--yellow);">⏳ Aguardando confirmação</h4>
-          <div style="color:var(--text2);font-size:0.85rem;">Nenhum aluno confirmou a leitura desta mensagem ainda.</div>
-        </div>`;
+        confirmacoesHtml =
+          `<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;">
+                        <h4 style="font-size:0.9rem;margin-bottom:0.5rem;color:var(--yellow);">⏳ Aguardando confirmação</h4>
+                        <div style="color:var(--text2);font-size:0.85rem;">Nenhum aluno confirmou a leitura desta mensagem ainda.</div>
+                    </div>`;
       }
 
-      confirmacoesHtml += `<div style="margin-top:0.8rem;display:flex;gap:1rem;flex-wrap:wrap;font-size:0.8rem;background:var(--surface2);padding:0.6rem 1rem;border-radius:8px;">
-        <span>👥 Total de alunos: <strong>${totalAlunos}</strong></span>
-        <span style="color:var(--green);">✅ Confirmaram: <strong>${totalConf}</strong></span>
-        <span style="color:var(--yellow);">⏳ Pendentes: <strong>${totalAlunos - totalConf}</strong></span>
-      </div>`;
+      confirmacoesHtml +=
+        `<div style="margin-top:0.8rem;display:flex;gap:1rem;flex-wrap:wrap;font-size:0.8rem;background:var(--surface2);padding:0.6rem 1rem;border-radius:8px;">
+                    <span>👥 Total de alunos: <strong>${totalAlunos}</strong></span>
+                    <span style="color:var(--green);">✅ Confirmaram: <strong>${totalConf}</strong></span>
+                    <span style="color:var(--yellow);">⏳ Pendentes: <strong>${totalAlunos - totalConf}</strong></span>
+                </div>`;
 
       const formBody = document.querySelector('#form-mensagem-container');
       const div = document.createElement('div');
@@ -6551,7 +7362,8 @@
         return;
       }
 
-      if (!confirm('Confirmar esta mensagem? Ela ficará ativa para os alunos a partir da data e hora definidas.')) return;
+      if (!confirm('Confirmar esta mensagem? Ela ficará ativa para os alunos a partir da data e hora definidas.'))
+        return;
 
       try {
         const msg = mensagensCache.find(m => m.id === id);
@@ -6668,52 +7480,56 @@
 
       let mensagens = mensagensCache.filter(m => {
         m.statusCalculado = window.calcularStatusMensagem(m);
-        return !search || m.titulo?.toLowerCase().includes(search) || m.conteudo?.toLowerCase().includes(search);
+        return !search || m.titulo?.toLowerCase().includes(search) || m.conteudo?.toLowerCase().includes(
+          search);
       });
 
       if (mensagens.length === 0) {
-        container.innerHTML = `<div class="empty"><div class="empty-icon">📨</div>Nenhuma mensagem cadastrada.</div>`;
+        container.innerHTML =
+          `<div class="empty"><div class="empty-icon">📨</div>Nenhuma mensagem cadastrada.</div>`;
         return;
       }
 
       let html = `<div class="table-wrap"><table>
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Mensagem</th>
-            <th>Início</th>
-            <th>Fim</th>
-            <th>Status</th>
-            <th>Alunos</th>
-            <th>Confirmações</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>`;
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Mensagem</th>
+                            <th>Início</th>
+                            <th>Fim</th>
+                            <th>Status</th>
+                            <th>Alunos</th>
+                            <th>Confirmações</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
 
       for (const msg of mensagens) {
         const status = msg.statusCalculado || 'Aguardando';
-        const statusBadge = `badge-${status === 'Aguardando' ? 'aguardando' : status === 'Ativa' ? 'ativa' : status === 'Encerrada' ? 'encerrada' : 'expirada'}`;
+        const statusBadge =
+          `badge-${status === 'Aguardando' ? 'aguardando' : status === 'Ativa' ? 'ativa' : status === 'Encerrada' ? 'encerrada' : 'expirada'}`;
         const totalAlunos = msg.alunos && msg.alunos.length > 0 ? msg.alunos.length : clientesCache.length;
         const confirmacoes = msg.confirmacoes ? msg.confirmacoes.length : 0;
 
-        const resumo = msg.conteudo ? msg.conteudo.substring(0, 50) + (msg.conteudo.length > 50 ? '...' : '') : '';
+        const resumo = msg.conteudo ? msg.conteudo.substring(0, 50) + (msg.conteudo.length > 50 ? '...' :
+          '') : '';
 
         html += `<tr>
-          <td><strong>${msg.titulo || '—'}</strong></td>
-          <td>${resumo}</td>
-          <td>${fmtDate(msg.dataInicio)} ${msg.horaInicio || ''}</td>
-          <td>${fmtDate(msg.dataFim)} ${msg.horaFim || ''}</td>
-          <td><span class="badge ${statusBadge}">${status}</span></td>
-          <td>${totalAlunos}</td>
-          <td>${confirmacoes}</td>
-          <td class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="window.abrirFormularioMensagem('${msg.id}')">✏️</button>
-            <button class="btn btn-red btn-sm" onclick="window.excluirMensagemDireto('${msg.id}')">🗑️</button>
-            <button class="btn btn-ghost btn-sm" onclick="window.visualizarMensagem('${msg.id}')">👁️</button>
-            <button class="btn btn-ghost btn-sm" onclick="window.duplicarMensagem('${msg.id}')">📋</button>
-          </td>
-        </tr>`;
+                        <td><strong>${msg.titulo || '—'}</strong></td>
+                        <td>${resumo}</td>
+                        <td>${fmtDate(msg.dataInicio)} ${msg.horaInicio || ''}</td>
+                        <td>${fmtDate(msg.dataFim)} ${msg.horaFim || ''}</td>
+                        <td><span class="badge ${statusBadge}">${status}</span></td>
+                        <td>${totalAlunos}</td>
+                        <td>${confirmacoes}</td>
+                        <td class="td-actions">
+                            <button class="btn btn-ghost btn-sm" onclick="window.abrirFormularioMensagem('${msg.id}')">✏️</button>
+                            <button class="btn btn-red btn-sm" onclick="window.excluirMensagemDireto('${msg.id}')">🗑️</button>
+                            <button class="btn btn-ghost btn-sm" onclick="window.visualizarMensagem('${msg.id}')">👁️</button>
+                            <button class="btn btn-ghost btn-sm" onclick="window.duplicarMensagem('${msg.id}')">📋</button>
+                        </td>
+                    </tr>`;
       }
 
       html += `</tbody></table></div>`;
@@ -6826,14 +7642,64 @@
     // ============================================================
     // INICIALIZAÇÃO DO APP E EVENTOS DE AUTENTICAÇÃO
     // ============================================================
-    const loginBtn = document.getElementById('login-btn');
-    const registerBtn = document.getElementById('register-confirm-btn');
-    const registerPublicBtn = document.getElementById('register-btn');
-    if (loginBtn) loginBtn.onclick = window.doLogin;
-    if (registerBtn) { registerBtn.onclick = window.doRegister; }
-    if (registerPublicBtn) { registerPublicBtn.onclick = () => window.openModal('modal-register-publico'); }
+    // Aguardar o DOM carregar completamente antes de configurar eventos
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginBtn = document.getElementById('login-btn');
+      const registerBtn = document.getElementById('register-confirm-btn');
+      const registerPublicBtn = document.getElementById('register-btn');
 
-    (async () => { try { await criarUsuarioPadraoAdmin(); } catch (e) { console.log('Erro ao criar admin:', e); } })();
+      if (loginBtn) {
+        loginBtn.onclick = function (e) {
+          e.preventDefault();
+          window.doLogin();
+        };
+      }
+
+      if (registerBtn) {
+        registerBtn.onclick = function (e) {
+          e.preventDefault();
+          window.doRegister();
+        };
+      }
+
+      if (registerPublicBtn) {
+        registerPublicBtn.onclick = function (e) {
+          e.preventDefault();
+          window.openModal('modal-register-publico');
+        };
+      }
+
+      // Também suporta Enter na tela de login
+      const loginUser = document.getElementById('login-user');
+      const loginPass = document.getElementById('login-pass');
+
+      if (loginUser) {
+        loginUser.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('login-btn').click();
+          }
+        });
+      }
+
+      if (loginPass) {
+        loginPass.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('login-btn').click();
+          }
+        });
+      }
+    });
+
+    // Inicialização
+    (async () => {
+      try {
+        await criarUsuarioPadraoAdmin();
+      } catch (e) {
+        console.log('Erro ao criar admin:', e);
+      }
+    })();
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -6870,6 +7736,10 @@
         currentUserRole = null;
         currentUserEmail = null;
         alunoLogado = null;
+        if (intervaloFaltasAutomaticas) {
+          clearInterval(intervaloFaltasAutomaticas);
+          intervaloFaltasAutomaticas = null;
+        }
       }
     });
   </script>
