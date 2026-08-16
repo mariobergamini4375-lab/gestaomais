@@ -2026,7 +2026,8 @@
               </div>
             </div>
             <div class="stats-grid">
-              <div class="stat-card alert">
+              <!-- OCULTADO: Alunos com Faltas Consecutivas -->
+              <div class="stat-card alert" style="display:none !important;">
                 <div class="stat-label">⚠️ Alunos com Faltas Consecutivas</div>
                 <div class="stat-value" id="dashboard-stat-faltas">0</div>
                 <div class="stat-cobrancas" id="dashboard-lista-faltas"></div>
@@ -3180,91 +3181,12 @@
     setInterval(verificarRestauracaoAtrasadas, 60 * 60 * 1000);
 
     // ============================================================
-    // FUNÇÕES DE FALTAS CONSECUTIVAS
+    // FUNÇÕES DE FALTAS CONSECUTIVAS - OCULTADAS
     // ============================================================
+    // Função mantida mas não será mais exibida no dashboard
     async function verificarFaltasConsecutivas() {
-      if (!currentUser?.uid) {
-        console.warn('verificarFaltasConsecutivas: usuário não autenticado');
-        return;
-      }
-
-      try {
-        let userUid = currentUser.uid;
-        if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
-          userUid = alunoLogado.adminUid;
-        }
-
-        const userRef = db.collection('usuarios').doc(userUid);
-        const frequenciasSnap = await userRef.collection('frequencias').get();
-        const frequencias = frequenciasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const alunosSnap = await userRef.collection('clientes').get();
-        const alunos = alunosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const alunosComFaltas = new Map();
-
-        for (const aluno of alunos) {
-          if (!aluno.diasHorarios || !Array.isArray(aluno.diasHorarios) || aluno.diasHorarios.length === 0) {
-            continue;
-          }
-
-          const faltasAluno = frequencias
-            .filter(f => f.clienteId === aluno.id && f.status === 'falta')
-            .sort((a, b) => a.data.localeCompare(b.data));
-
-          if (faltasAluno.length < 2) continue;
-
-          let faltasConsecutivas = [];
-          let dataAnterior = null;
-
-          for (const falta of faltasAluno) {
-            const dataFalta = new Date(falta.data + 'T12:00:00');
-
-            if (dataAnterior) {
-              const diffDias = Math.ceil((dataFalta - dataAnterior) / (1000 * 60 * 60 * 24));
-              if (diffDias <= 7) {
-                faltasConsecutivas.push(falta.data);
-              } else {
-                if (faltasConsecutivas.length >= 2) {
-                  break;
-                }
-                faltasConsecutivas = [falta.data];
-              }
-            } else {
-              faltasConsecutivas = [falta.data];
-            }
-            dataAnterior = dataFalta;
-
-            if (faltasConsecutivas.length >= 2) {
-              const alertasSnap = await userRef.collection('alertasFaltas')
-                .where('alunoId', '==', aluno.id)
-                .where('resolvido', '==', false)
-                .get();
-
-              if (alertasSnap.empty) {
-                await userRef.collection('alertasFaltas').add({
-                  alunoId: aluno.id,
-                  nome: aluno.nome,
-                  telefone: aluno.telefone || '',
-                  faltas: [...faltasConsecutivas],
-                  ultimaFalta: faltasConsecutivas[faltasConsecutivas.length - 1],
-                  resolvido: false,
-                  reposicaoAgendada: false,
-                  criadoEm: new Date().toISOString()
-                });
-                console.log(`✅ Alerta criado para ${aluno.nome} - ${faltasConsecutivas.length} faltas consecutivas`);
-              }
-              break;
-            }
-          }
-        }
-
-        await refreshCache();
-        window.renderDashboard();
-
-      } catch (error) {
-        console.error('❌ Erro ao verificar faltas consecutivas:', error);
-      }
+      // Função mantida para compatibilidade, mas não afeta o dashboard
+      return;
     }
 
     // ============================================================
@@ -3854,21 +3776,9 @@
           return `<div class="cobranca-item"><div class="cobranca-info"><div class="cobranca-nome">${c.nome}</div><div class="cobranca-valor">🎂 Aniversário!</div><div class="cobranca-vencimento">${fmtDate(c.nascimento)}</div></div><a href="#" onclick="window.enviarParabensComRegistro('${c.id}', 'dashboard', '${tel}', '${msg}'); return false;" class="btn btn-pink btn-sm">🎉 Parabéns</a></div>`;
         }).join('') :
         '<div class="empty">🎂 Nenhum aniversariante</div>';
-      const alertasFaltas = alertasFaltasCache.filter(a => !a.resolvido && !a.reposicaoAgendada);
-      const dashboardFaltasContainer = document.getElementById('dashboard-lista-faltas');
-      const dashboardFaltasStat = document.getElementById('dashboard-stat-faltas');
-      if (dashboardFaltasContainer) {
-        dashboardFaltasStat.textContent = alertasFaltas.length;
-        if (alertasFaltas.length === 0) {
-          dashboardFaltasContainer.innerHTML =
-            '<div class="empty">✅ Nenhum aluno com faltas consecutivas</div>';
-        } else {
-          dashboardFaltasContainer
-            .innerHTML = alertasFaltas.map(alerta =>
-              `<div class="cobranca-item" style="border-left: 3px solid var(--orange);" data-alerta-id="${alerta.id}"><div class="cobranca-info"><div class="cobranca-nome">${alerta.nome}</div><div class="cobranca-valor">⚠️ 2 faltas consecutivas</div><div class="cobranca-vencimento">Última falta: ${fmtDate(alerta.ultimaFalta)}</div><div class="cobranca-vencimento" style="font-size:0.65rem;color:var(--green);">${alerta.ultimaMensagemData ? `📨 Último envio: ${alerta.ultimaMensagemData} ${alerta.ultimaMensagemHora || ''}` : 'Nunca enviado'}</div></div><div class="td-actions"><button class="btn btn-whatsapp btn-sm" onclick="window.enviarWhatsappFaltaDashboard('${alerta.id}')">📲 WhatsApp</button><button class="btn btn-green btn-sm" onclick="window.ocultarAlertaFalta('${alerta.id}')">✔ Dar baixa</button></div></div>`
-            ).join('');
-        }
-      }
+
+      // OCULTADO: Seção de faltas consecutivas removida do dashboard
+      // A seção foi ocultada via CSS com display:none !important
     };
 
     window.renderHoje = async function () {
@@ -4142,7 +4052,6 @@
 
       await refreshCache();
       await window.carregarFrequencia();
-      await verificarFaltasConsecutivas();
       window.renderDashboard();
 
       if (document.getElementById('page-relatorio-frequencia').classList.contains('active')) {
@@ -4460,7 +4369,6 @@
       }
       document.getElementById('presenca-auto-count').textContent =
         `${document.querySelectorAll('#presenca-automatica-content .frequencia-card').length} alunos`;
-      await verificarFaltasConsecutivas();
       window.renderDashboard();
 
       if (document.getElementById('page-relatorio-frequencia').classList.contains('active')) {
@@ -4469,112 +4377,11 @@
     };
 
     // ============================================================
-    // FUNÇÃO DE RECONCILIAÇÃO DE FALTAS (FALLBACK)
+    // FUNÇÃO DE RECONCILIAÇÃO DE FALTAS (FALLBACK) - DESATIVADA
     // ============================================================
     async function processarFaltasPeriodoInativo(ultimoLoginISO) {
-      if (!currentUser?.uid) {
-        console.warn('processarFaltasPeriodoInativo: usuário não autenticado');
-        return;
-      }
-
-      try {
-        console.log('🔄 Iniciando reconciliação de faltas por inatividade...');
-
-        let userUid = currentUser.uid;
-        if (currentUserRole === 'aluno' && alunoLogado && alunoLogado.adminUid) {
-          userUid = alunoLogado.adminUid;
-        }
-
-        const userRef = db.collection('usuarios').doc(userUid);
-
-        const alunosSnap = await userRef.collection('clientes').get();
-        const alunos = alunosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const frequenciasSnap = await userRef.collection('frequencias').get();
-        const frequenciasExistentes = new Set();
-        frequenciasSnap.docs.forEach(doc => {
-          const data = doc.data();
-          frequenciasExistentes.add(`${data.clienteId}_${data.data}`);
-        });
-
-        const agora = new Date();
-        const batch = db.batch();
-        let totalFaltasCriadas = 0;
-
-        const mapaDias = {
-          0: 'Domingo',
-          1: 'Segunda-feira',
-          2: 'Terça-feira',
-          3: 'Quarta-feira',
-          4: 'Quinta-feira',
-          5: 'Sexta-feira',
-          6: 'Sábado'
-        };
-
-        for (const aluno of alunos) {
-          if (!aluno.diasHorarios || !Array.isArray(aluno.diasHorarios) || aluno.diasHorarios.length ===
-            0) {
-            continue;
-          }
-
-          const dataCriacao = aluno.dataMatricula || aluno.dataCriacaoAcesso || new Date().toISOString()
-            .split('T')[0];
-          const dataInicio = new Date(dataCriacao + 'T00:00:00');
-
-          let dataAtualVerificacao = new Date(dataInicio);
-
-          while (dataAtualVerificacao <= agora) {
-            const diaSemanaAtual = mapaDias[dataAtualVerificacao.getDay()];
-            const dataISO = dataAtualVerificacao.toISOString().split('T')[0];
-
-            for (const aula of aluno.diasHorarios) {
-              if (diaSemanaAtual === aula.dia) {
-                const [horaAula, minutoAula] = aula.horario.split(':').map(Number);
-                const dataHoraAula = new Date(dataAtualVerificacao);
-                dataHoraAula.setHours(horaAula, minutoAula + 30, 0, 0);
-
-                if (dataHoraAula <= agora && !ehFeriado(dataISO)) {
-                  const chaveFrequencia = `${aluno.id}_${dataISO}`;
-                  if (!frequenciasExistentes.has(chaveFrequencia)) {
-                    const novaFreqRef = userRef.collection('frequencias').doc();
-                    batch.set(novaFreqRef, {
-                      clienteId: aluno.id,
-                      data: dataISO,
-                      status: 'falta',
-                      marcadoAutomaticamente: true,
-                      motivo: 'Reconciliação - período inativo',
-                      horarioAula: aula.horario,
-                      marcadoEm: new Date().toISOString(),
-                      criadoPor: 'system_reconciliacao',
-                      dataAula: dataISO,
-                      horarioAulaOriginal: aula.horario,
-                      diaSemana: aula.dia
-                    });
-                    frequenciasExistentes.add(chaveFrequencia);
-                    totalFaltasCriadas++;
-                  }
-                }
-              }
-            }
-
-            dataAtualVerificacao.setDate(dataAtualVerificacao.getDate() + 1);
-            dataAtualVerificacao.setHours(0, 0, 0, 0);
-          }
-        }
-
-        if (totalFaltasCriadas > 0) {
-          await batch.commit();
-          console.log(`✅ ${totalFaltasCriadas} falta(s) criada(s) na reconciliação`);
-          await refreshCache();
-          await verificarFaltasConsecutivas();
-          window.renderDashboard();
-        } else {
-          console.log('✅ Nenhuma falta a reconciliar');
-        }
-
-      } catch (error) {
-        console.error('❌ Erro ao processar faltas por inatividade:', error);
-      }
+      // Função desativada - não processa mais faltas consecutivas
+      return;
     }
 
     // ============================================================
@@ -5423,7 +5230,6 @@
             currentUserEmail = usuarioData.email;
             atualizarMenuAdmin();
             await refreshCache();
-            await processarFaltasPeriodoInativo(usuarioData.ultimoLogin || null);
             await db.collection('usuarios').doc(user.uid).update({
               lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(err => console.log('Erro ao atualizar último login:', err));
@@ -5497,7 +5303,6 @@
           currentUserEmail = usuarioData.email;
           atualizarMenuAdmin();
           await refreshCache();
-          await processarFaltasPeriodoInativo(usuarioData.ultimoLogin || null);
           await db.collection('usuarios').doc(user.uid).update({
             lastLogin: firebase.firestore.FieldValue.serverTimestamp()
           }).catch(err => console.log('Erro ao atualizar último login:', err));
@@ -5645,7 +5450,6 @@
       await criarDadosIniciais();
       loadHiddenItems();
       popularSelectHorarios();
-      await verificarFaltasConsecutivas();
       window.renderDashboard();
       window.renderHoje();
       window.renderClientes();
@@ -6098,8 +5902,6 @@
         if (document.getElementById('page-aluno-dashboard').classList.contains('active')) {
           window.carregarAlunoDashboard();
         }
-
-        await verificarFaltasConsecutivas();
 
       } catch (error) {
         console.error('Erro ao confirmar check-in:', error);
